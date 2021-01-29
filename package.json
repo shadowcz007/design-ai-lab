@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "colorthief": "^2.3.2",
         "monaco-editor": "^0.21.3"
     }
 }

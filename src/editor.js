@@ -1,30 +1,18 @@
 const path = require('path');
 
-class Editor{
-    constructor(container,code,executeJavaScript){
-        this.code=code||`function setup() {
-            // put setup code here
-            createCanvas(400, 400);
-          }
-          function draw() {
-            // put drawing code here
-            if (mouseIsPressed) {
-              fill(0);
-            } else {
-              fill(255);
-            }
-            ellipse(mouseX, mouseY, 80, 80);
-          }`;
+class Editor {
+    constructor(container, code, executeJavaScript) {
+        this.code = code || `//Hello AI world!`;
 
-        this.readOnly=true;
-        this.container=container;
-        this.executeJavaScript=executeJavaScript;
-        this.editor=null;
+        this.readOnly = true;
+        this.container = container;
+        this.executeJavaScript = executeJavaScript;
+        this.editor = null;
         this.init();
 
     }
 
-    init(){
+    init() {
 
         const amdLoader = require('monaco-editor/min/vs/loader.js');
         const amdRequire = amdLoader.require;
@@ -45,7 +33,7 @@ class Editor{
         // workaround monaco-css not understanding the environment
         self.module = undefined;
 
-        amdRequire(['vs/editor/editor.main'], ()=> {
+        amdRequire(['vs/editor/editor.main'], () => {
             // console.log("----")
             this.editor = monaco.editor.create(this.container, {
                 value: this.code,
@@ -67,35 +55,35 @@ class Editor{
             // this.editor.onDidFocusEditorText(()=>{
             //     this.execute()
             // });
-            this.editor.onDidChangeModelContent(()=>{
+            this.editor.onDidChangeModelContent(() => {
                 this.execute()
             });
             // this.editor.getAction(['editor.action.formatDocument']).run();
         });
     }
-    getCode(){
+    getCode() {
         return this.editor.getValue();
     }
-    setCode(code){
+    setCode(code) {
         // console.log(code)
-        code=code||"";
+        code = code || "";
         this.editor.setValue(code);
         // setTimeout(()=>{
         //     this.editor.getAction(['editor.action.formatDocument']).run();
         // },500)
     }
-    execute(){
+    execute() {
         // console.log(this)
-        const code=this.editor.getValue();
+        const code = this.editor.getValue();
         this.executeJavaScript(code);
     }
-    toggle(){
-        this.readOnly=!this.readOnly;
-        this.editor.updateOptions({readOnly:this.readOnly});
+    toggle() {
+        this.readOnly = !this.readOnly;
+        this.editor.updateOptions({ readOnly: this.readOnly });
         this.editor.getAction(['editor.action.formatDocument']).run();
         return this.readOnly
     }
 }
 
 
-module.exports=Editor;
+module.exports = Editor;

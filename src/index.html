@@ -1,218 +1,282 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>Hello AI World!</title>
-   <style>
-     body{
-      background-color: #eee;
-      margin: 0;
-      padding:0;
-      user-select: none;
-     }
-     header{
-      padding: 24px 24px 8px 24px;
-      min-width: 500px;
-      border-bottom: 1px dashed gray;
-     }
-     header p{
-      margin: 0 12px;
-      font-size: 12px;
-      color: dimgrey;
-     }
-     header h1{
-      color: rgb(50, 52, 62);
-      font-size: 32px;
-      font-weight: 500;
-      margin: 0;
-      padding: 0 12px 0 12px;
-      font-family: monospace;
-     }
-     
-     header span{
-      font-size: 10px;
-      color: #9db3c5;
-      background-color: rgb(253 253 220);
-      padding: 0px 6px;
-      margin: 0 4px;
-      font-weight: 500;
-     }
-     main{
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-start;
-       /* position: absolute; */
-       max-width: 960px;
-       width: 100%;
-       left:24px;
-       min-width: 400px;
-       margin-top: 32px;
-     }
-     footer{
-      position: fixed;
-      background-color: #333333;
-      margin: 0;
-      padding: 0;
-      color: white;
-      bottom: 0;
-      width: 100%; 
-      z-index: 9999; 
-     }
-     footer p{
-      color: white;
-      font-size: 12px;
-      padding: 4px 12px;
-      text-align: right;
-      font-weight: 300;
-     }
-     p{
-       padding: 0;
-       margin: 0;
-     }
-     img{
-       margin: 24px;
-     }
-     button{
-        color: black;
-        padding: 4px 16px;
-        margin: 4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-        font-weight: 300;
-        cursor: pointer;
-        user-select: none;
-        /* border-radius: 14px; */
-        outline: none;
-        border: 1px solid black;
-     }
-     button:hover{
-        background-color: black;
-        color: white;
-     }
-
-     .btns{
-      margin: 8px 0 0 12px;
-      display: flex;
-     }
-     .btn-small{
-      margin: 2px;
-      font-size: 12px;
-      border: none;
-      background-color: #d4d4d4;
-      border-radius: 0;
-      box-shadow: inset 1px 1px 1px grey;
-      font-size: 10px;
-      font-weight: 500;
-      padding: 2px 8px;
-     }
-
-     .pannel{
-      width: calc(50% - 8px);
-      margin:4px;
-      background-color:#d8d8d8
-      /* height:50vh; */
-     }
-
-     #editor-pannel{
-      background: #1b1b1b;
-     }
-     #editor-pannel button{
-      margin-left: calc(100% - 80px);
-     }
-     #readme{
-      min-height: 88px;
-     }
-     .readme-show{
-      padding: 12px;
-      min-height: auto!important;
-      font-size: 18px;
-      font-weight: 500;
-      background-color:lemonchiffon;
-     }
-     .readme-show > div{
-      padding: 2px;
-      font-size: 14px;
-      font-weight: 300;
-     }
-     .readme-show > p{
-      padding: 2px;
-      font-size: 14px;
-      font-weight: 300;
-     }
-     #course{
-      min-height:500px;
-      background:white;
-      padding: 12px;
-     }
-     .course-show{
-      font-size: 14px;
-      font-weight: 400;
-      color: #1b1b1b;
-     }
-     .course-show > div{
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 300;
-      color:#333333
-     }
-     .course-show > p{
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 300;
-      color:#333333
-     }
-     
-     #editor{
-      /* width: calc(50% - 4px);*/
-      height: 55vh; 
-      /* position: absolute; */
-      /* left: calc(40% + 28px);
-      border: 0.5px dotted #d4d4d4; */
-     }
-     /* .ui-focus{
+    <style>
+        body {
+            background-color: #eee;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        
+        header {
+            padding: 24px 24px 8px 24px;
+            min-width: 500px;
+            border-bottom: 1px dashed gray;
+        }
+        
+        header p {
+            margin: 0 12px;
+            font-size: 12px;
+            color: dimgrey;
+        }
+        
+        header h1 {
+            color: rgb(50, 52, 62);
+            font-size: 32px;
+            font-weight: 500;
+            margin: 0;
+            padding: 0 12px 0 12px;
+            font-family: monospace;
+        }
+        
+        header span {
+            font-size: 10px;
+            color: #9db3c5;
+            background-color: rgb(253 253 220);
+            padding: 0px 6px;
+            margin: 0 4px;
+            font-weight: 500;
+        }
+        
+        header .btns {
+            justify-content: space-between;
+        }
+        
+        header .btns div {
+            display: flex;
+        }
+        
+        main {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            /* position: absolute;
+            max-width: 1280px; */
+            width: 100%;
+            min-width: 400px;
+            margin-top: 32px;
+            padding-bottom: 44px;
+        }
+        
+        footer {
+            position: fixed;
+            background-color: #333333;
+            margin: 0;
+            padding: 0;
+            color: white;
+            bottom: 0;
+            width: 100%;
+            z-index: 9999;
+        }
+        
+        footer p {
+            color: white;
+            font-size: 12px;
+            padding: 4px 12px;
+            text-align: right;
+            font-weight: 300;
+        }
+        
+        p {
+            padding: 0;
+            margin: 0;
+        }
+        
+        img {
+            margin: 24px;
+        }
+        
+        button {
+            color: rgb(109, 86, 214);
+            padding: 4px 16px;
+            margin: 4px;
+            display: flex;
+            box-shadow: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 300;
+            cursor: pointer;
+            background: none;
+            border: none;
+            user-select: none;
+            /* border-radius: 14px; */
+            outline: none;
+        }
+        
+        button:hover {
+            background-color: rgb(109, 86, 214);
+            color: white;
+        }
+        
+        .btns {
+            margin: 8px 0 0 12px;
+            display: flex;
+            justify-content: flex-end;
+            flex-direction: row;
+        }
+        
+        .btn-small {
+            margin: 2px;
+            font-size: 12px;
+            border: none;
+            border-radius: 0;
+            /* box-shadow: inset 1px 1px 1px grey; */
+            font-size: 16px;
+            color: mediumpurple;
+            font-weight: 500;
+            padding: 2px 8px;
+        }
+        
+        .pannel {
+            width: calc(45% - 8px);
+            height: 70vh;
+            margin: 4px;
+            background-color: #d8d8d8;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 4px;
+            box-shadow: 0 0 4px #d2d2d2;
+        }
+        
+        #editor-pannel {
+            background: #1b1b1b;
+        }
+        
+        #editor-pannel button {}
+        
+        #readme {
+            min-height: 88px;
+            padding: 14px;
+        }
+        
+        .readme-show {
+            padding: 12px;
+            min-height: auto!important;
+            font-size: 18px;
+            font-weight: 500;
+            background-color: lemonchiffon;
+        }
+        
+        .readme-show>div {
+            padding: 2px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        .readme-show>p {
+            padding: 2px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        #edit-file {
+            box-shadow: none;
+            background: none;
+            font-size: 14px;
+        }
+        
+        #edit-file:hover {
+            background: rgb(128, 116, 240)
+        }
+        
+        #course {
+            min-height: 500px;
+            background: white;
+            padding: 12px;
+        }
+        
+        #course-pannel .btns {
+            margin: 0;
+            background-color: lemonchiffon;
+        }
+        
+        .course-show {
+            font-size: 14px;
+            font-weight: 400;
+            color: #1b1b1b;
+        }
+        
+        .course-show>div {
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 300;
+            color: #333333
+        }
+        
+        .course-show>p {
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 300;
+            color: #333333
+        }
+        
+        #editor {
+            /* width: calc(50% - 4px);*/
+            height: 55vh;
+        }
+        
+        #log {
+            height: 15vh;
+            background: white
+        }
+        /* .ui-focus{
       border-color: green !important;
      }
      .ui-error{
       border-color: red !important;
      } */
-   </style>
-   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
-   <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
-   
-  </head>
-  <body>
+    </style>
+    <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
+
+</head>
+
+<body>
     <header>
-      <h1>HELLO AI WORLD!</h1>
-      <p>关键词:<span>javascript</span>
-         <span>tensorflow.js</span><span>p5.js</span><span>Code Examples</span></p>
-      <div class="btns">
-        <button class="btn-small" id="open-file">打开</button>
-        <button class="btn-small" id="edit-file" >编辑</button>
-        <button class="btn-small" id="new-file">新建</button>
-        <button class="btn-small" id="save-file" style="display: none;">保存</button>
-      </div>
+        <h1>HELLO AI WORLD!</h1>
+        <p>关键词:<span>javascript</span>
+            <span>tensorflow.js</span><span>p5.js</span><span>Code Examples</span></p>
+        <div class="btns">
+            <div>
+                <button class="btn-small" id="open-file"><i class="fas fa-folder-open"></i></button>
+                <button class="btn-small" id="new-file"><i class="fas fa-sticky-note"></i></button>
+                <button class="btn-small" id="save-file" style="display: none;"><i class="fas fa-save"></i></button>
+            </div>
+        </div>
     </header>
     <main>
-      <div id="course-pannel" class="pannel">
-        <div id="readme"></div>
-        <div id="course"></div>
-      </div>
-      
-      <div id="editor-pannel" class="pannel">
-        <button id="practice-btn"><i class="fas fa-play-circle"></i></button>
-        <div id="editor"></div>
-      </div>
-      
+        <div id="course-pannel" class="pannel">
+            <div class="btns">
+                <button class="btn-small" id="edit-file"><i class="fas fa-toggle-on"></i></button>
+            </div>
+            <div id="readme">智能设计</div>
+            <div id="course">
+                <p>- 工具箱</p>
+            </div>
+        </div>
+
+        <div id="editor-pannel" class="pannel">
+            <div class="btns">
+                <button id="practice-btn"><i class="fas fa-sync"></i></button>
+            </div>
+            <div id="editor"></div>
+            <div id="log"></div>
+        </div>
+
     </main>
     <footer>
-      <p>by shadow @ Mixlab 2021</p>
+        <p>by shadow @ Mixlab 2021</p>
     </footer>
     <!-- <main>
       <input type="text" id="url">
       <button id="run">开始</button>
     </main> -->
     <script src="./renderer.js"></script>
-  </body>
+</body>
+
 </html>
