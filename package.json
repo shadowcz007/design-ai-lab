@@ -1,0 +1,26 @@
+{
+    "name": "design-ai-lab",
+    "version": "0.0.1",
+    "description": "智能设计实验工具 Artificial Intelligence for Graph Design",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "repository": "https://github.com/shadowcz007/design-ai-lab.git",
+    "keywords": [
+        "AI",
+        "design",
+        "graph design",
+        "lab",
+        "tool"
+    ],
+    "author": "shadow",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^11.2.1"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.2",
+        "monaco-editor": "^0.21.3"
+    }
+}
