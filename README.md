@@ -7,7 +7,7 @@
 - 提供示例代码
 - 桌面软件，安装即用
 
-![DEMO](https://github.com/shadowcz007/design-ai-lab/raw/master/examples/demo.png)
+![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/demo.png)
 
 **Clone and run for a quick way to see Electron in action.**
 
