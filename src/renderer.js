@@ -1,107 +1,15 @@
 // 渲染进程
 const { ipcRenderer, remote } = require("electron");
+const md5 = require('md5');
 const fs = require("fs");
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
-
-
-//esprima 把源码转化为抽象语法树
-const esprima = require('esprima');
-//estraverse 遍历并更新抽象语法树
-const estraverse = require('estraverse');
-//抽象语法树还原成源码
-const escodegen = require('escodegen');
-
-let jsCode = `
-function setup() {
-    createCanvas(window.innerWidth, 400);
-   
-}
-
-function draw() {
-    background("#232dff");
-    
-    ellipse(150, 155, 40, 80);
-}`;
-
-let jsSuccessCode = `
-try{
-    CODE_HERE();
-    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-} catch (error) {
-    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-};
-`;
-
-
-let targetFunNames = ["setup", "draw"];
-
-let sAST = esprima.parse(jsSuccessCode);
-let tryAST = null;
-let codeHereIndex = null;
-for (let index = 0; index < sAST.body.length; index++) {
-
-    if (sAST.body[index].type === "TryStatement") {
-        // console.log(sAST.body[index])
-        for (let i = 0; i < sAST.body[index].block.body.length; i++) {
-            // console.log(sAST.body[index].block.body[i].expression.callee.name)
-            if (sAST.body[index].block.body[i].expression.callee.name === "CODE_HERE") {
-                sAST.body[index].block.body[i] = null;
-                codeHereIndex = i;
-                //替换此代码
-            }
-        }
-        tryAST = sAST.body[index];
-    };
-}
-
-
-// tryAST.block.body = [...tryAST.block.body.slice(0, codeHereIndex),
-//     1,
-//     ...tryAST.block.body.slice(codeHereIndex + 1, tryAST.block.body.length)
-// ];
-// console.log(JSON.stringify([...tryAST.block.body.slice(0, codeHereIndex),
-//     1,
-//     ...tryAST.block.body.slice(codeHereIndex + 1, tryAST.block.body.length)
-// ], null, 2));
-
-let AST = esprima.parse(jsCode);
-
-estraverse.traverse(AST, {
-    enter(node) {
-
-        if (node.type === "FunctionDeclaration" && (targetFunNames.includes(node.id.name))) {
-            console.log(node.body.body)
-
-            //改写
-            let nTryAST = JSON.parse(JSON.stringify(tryAST));
-
-            nTryAST.block.body = [...nTryAST.block.body.slice(0, codeHereIndex),
-                ...node.body.body,
-                ...nTryAST.block.body.slice(codeHereIndex + 1, nTryAST.block.body.length)
-            ];
-            // console.log(JSON.stringify(nTryAST.block.body, null, 2))
-            node.body = nTryAST;
-
-        }
-        // if (node.type === 'Identifier') {
-        //     node.name += '_enter'
-        // }
-    },
-    leave(node) {
-        // console.log('leave', node.type)
-        // if (node.type === 'Identifier') {
-        //     node.name += '_leave'
-        // }
-    }
-});
-
-let jsCodeNew = escodegen.generate(AST);
-console.log(jsCodeNew);
-
+const Rewrite = require("./rewrite");
 
 (() => {
-    //
+    //改写代码
+    //TODO 错误捕捉
+    const rewrite = new Rewrite(["setup", "draw"]);
 
     //编辑器
     let previewWindow = null,
@@ -114,18 +22,20 @@ console.log(jsCodeNew);
             previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
             //const code=this.editor.getValue();
 
-            //TODO 错误捕捉
-            // function draw() {
-            //     try{
-            //       background("#232dff");
-            //       ellipse(150, 155, 40, 80);
-            //       ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-            //     } catch (error) {
-            //         console.log(error);
-            //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-            //     };
+            try {
+                new Function(code.trim())();
+            } catch (error) {
+                //console.log(error)
+                executeJavaScriptResult(error);
+            }
 
-            //   }
+            // console.log(code)
+            try {
+                code = rewrite.create(code.trim());
+            } catch (error) {
+                //console.log(error)
+                executeJavaScriptResult(error);
+            }
 
             previewWindow.webContents.executeJavaScript(`
               
@@ -139,15 +49,14 @@ console.log(jsCodeNew);
                     console.log(error);
                     ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
                 };
-                
-                        
+                     
                 `, false)
                 .then((result) => {
-                    console.log("成功", result)
-                        // editorElement.classList.remove("ui-error");
-                        // editorElement.classList.add("ui-success");
+                    //console.log("成功", result)
+                    // editorElement.classList.remove("ui-error");
+                    // editorElement.classList.add("ui-success");
                 }).catch(err => {
-                    console.log(err)
+                    executeJavaScriptResult(err)
                         // console.log("失败")
                         // editorElement.classList.add("ui-error");
                         // editorElement.classList.remove("ui-success");
@@ -266,10 +175,11 @@ console.log(jsCodeNew);
     // console.log(saveBtn)
     practiceBtn.addEventListener("click", e => {
         let t = editor.toggle();
-        editor.execute();
-        localStorage.setItem("code", editor.getCode());
+
         if (t === true) {
             practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
+            editor.execute();
+            localStorage.setItem("code", editor.getCode());
         } else {
             practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
             previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
@@ -278,17 +188,59 @@ console.log(jsCodeNew);
                 previewWindow.show();
                 previewWindow.webContents.reload();
                 mainWindow.focus();
+                previewWindow.webContents.once('dom-ready', () => {
+                    editor.execute();
+                    localStorage.setItem("code", editor.getCode());
+                })
             };
-        }
+        };
+
     })
 
 })();
 
 
 ipcRenderer.on("executeJavaScript-result", (event, arg) => {
-    console.log(arg)
-    document.querySelector("#log").innerHTML = arg;
-})
+    // console.log(arg)
+    executeJavaScriptResult(arg);
+});
+
+function executeJavaScriptResult(text) {
+    console.log('executeJavaScriptResult', text)
+    if (typeof text === 'object') {
+        text = text.description;
+    };
+
+    if (text !== 'success') {
+        createLog(text);
+    } else {
+        clearLog();
+    };
+}
+
+function createLog(text) {
+    let className = "log_" + md5(text);
+    let findLog = document.querySelector("#log").querySelector("." + className);
+    if (findLog) {
+        if (findLog.getAttribute("data-count") != "99+" && parseInt(findLog.getAttribute("data-count")) + 1 >= 99) {
+            findLog.setAttribute("data-count", "99+");
+        } else if (findLog.getAttribute("data-count") != "99+") {
+            findLog.setAttribute("data-count", parseInt(findLog.getAttribute("data-count")) + 1);
+        }
+
+    } else {
+        let div = document.createElement("div");
+        div.innerText = text;
+        div.className = className;
+        div.setAttribute("data-count", 1);
+        div.setAttribute("data-time", (new Date()).getTime());
+        document.querySelector("#log").appendChild(div);
+    }
+}
+
+function clearLog() {
+    document.querySelector("#log").innerHTML = "";
+}
 
 
 // document.getElementById('run').addEventListener("click",()=>{

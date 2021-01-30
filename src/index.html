@@ -221,8 +221,34 @@
         }
         
         #log {
+            overflow: scroll;
             height: 15vh;
             background: white
+        }
+        
+        #log div {
+            display: flex;
+            font-size: 10px;
+            padding: 2px 12px;
+            margin: 2px 0;
+        }
+        
+        #log>div::before {
+            content: attr(data-count);
+            font-size: 8px;
+            background: #75beff;
+            width: 12px;
+            height: 12px;
+            margin: 0 6px;
+            display: block;
+            text-align: center;
+            line-height: 14px;
+            border-radius: 100%;
+        }
+        
+        #log>div::after {
+            content: attr(data-time);
+            font-size: 8px;
         }
         /* .ui-focus{
       border-color: green !important;

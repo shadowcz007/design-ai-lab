@@ -59,6 +59,40 @@ class Editor {
                 this.execute()
             });
             // this.editor.getAction(['editor.action.formatDocument']).run();
+
+            monaco.languages.registerCompletionItemProvider('javascript', {
+                provideCompletionItems: () => {
+                    return { suggestions: createSuggestions() };
+                }
+            });
+
+
+            function createSuggestions() {
+                let ts = [{
+                    label: 'createCanvas(width:number,height:number)',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    insertText: 'createCanvas(${1:width},${2:height});',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    detail: '创建画布'
+                }];
+
+                return Array.from(ts, t => {
+                    const {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label
+                    } = t;
+                    return {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label: "🚀 " + label
+                    }
+                })
+            };
         });
     }
     getCode() {

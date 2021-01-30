@@ -25,6 +25,7 @@
         "escodegen": "^2.0.0",
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
+        "md5": "^2.3.0",
         "monaco-editor": "^0.21.3"
     }
 }
