@@ -4,6 +4,102 @@ const fs = require("fs");
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 
+
+//esprima 把源码转化为抽象语法树
+const esprima = require('esprima');
+//estraverse 遍历并更新抽象语法树
+const estraverse = require('estraverse');
+//抽象语法树还原成源码
+const escodegen = require('escodegen');
+
+let jsCode = `
+function setup() {
+    createCanvas(window.innerWidth, 400);
+   
+}
+
+function draw() {
+    background("#232dff");
+    
+    ellipse(150, 155, 40, 80);
+}`;
+
+let jsSuccessCode = `
+try{
+    CODE_HERE();
+    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
+} catch (error) {
+    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
+};
+`;
+
+
+let targetFunNames = ["setup", "draw"];
+
+let sAST = esprima.parse(jsSuccessCode);
+let tryAST = null;
+let codeHereIndex = null;
+for (let index = 0; index < sAST.body.length; index++) {
+
+    if (sAST.body[index].type === "TryStatement") {
+        // console.log(sAST.body[index])
+        for (let i = 0; i < sAST.body[index].block.body.length; i++) {
+            // console.log(sAST.body[index].block.body[i].expression.callee.name)
+            if (sAST.body[index].block.body[i].expression.callee.name === "CODE_HERE") {
+                sAST.body[index].block.body[i] = null;
+                codeHereIndex = i;
+                //替换此代码
+            }
+        }
+        tryAST = sAST.body[index];
+    };
+}
+
+
+// tryAST.block.body = [...tryAST.block.body.slice(0, codeHereIndex),
+//     1,
+//     ...tryAST.block.body.slice(codeHereIndex + 1, tryAST.block.body.length)
+// ];
+// console.log(JSON.stringify([...tryAST.block.body.slice(0, codeHereIndex),
+//     1,
+//     ...tryAST.block.body.slice(codeHereIndex + 1, tryAST.block.body.length)
+// ], null, 2));
+
+let AST = esprima.parse(jsCode);
+
+estraverse.traverse(AST, {
+    enter(node) {
+
+        if (node.type === "FunctionDeclaration" && (targetFunNames.includes(node.id.name))) {
+            console.log(node.body.body)
+
+            //改写
+            let nTryAST = JSON.parse(JSON.stringify(tryAST));
+
+            nTryAST.block.body = [...nTryAST.block.body.slice(0, codeHereIndex),
+                ...node.body.body,
+                ...nTryAST.block.body.slice(codeHereIndex + 1, nTryAST.block.body.length)
+            ];
+            // console.log(JSON.stringify(nTryAST.block.body, null, 2))
+            node.body = nTryAST;
+
+        }
+        // if (node.type === 'Identifier') {
+        //     node.name += '_enter'
+        // }
+    },
+    leave(node) {
+        // console.log('leave', node.type)
+        // if (node.type === 'Identifier') {
+        //     node.name += '_leave'
+        // }
+    }
+});
+
+let jsCodeNew = escodegen.generate(AST);
+console.log(jsCodeNew);
+
+
 (() => {
     //
 
@@ -170,10 +266,10 @@ const Editor = require("./editor");
     // console.log(saveBtn)
     practiceBtn.addEventListener("click", e => {
         let t = editor.toggle();
-
+        editor.execute();
+        localStorage.setItem("code", editor.getCode());
         if (t === true) {
             practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
-            localStorage.setItem("code", editor.getCode());
         } else {
             practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
             previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
@@ -182,9 +278,7 @@ const Editor = require("./editor");
                 previewWindow.show();
                 previewWindow.webContents.reload();
                 mainWindow.focus();
-            }
-            editor.execute();
-            // saveFile.style.display="block";
+            };
         }
     })
 
