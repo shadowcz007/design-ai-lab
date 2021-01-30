@@ -8,6 +8,15 @@
 - 集成p5.js、ml4.js、tensorflow.js
 - 提供示例代码
 - 桌面软件，安装即用
+- 可发布为本地的桌面应用
+
+# examples
+
+- Hello World
+
+- 海报合成工具
+
+![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/01.jpg)
 
 
 **Clone and run for a quick way to see Electron in action.**
@@ -42,3 +51,6 @@ npm start
 ```javascript
 app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 ```
+
+
+## 欢迎访问微信公众号 Mixlab无界社区

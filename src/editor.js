@@ -56,7 +56,8 @@ class Editor {
             //     this.execute()
             // });
             this.editor.onDidChangeModelContent(() => {
-                this.execute()
+                this.execute();
+                // console.log("----")
             });
             // this.editor.getAction(['editor.action.formatDocument']).run();
 
@@ -68,15 +69,67 @@ class Editor {
 
 
             function createSuggestions() {
-                let ts = [{
-                    label: 'createCanvas(width:number,height:number)',
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    insertText: 'createCanvas(${1:width},${2:height});',
+                let vs = [{
+                    label: 'windowWidth',
+                    kind: 0,
+                    insertText: 'windowWidth',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '创建画布'
+                    detail: '窗口内部宽度'
                 }];
+                let ss = [{
+                    label: 'JSON.stringify(object,null,2)',
+                    kind: 1,
+                    insertText: 'JSON.stringify(${1:object},null,2)',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    detail: '-'
+                }];
+                let ts = [{
+                        label: 'createCanvas(width:number,height:number)',
+                        kind: 1,
+                        insertText: 'createCanvas(${1:windowWidth},${2:windowHeight});',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '创建画布'
+                    },
+                    {
+                        label: 'createFileInput(handleFile:function)',
+                        kind: 1,
+                        insertText: 'input = createFileInput(${1:handleFile});' + `\n
+input.position(20, 100);
+function handleFile(file) {
+    if (file.type === 'image') {
+        img = createImg(file.data, '');
+        img.hide();
+    } else {
+        img = null;
+    }
+}`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '选择文件'
+                    },
+                    {
+                        label: 'image(img:p5.Image,x:number,y:number,width:number,height:number)',
+                        kind: 1,
+                        insertText: 'image(${1:img},${2:x},${3:y},${4:width},${5:height});',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '图片'
+                    },
+                    {
+                        label: 'loadFont(url:string)',
+                        kind: 1,
+                        insertText: 'loadFont(${1:url});',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '字体'
+                    },
+                    {
+                        label: 'text(text:string,x:number,y:number)',
+                        kind: 1,
+                        insertText: 'text(${1:text},${2:x},${3:y});',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '字体'
+                    },
+                ];
 
-                return Array.from(ts, t => {
+                return [...Array.from(ts, t => {
                     const {
                         kind,
                         insertText,
@@ -91,7 +144,37 @@ class Editor {
                         detail,
                         label: "🚀 " + label
                     }
-                })
+                }), ...Array.from(vs, t => {
+                    const {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label
+                    } = t;
+                    return {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label: "💡 " + label
+                    }
+                }), ...Array.from(ss, t => {
+                    const {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label
+                    } = t;
+                    return {
+                        kind,
+                        insertText,
+                        insertTextRules,
+                        detail,
+                        label: "💡 " + label
+                    }
+                })]
             };
         });
     }
@@ -110,11 +193,14 @@ class Editor {
         // console.log(this)
         const code = this.editor.getValue();
         this.executeJavaScript(code);
+
+    }
+    format() {
+        this.editor.getAction(['editor.action.formatDocument']).run();
     }
     toggle() {
         this.readOnly = !this.readOnly;
         this.editor.updateOptions({ readOnly: this.readOnly });
-        this.editor.getAction(['editor.action.formatDocument']).run();
         return this.readOnly
     }
 }

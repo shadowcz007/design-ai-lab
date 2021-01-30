@@ -13,8 +13,8 @@ class Knowledge {
 
     }
     init() {
-        this.courseHtml ? this.course.innerHTML = this.courseHtml : null;
-        this.readmeHtml ? this.readme.innerHTML = this.readmeHtml : null;
+        this.courseHtml != null ? this.course.innerHTML = this.courseHtml : null;
+        this.readmeHtml != null ? this.readme.innerHTML = this.readmeHtml : null;
     }
     get() {
         this.courseHtml = this.course.innerHTML;

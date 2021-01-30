@@ -82,7 +82,8 @@ const Rewrite = require("./rewrite");
     const newFile = document.querySelector("#new-file"),
         editFile = document.querySelector("#edit-file"),
         openFile = document.querySelector("#open-file"),
-        saveFile = document.querySelector("#save-file");
+        saveFile = document.querySelector("#save-file"),
+        publicFile = document.querySelector("#public-file");
 
     openFile.addEventListener("click", e => {
         e.preventDefault();
@@ -105,13 +106,16 @@ const Rewrite = require("./rewrite");
             // openFile.style.display="none";
             newFile.style.display = "block";
             knowledge.toggle(true);
+
+            localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+            localStorage.setItem("code", editor.getCode());
         };
     });
     //编辑/预览 切换
     editFile.addEventListener("click", e => {
         e.preventDefault();
         let isReadOnly = knowledge.toggle();
-        console.log(isReadOnly)
+        // console.log(isReadOnly)
         if (!isReadOnly) {
             //编辑状态
             editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
@@ -136,6 +140,7 @@ const Rewrite = require("./rewrite");
             readme: "",
             course: ""
         })
+        console.log(knowledge)
         editor.setCode('//Hello AI world!');
         localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         localStorage.setItem("code", editor.getCode());
@@ -144,6 +149,8 @@ const Rewrite = require("./rewrite");
         e.preventDefault();
 
         localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+        localStorage.setItem("code", editor.getCode());
+
         let filePath = remote.dialog.showSaveDialogSync({
             title: "另存为……",
             defaultPath: `AICODE_${(new Date()).getDay()}.json`
@@ -160,6 +167,25 @@ const Rewrite = require("./rewrite");
         };
         // console.log(filePath)
     });
+    //发布
+    publicFile.addEventListener("click", e => {
+        e.preventDefault();
+        editor.toggle(false);
+        openPractice();
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        mainWindow.hide();
+        const storage = require('electron-json-storage');
+        storage.set('app', {
+            public: 1,
+            executeJavaScript: `
+                                if (p5.instance) { p5.instance.remove() };
+                                document.querySelector("#p5").innerHTML = "";
+                                ${editor.getCode().trim()};
+                                new p5(null, 'p5');`
+        }, function(error) {
+            if (error) throw error;
+        });
+    });
 
 
     document.querySelector("#course").addEventListener("input", e => {
@@ -174,28 +200,35 @@ const Rewrite = require("./rewrite");
     const practiceBtn = document.querySelector("#practice-btn");
     // console.log(saveBtn)
     practiceBtn.addEventListener("click", e => {
+
         let t = editor.toggle();
 
         if (t === true) {
             practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
             editor.execute();
             localStorage.setItem("code", editor.getCode());
+            editor.format();
         } else {
-            practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
-            previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-            mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
-            if (previewWindow && mainWindow) {
-                previewWindow.show();
-                previewWindow.webContents.reload();
-                mainWindow.focus();
-                previewWindow.webContents.once('dom-ready', () => {
-                    editor.execute();
-                    localStorage.setItem("code", editor.getCode());
-                })
-            };
+            openPractice();
         };
 
-    })
+    });
+
+    function openPractice() {
+        practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        if (previewWindow && mainWindow) {
+            previewWindow.show();
+            previewWindow.webContents.reload();
+            mainWindow.focus();
+            previewWindow.webContents.once('dom-ready', () => {
+                editor.execute();
+                localStorage.setItem("code", editor.getCode());
+                editor.format();
+            })
+        };
+    }
 
 })();
 
@@ -206,11 +239,11 @@ ipcRenderer.on("executeJavaScript-result", (event, arg) => {
 });
 
 function executeJavaScriptResult(text) {
-    console.log('executeJavaScriptResult', text)
-    if (typeof text === 'object') {
-        text = text.description;
+    //console.log('executeJavaScriptResult----1', typeof(text), text.toString())
+    if (typeof(text) === 'object') {
+        text = text.toString()
     };
-
+    console.log('executeJavaScriptResult----2', text)
     if (text !== 'success') {
         createLog(text);
     } else {

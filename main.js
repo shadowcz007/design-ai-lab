@@ -1,5 +1,10 @@
 const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('path');
+const storage = require('electron-json-storage');
+
+// const dataPath = storage.getDataPath();
+// console.log(dataPath);
+
 
 //全局变量
 global._WINS = {};
@@ -63,7 +68,10 @@ function createWindow(key, opts, workAreaSize) {
     win.loadFile(opts.html);
     // 打开调试工具
     // win.webContents.openDevTools();
-    if (opts.show === true) win.webContents.on("dom-ready", () => win.show());
+    if (opts.show === true) win.webContents.on("dom-ready", () => {
+        win.show();
+        opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
+    });
     win.on("closed", () => {
         for (const key in global._WINS) {
             global._WINS[key].destroy()
@@ -78,9 +86,21 @@ function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
     config.mainWindow.height = workAreaSize.height;
     config.mainWindow.width = workAreaSize.width - config.previewWindow.width - 20;
-    for (const key in config) {
-        if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
-    }
+
+    storage.get('app', function(error, data) {
+        if (error) throw error;
+        //是否发布，发布了，主窗口将隐藏
+        if (data && data.public === 1) {
+            config.mainWindow.show = false;
+            config.previewWindow.show = true;
+            config.previewWindow.closable = true;
+            config.previewWindow.executeJavaScript = data.executeJavaScript;
+        }
+        for (const key in config) {
+            if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
+        }
+    });
+
 }
 
 ipcMain.on('init-window', (event, arg) => {

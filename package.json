@@ -1,6 +1,6 @@
 {
     "name": "design-ai-lab",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "智能设计实验工具 Artificial Intelligence for Graph Design",
     "main": "main.js",
     "scripts": {
@@ -22,6 +22,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
         "colorthief": "^2.3.2",
+        "electron-json-storage": "^4.3.0",
         "escodegen": "^2.0.0",
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
