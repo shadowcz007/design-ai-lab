@@ -1,7 +1,6 @@
 const { app, BrowserWindow, screen, ipcMain, Tray, Menu, } = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
-
 const package = require("./package.json");
 // console.log(package);
 
@@ -186,7 +185,7 @@ function initMenu(modeMenu) {
                 _IS_MAC ? { role: 'close', label: '关闭' } : { role: 'quit', label: '关闭' }
             ]
         },
-        // { role: 'editMenu' }
+        { role: 'editMenu' },
         {
             label: '模式',
             submenu: modeMenu

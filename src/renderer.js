@@ -5,6 +5,8 @@ const fs = require("fs");
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Rewrite = require("./rewrite");
+const db = require('./db');
+
 
 (() => {
         //改写代码
@@ -107,12 +109,14 @@ const Rewrite = require("./rewrite");
         return new Promise((resolve,reject)=>{
          //截图
         //  console.log('截图');
+        previewWindow=previewWindow||(remote.getGlobal("_WINS")).previewWindow;
         (remote.getGlobal("_WINS")).previewWindow.webContents.capturePage().then(img=>{
             // console.log(img.toDataURL())
             resolve({   
                 poster:img.toDataURL(),
                 knowledge: knowledge.get(),
-                code: editor.getCode()
+                code: editor.getCode(),
+                size: previewWindow.getSize()
             })
         });
         });
@@ -149,6 +153,9 @@ const Rewrite = require("./rewrite");
 
             localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
             localStorage.setItem("code", editor.getCode());
+
+            //存至数据库
+            db.add(res);
         };
     });
     //编辑/预览 切换
