@@ -1,10 +1,14 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, } = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
 
-// const dataPath = storage.getDataPath();
-// console.log(dataPath);
+const package = require("./package.json");
+// console.log(package);
 
+// const dataPath = storage.getDataPath();
+// console.log(process);
+//平台
+const _IS_MAC = process.platform === 'darwin';
 
 //全局变量
 global._WINS = {};
@@ -12,6 +16,8 @@ global._WINS = {};
 const _INDEX_HTML = path.join(__dirname, 'src/index.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
+
+let appIcon;
 
 const config = {
     mainWindow: {
@@ -23,6 +29,7 @@ const config = {
         title: "实验",
         show: true,
         closable: true,
+        resizable: true,
         titleBarStyle: "default",
         html: _INDEX_HTML
     },
@@ -35,6 +42,7 @@ const config = {
         title: "预览",
         show: false,
         closable: false,
+        resizable: true,
         titleBarStyle: "hiddenInset",
         html: _PRE_HTML
     }
@@ -52,6 +60,7 @@ function createWindow(key, opts, workAreaSize) {
         title: opts.title || "-",
         show: false,
         closable: opts.closable,
+        resizable: opts.resizable,
         titleBarStyle: opts.titleBarStyle,
         webPreferences: {
             preload: _PRELOAD_JS,
@@ -67,8 +76,8 @@ function createWindow(key, opts, workAreaSize) {
     // 加载xxx.html
     win.loadFile(opts.html);
     // 打开调试工具
-    // win.webContents.openDevTools();
-    if (opts.show === true) win.webContents.on("dom-ready", () => {
+    win.webContents.openDevTools();
+    if (opts.show === true) win.webContents.once("dom-ready", () => {
         win.show();
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
     });
@@ -95,13 +104,114 @@ function initWindow() {
             config.previewWindow.show = true;
             config.previewWindow.closable = true;
             config.previewWindow.executeJavaScript = data.executeJavaScript;
+            config.previewWindow.width = data.size[0];
+            config.previewWindow.height = data.size[1];
+            config.previewWindow.resizable = false;
         }
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
         }
     });
 
+};
+
+
+function initAppIcon() {
+    appIcon = new Tray(path.join(__dirname, "assets/appIcon.png"));
+    const contextMenu = Menu.buildFromTemplate([{
+            label: '编辑',
+            type: 'normal',
+            checked: false,
+            click: async() => {
+                global._WINS.mainWindow.show();
+                global._WINS.previewWindow.setClosable(false);
+                global._WINS.previewWindow.setResizable(true);
+            }
+        }, {
+            label: '发布',
+            type: 'normal',
+            checked: false,
+            click: async() => {
+                global._WINS.mainWindow.webContents.send('public-file', null);
+
+            }
+        },
+        // { label: '调取', type: 'radio' }
+    ]);
+
+
+    // Make a change to the context menu
+    // contextMenu.items[0].checked = false;
+    // Call this again for Linux because we modified the context menu
+    appIcon.setContextMenu(contextMenu);
+    appIcon.setToolTip('design.ai');
+
+    return contextMenu.items
 }
+
+function initMenu(modeMenu) {
+
+    const template = [
+        // { role: 'appMenu' }
+        ...(_IS_MAC ? [{
+            label: package.name,
+            submenu: [
+                { role: 'about', label: `关于 v${package.version}` },
+                { type: 'separator' },
+                // { role: 'services' },
+                // { type: 'separator' },
+                // { role: 'hide' },
+                // { role: 'hideothers' },
+                // { role: 'unhide' },
+                // { type: 'separator' },
+                { role: 'quit', label: '关闭' }
+            ]
+        }] : []),
+        // { role: 'fileMenu' }
+        {
+            label: '文件',
+            submenu: [{
+                    label: '打开',
+                    click: async() => {
+                        const { shell } = require('electron')
+                        await shell.openExternal('https://electronjs.org')
+                    }
+                },
+                {
+                    label: '新建'
+                },
+                {
+                    label: '另存为'
+                },
+                _IS_MAC ? { role: 'close', label: '关闭' } : { role: 'quit', label: '关闭' }
+            ]
+        },
+        // { role: 'editMenu' }
+        {
+            label: '模式',
+            submenu: modeMenu
+        },
+        {
+            role: 'windowMenu'
+        },
+        {
+            role: 'help',
+            label: '帮助',
+            submenu: [{
+                label: 'Learn More',
+                click: async() => {
+                    const { shell } = require('electron')
+                    await shell.openExternal('https://electronjs.org')
+                }
+            }]
+        }
+    ]
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+
+};
+
 
 ipcMain.on('init-window', (event, arg) => {
     initWindow()
@@ -111,6 +221,9 @@ ipcMain.on('init-window', (event, arg) => {
 
 // 当应用完成初始化后
 app.whenReady().then(() => {
+    let modeMenu = initAppIcon();
+
+    initMenu(modeMenu);
 
     initWindow();
 

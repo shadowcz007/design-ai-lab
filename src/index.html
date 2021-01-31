@@ -52,7 +52,7 @@
         
         main {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: flex-start;
             /* position: absolute;
             max-width: 1280px; */
@@ -147,7 +147,34 @@
             background: #1b1b1b;
         }
         
+        .editor-pannel-large {
+            width: 70% !important
+        }
+        
         #editor-pannel button {}
+        
+        #edit-file {
+            box-shadow: none;
+            background: none;
+            font-size: 14px;
+        }
+        
+        #edit-file:hover {
+            background: rgb(128, 116, 240)
+        }
+        
+        #knowledge-pannel {
+            width: 80%
+        }
+        
+        .knowledge-pannel-small {
+            width: 30% !important
+        }
+        
+        #knowledge-pannel .btns {
+            margin: 0;
+            background-color: lemonchiffon;
+        }
         
         #readme {
             min-height: 88px;
@@ -174,25 +201,10 @@
             font-weight: 300;
         }
         
-        #edit-file {
-            box-shadow: none;
-            background: none;
-            font-size: 14px;
-        }
-        
-        #edit-file:hover {
-            background: rgb(128, 116, 240)
-        }
-        
         #course {
             min-height: 500px;
             background: white;
             padding: 12px;
-        }
-        
-        #course-pannel .btns {
-            margin: 0;
-            background-color: lemonchiffon;
         }
         
         .course-show {
@@ -245,12 +257,12 @@
             line-height: 14px;
             border-radius: 100%;
         }
-        
-        #log>div::after {
+        /* 
+         #log>div::after {
             content: attr(data-time);
             font-size: 8px;
         }
-        /* .ui-focus{
+       .ui-focus{
       border-color: green !important;
      }
      .ui-error{
@@ -279,7 +291,7 @@
         </div>
     </header>
     <main>
-        <div id="course-pannel" class="pannel">
+        <div id="knowledge-pannel" class="pannel">
             <div class="btns">
                 <button class="btn-small" id="edit-file"><i class="fas fa-toggle-on"></i></button>
             </div>

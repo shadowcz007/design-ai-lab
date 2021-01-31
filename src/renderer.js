@@ -7,54 +7,86 @@ const Editor = require("./editor");
 const Rewrite = require("./rewrite");
 
 (() => {
-    //改写代码
-    //TODO 错误捕捉
-    const rewrite = new Rewrite(["setup", "draw"]);
+        //改写代码
+        //TODO 错误捕捉
+        const rewrite = new Rewrite(["setup", "draw"]);
 
-    //编辑器
-    let previewWindow = null,
-        mainWindow = null;
+        //编辑器
+        let previewWindow = null,
+            mainWindow = null;
 
-    const editor = new Editor(
-        document.querySelector("#editor"),
-        localStorage.getItem("code"),
-        (code) => {
-            previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-            //const code=this.editor.getValue();
+        const editor = new Editor(
+                document.querySelector("#editor"),
+                localStorage.getItem("code"),
+                (code) => {
+                    previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+                    //const code=this.editor.getValue();
 
-            try {
-                new Function(code.trim())();
-            } catch (error) {
-                //console.log(error)
-                executeJavaScriptResult(error);
-            }
+                    //检查编辑器 写的代码 本身的错误
+                    let isError = false;
+                    try {
+                        new Function(code.trim())();
+                    } catch (error) {
+                        //console.log(error)
+                        executeJavaScriptResult(error);
+                        isError = true;
+                    };
 
-            // console.log(code)
-            try {
-                code = rewrite.create(code.trim());
-            } catch (error) {
-                //console.log(error)
-                executeJavaScriptResult(error);
-            }
+                    // // console.log(code)
+                    // try {
+                    //     code = rewrite.create(code.trim());
+                    // } catch (error) {
+                    //     //console.log(error)
+                    //     executeJavaScriptResult(error);
+                    // }
 
-            previewWindow.webContents.executeJavaScript(`
-              
+                    // previewWindow.webContents.executeJavaScript(`
+
+                    //     try {
+                    //         if (p5.instance) { p5.instance.remove() };
+                    //         document.querySelector("#p5").innerHTML = "";
+                    //         ${code.trim()};
+                    //         new p5(null, 'p5');
+                    //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
+                    //     } catch (error) {
+                    //         console.log(error);
+                    //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
+                    //     };
+
+                    //     `, false)
+                    //     .then((result) => {
+                    //         //console.log("成功", result)
+                    //         // editorElement.classList.remove("ui-error");
+                    //         // editorElement.classList.add("ui-success");
+                    //     }).catch(err => {
+                    //         executeJavaScriptResult(err)
+                    //             // console.log("失败")
+                    //             // editorElement.classList.add("ui-error");
+                    //             // editorElement.classList.remove("ui-success");
+                    //     });
+
+                    if (isError) return;
+
+                    let preRun = ['preload', 'setup', 'draw'];
+
+                    previewWindow.webContents.executeJavaScript(`
                 try {
                     if (p5.instance) { p5.instance.remove() };
                     document.querySelector("#p5").innerHTML = "";
                     ${code.trim()};
                     new p5(null, 'p5');
+                    ${Array.from(preRun,r=>`if(window.${r}) ${r}();`).join("\n")}
                     ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
                 } catch (error) {
                     console.log(error);
                     ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
                 };
-                     
                 `, false)
                 .then((result) => {
-                    //console.log("成功", result)
-                    // editorElement.classList.remove("ui-error");
-                    // editorElement.classList.add("ui-success");
+                    console.log("executeJavaScript", result)
+                        //executeJavaScriptResult('success')
+                        // editorElement.classList.remove("ui-error");
+                        // editorElement.classList.add("ui-success");
                 }).catch(err => {
                     executeJavaScriptResult(err)
                         // console.log("失败")
@@ -72,10 +104,18 @@ const Rewrite = require("./rewrite");
 
     //获得需要存储的数据
     function getSaveFileContent() {
-        return {
-            knowledge: knowledge.get(),
-            code: editor.getCode()
-        }
+        return new Promise((resolve,reject)=>{
+         //截图
+        //  console.log('截图');
+        (remote.getGlobal("_WINS")).previewWindow.webContents.capturePage().then(img=>{
+            // console.log(img.toDataURL())
+            resolve({   
+                poster:img.toDataURL(),
+                knowledge: knowledge.get(),
+                code: editor.getCode()
+            })
+        });
+        });
     }
 
     //GUI
@@ -119,6 +159,8 @@ const Rewrite = require("./rewrite");
         if (!isReadOnly) {
             //编辑状态
             editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
+            document.getElementById("knowledge-pannel").classList.remove("knowledge-pannel-small");
+            document.getElementById("editor-pannel").classList.remove("editor-pannel-large");
         } else {
             //预览状态
             editFile.innerHTML = `<i class="fas fa-toggle-on"></i>`;
@@ -137,13 +179,14 @@ const Rewrite = require("./rewrite");
         editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
         knowledge.toggle(false);
         knowledge.set({
-            readme: "",
-            course: ""
-        })
-        console.log(knowledge)
+                readme: "",
+                course: ""
+            })
+            // console.log(knowledge)
         editor.setCode('//Hello AI world!');
         localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         localStorage.setItem("code", editor.getCode());
+        openPractice();
     });
     saveFile.addEventListener("click", e => {
         e.preventDefault();
@@ -156,35 +199,25 @@ const Rewrite = require("./rewrite");
             defaultPath: `AICODE_${(new Date()).getDay()}.json`
         });
         if (filePath) {
-            fs.writeFile(filePath, JSON.stringify(getSaveFileContent(), null, 2), 'utf8', function(err) {
-                if (err) console.error(err);
-                console.log("保存成功");
-                knowledge.toggle(true);
-                saveFile.style.display = "none";
-                editFile.style.display = "block";
-                newFile.style.display = "block";
-            });
+            getSaveFileContent().then(res=>{
+
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                    if (err) console.error(err);
+                    console.log("保存成功");
+                    knowledge.toggle(true);
+                    saveFile.style.display = "none";
+                    editFile.style.display = "block";
+                    newFile.style.display = "block";
+                });
+            })
+            
         };
         // console.log(filePath)
     });
     //发布
     publicFile.addEventListener("click", e => {
         e.preventDefault();
-        editor.toggle(false);
-        openPractice();
-        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
-        mainWindow.hide();
-        const storage = require('electron-json-storage');
-        storage.set('app', {
-            public: 1,
-            executeJavaScript: `
-                                if (p5.instance) { p5.instance.remove() };
-                                document.querySelector("#p5").innerHTML = "";
-                                ${editor.getCode().trim()};
-                                new p5(null, 'p5');`
-        }, function(error) {
-            if (error) throw error;
-        });
+        pubilc();
     });
 
 
@@ -215,6 +248,8 @@ const Rewrite = require("./rewrite");
     });
 
     function openPractice() {
+        document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
+        document.getElementById("editor-pannel").classList.add("editor-pannel-large");
         practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
         previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
@@ -228,7 +263,35 @@ const Rewrite = require("./rewrite");
                 editor.format();
             })
         };
-    }
+    };
+
+    function pubilc() {
+        editor.toggle(false);
+        openPractice();
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        mainWindow.hide();
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        previewWindow.setResizable(false);
+        previewWindow.setClosable(true);
+        // console.log(previewWindow.getSize())
+        const storage = require('electron-json-storage');
+        storage.set('app', {
+            public: 1,
+            executeJavaScript: `
+                                if (p5.instance) { p5.instance.remove() };
+                                document.querySelector("#p5").innerHTML = "";
+                                ${editor.getCode().trim()};
+                                new p5(null, 'p5');`,
+            size: previewWindow.getSize()
+        }, function(error) {
+            if (error) throw error;
+        });
+    };
+
+    ipcRenderer.on("public-file", (event, arg) => {
+        // console.log(arg)
+        pubilc(arg);
+    });
 
 })();
 
@@ -249,6 +312,8 @@ function executeJavaScriptResult(text) {
     } else {
         clearLog();
     };
+
+    sortLogs();
 }
 
 function createLog(text) {
@@ -261,6 +326,8 @@ function createLog(text) {
             findLog.setAttribute("data-count", parseInt(findLog.getAttribute("data-count")) + 1);
         }
 
+        findLog.setAttribute("data-time", (new Date()).getTime());
+
     } else {
         let div = document.createElement("div");
         div.innerText = text;
@@ -268,7 +335,23 @@ function createLog(text) {
         div.setAttribute("data-count", 1);
         div.setAttribute("data-time", (new Date()).getTime());
         document.querySelector("#log").appendChild(div);
-    }
+    };
+
+    
+}
+
+function sortLogs(){
+    let findLogs = document.querySelector("#log").children;
+    findLogs =Array.from(findLogs,l=>{
+        return {
+            div:l,
+            time:parseInt(l.getAttribute("data-time"))
+        }
+    }).sort((b,a)=>a.time-b.time);
+    document.querySelector("#log").innerHTML="";
+    findLogs.forEach(g=>{
+        document.querySelector("#log").appendChild(g.div);
+    })
 }
 
 function clearLog() {
