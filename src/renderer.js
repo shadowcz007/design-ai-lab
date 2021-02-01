@@ -6,7 +6,10 @@ const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Rewrite = require("./rewrite");
 const db = require('./db');
+const ffmpeg=require('./ffmpeg');
+const Log=require('./log');
 
+ffmpeg.mergeVideos(remote.dialog);
 
 (() => {
         //改写代码
@@ -30,7 +33,7 @@ const db = require('./db');
                         new Function(code.trim())();
                     } catch (error) {
                         //console.log(error)
-                        executeJavaScriptResult(error);
+                        Log.add(error);
                         isError = true;
                     };
 
@@ -39,7 +42,7 @@ const db = require('./db');
                     //     code = rewrite.create(code.trim());
                     // } catch (error) {
                     //     //console.log(error)
-                    //     executeJavaScriptResult(error);
+                    //     Log.add(error);
                     // }
 
                     // previewWindow.webContents.executeJavaScript(`
@@ -61,7 +64,7 @@ const db = require('./db');
                     //         // editorElement.classList.remove("ui-error");
                     //         // editorElement.classList.add("ui-success");
                     //     }).catch(err => {
-                    //         executeJavaScriptResult(err)
+                    //         Log.add(err)
                     //             // console.log("失败")
                     //             // editorElement.classList.add("ui-error");
                     //             // editorElement.classList.remove("ui-success");
@@ -86,11 +89,11 @@ const db = require('./db');
                 `, false)
                 .then((result) => {
                     console.log("executeJavaScript", result)
-                        //executeJavaScriptResult('success')
+                        //Log.add('success')
                         // editorElement.classList.remove("ui-error");
                         // editorElement.classList.add("ui-success");
                 }).catch(err => {
-                    executeJavaScriptResult(err)
+                    Log.add(err)
                         // console.log("失败")
                         // editorElement.classList.add("ui-error");
                         // editorElement.classList.remove("ui-success");
@@ -305,65 +308,10 @@ const db = require('./db');
 
 ipcRenderer.on("executeJavaScript-result", (event, arg) => {
     // console.log(arg)
-    executeJavaScriptResult(arg);
+    Log.add(arg);
 });
 
-function executeJavaScriptResult(text) {
-    //console.log('executeJavaScriptResult----1', typeof(text), text.toString())
-    if (typeof(text) === 'object') {
-        text = text.toString()
-    };
-    console.log('executeJavaScriptResult----2', text)
-    if (text !== 'success') {
-        createLog(text);
-    } else {
-        clearLog();
-    };
 
-    sortLogs();
-}
-
-function createLog(text) {
-    let className = "log_" + md5(text);
-    let findLog = document.querySelector("#log").querySelector("." + className);
-    if (findLog) {
-        if (findLog.getAttribute("data-count") != "99+" && parseInt(findLog.getAttribute("data-count")) + 1 >= 99) {
-            findLog.setAttribute("data-count", "99+");
-        } else if (findLog.getAttribute("data-count") != "99+") {
-            findLog.setAttribute("data-count", parseInt(findLog.getAttribute("data-count")) + 1);
-        }
-
-        findLog.setAttribute("data-time", (new Date()).getTime());
-
-    } else {
-        let div = document.createElement("div");
-        div.innerText = text;
-        div.className = className;
-        div.setAttribute("data-count", 1);
-        div.setAttribute("data-time", (new Date()).getTime());
-        document.querySelector("#log").appendChild(div);
-    };
-
-    
-}
-
-function sortLogs(){
-    let findLogs = document.querySelector("#log").children;
-    findLogs =Array.from(findLogs,l=>{
-        return {
-            div:l,
-            time:parseInt(l.getAttribute("data-time"))
-        }
-    }).sort((b,a)=>a.time-b.time);
-    document.querySelector("#log").innerHTML="";
-    findLogs.forEach(g=>{
-        document.querySelector("#log").appendChild(g.div);
-    })
-}
-
-function clearLog() {
-    document.querySelector("#log").innerHTML = "";
-}
 
 
 // document.getElementById('run').addEventListener("click",()=>{

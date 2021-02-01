@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu, } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog} = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
 const package = require("./package.json");
@@ -232,6 +232,8 @@ app.whenReady().then(() => {
         if (BrowserWindow.getAllWindows().length === 0) initWindow()
     })
 
+    // const ffmpeg=require('./src/ffmpeg');
+    // ffmpeg.start(dialog);
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

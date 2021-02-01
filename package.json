@@ -23,12 +23,16 @@
         "electron-builder": "^22.9.1"
     },
     "dependencies": {
+        "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "blockly": "^4.20201217.0",
         "colorthief": "^2.3.2",
         "electron-json-storage": "^4.3.0",
         "escodegen": "^2.0.0",
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "jimp": "^0.16.1",
         "lowdb": "^1.0.0",
         "md5": "^2.3.0",
         "monaco-editor": "^0.21.3"
