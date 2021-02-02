@@ -14,12 +14,12 @@ const dialog = remote.dialog;
 //     console.log(font)
 // });
 
-function createOutputName(input,type){
+function createOutputName(input, type) {
     let dirname = path.dirname(input),
-    basename = path.basename(input),
-    extname = path.extname(input);
+        basename = path.basename(input),
+        extname = path.extname(input);
     return {
-        output:path.join(dirname, basename.replace(extname, "") + `_${type}`+extname),
+        output: path.join(dirname, basename.replace(extname, "") + `_${type}` + extname),
         dirname,
         basename,
         extname
@@ -29,7 +29,7 @@ function createOutputName(input,type){
 //video转frame
 function resize(input, size = '480x?', aspect = "9:16", background = "#35A5FF") {
     return new Promise((resolve, reject) => {
-        let {output }=createOutputName(input,'resize');
+        let { output } = createOutputName(input, 'resize');
         ffmpeg(input)
             .videoCodec('libx264')
             .format('mp4')
@@ -38,12 +38,12 @@ function resize(input, size = '480x?', aspect = "9:16", background = "#35A5FF") 
             .autoPad(background)
             .outputFps(24)
             .output(output)
-            .on('progress', function (progress) {
+            .on('progress', function(progress) {
                 console.log('Processing: ' + progress.percent + '% done');
             })
-            .on('end', function () {
+            .on('end', function() {
                 console.log('Finished processing');
-                resolve(output); 
+                resolve(output);
             })
             .run();
     });
@@ -54,11 +54,11 @@ function resize(input, size = '480x?', aspect = "9:16", background = "#35A5FF") 
 //video转frame
 function extract(input, fadeIn = 10, fadeOut = 10) {
     return new Promise((resolve, reject) => {
-        let {dirname,basename,extname}=createOutputName(input,'extract');
+        let { dirname, basename, extname } = createOutputName(input, 'extract');
 
         let outputDir = path.join(dirname, basename.replace(extname, ""));
         let outputfile = path.join(outputDir, '/%02d.jpg');
-        
+
         try {
             fs.mkdirSync(outputDir);
         } catch (error) {
@@ -70,10 +70,10 @@ function extract(input, fadeIn = 10, fadeOut = 10) {
             .videoFilters(`fade=in:0:${fadeOut}`)
             .outputFps(24)
             .output(outputfile)
-            .on('progress', function (progress) {
+            .on('progress', function(progress) {
                 console.log('Processing: ' + progress.percent + '% done');
             })
-            .on('end', function () {
+            .on('end', function() {
                 console.log('Finished processing');
                 let outputFrames = sortFiles(path.dirname(outputfile));
                 resolve({
@@ -132,26 +132,26 @@ function extract(input, fadeIn = 10, fadeOut = 10) {
 // }
 
 //为视频添加水印
-function drawText(videoFilePath, waterMarkFilePath, x=100, y=100) {
+function drawText(videoFilePath, waterMarkFilePath, x = 100, y = 100) {
 
-    let {output}=createOutputName(videoFilePath,'watermark');
+    let { output } = createOutputName(videoFilePath, 'watermark');
 
     return new Promise((resolve, reject) => {
         ffmpeg(videoFilePath)
-        .input(waterMarkFilePath)
-        .videoCodec('libx264')
-        .format('mp4')
-        .inputOptions('-filter_complex', `overlay=${x}:${y}`)
-        .on('error', function (err) { 
-            console.log('水印添加错误: ' + err.message);
-        })
-        .on('end', function () { 
-            console.log('水印添加成功');
-            resolve(output);
-        })
-        .save(output);
+            .input(waterMarkFilePath)
+            .videoCodec('libx264')
+            .format('mp4')
+            .inputOptions('-filter_complex', `overlay=${x}:${y}`)
+            .on('error', function(err) {
+                console.log('水印添加错误: ' + err.message);
+            })
+            .on('end', function() {
+                console.log('水印添加成功');
+                resolve(output);
+            })
+            .save(output);
     });
-    
+
 }
 
 // get the video duration
@@ -229,10 +229,10 @@ function addMusicToVideo(video, music) {
 
 }
 
-function saveImage(imgData,filename){
+function saveImage(imgData, filename) {
     var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
-    console.log(filename,base64Data)
-    var dataBuffer = Buffer.from(base64Data,'base64');
+    // console.log(filename,base64Data)
+    var dataBuffer = Buffer.from(base64Data, 'base64');
     // console.log('加水印',filename)
     fs.writeFileSync(filename, dataBuffer);
 }
@@ -242,35 +242,37 @@ function pipe(inputs, textInputs) {
     return new Promise((resolve, reject) => {
         let frames = [];
 
-        let watermarks=[];
+        let watermarks = [];
 
-        textInputs.forEach((t,i)=>{
-            let {dirname,
+        textInputs.forEach((t, i) => {
+            let {
+                dirname,
                 basename,
-                extname}=createOutputName(inputs[i],'watermark');
-            let filename=path.join(dirname, basename.replace(extname, "") + `_watermark_${i}.png`);
-            saveImage(t.base64,filename);
+                extname
+            } = createOutputName(inputs[i], 'watermark');
+            let filename = path.join(dirname, basename.replace(extname, "") + `_watermark_${i}.png`);
+            saveImage(t.base64, filename);
             watermarks.push(filename);
         });
 
-        setTimeout(()=>{
+        setTimeout(() => {
 
             Promise.all(
                 Array.from(inputs, (inp, index) => resize(inp))
-            ).then(inn=>{
+            ).then(inn => {
                 //新尺寸的视频，加水印
                 Promise.all(
-                    Array.from(inn, (inp, index) => drawText(inp,watermarks[index]))
-                ).then(innn=>{
+                    Array.from(inn, (inp, index) => drawText(inp, watermarks[index]))
+                ).then(innn => {
                     console.log(inn)
-                    //加水印后提取视频帧
+                        //加水印后提取视频帧
                     Promise.all(
-                        Array.from(innn,inp=>extract(inp))
-                    ).then(values=>{
+                        Array.from(innn, inp => extract(inp))
+                    ).then(values => {
                         console.log(innn)
-    
+
                         console.log(watermarks)
-    
+
                         // [{
                         //     filePath: outputDir,
                         //     frames: outputFrames
@@ -281,18 +283,18 @@ function pipe(inputs, textInputs) {
                                 filePath: vs.filePath
                             });
                         }));
-                        
+
                         resolve(frames);
                     });
-                  
-                }) 
-        
+
+                })
+
             });
 
 
-        },500);
-        
-        
+        }, 500);
+
+
     });
 
 }
@@ -348,10 +350,10 @@ function frames2video(filePath) {
         ffmpeg(path.join(filePath, `%0${("" + files.length).length}d.jpg`))
             .videoCodec('libx264')
             .output(outputfile)
-            .on('progress', function (progress) {
+            .on('progress', function(progress) {
                 console.log('Processing: ' + progress.percent + '% done');
             })
-            .on('end', function () {
+            .on('end', function() {
                 console.log('Finished processing');
                 resolve(outputfile);
             })
@@ -459,28 +461,28 @@ function createShortVideoInput() {
 //需要把_imgs保存为文本文件，再使用
 function createShortVideo(_imgs) {
     console.log(_imgs)
-    // let filePaths = dialog.showOpenDialogSync({
-    //     title: "打开……",
-    //     properties: ['openFile', 'multiSelections'],
-    //     filters: [
-    //         { name: '合并多个视频+1个音频', extensions: ['mov', 'avi', 'mp4','mp3', 'jpg', 'png', 'gif'] }
-    //     ]
-    // });
-    // if (filePaths) {
-    //     let extnames=Array.from(filePaths,f=>path.extname(f));
-    //     let mp3=filePaths[extnames.indexOf('.mp3')];
-    //     filePaths[extnames.indexOf('.mp3')]=null;
-    //     // console.log(filePaths)
-    //     let videos=filePaths.filter(f=>f);
-    //     // console.log(extnames.indexOf('.mp3'))
-    //     return new Promise((resolve, reject) => {
-    //         mergeVideos(videos).then(outputVideo=>{
-    //             addMusicToVideo(outputVideo,mp3).then(output=>{
-    //                 fs.unlinkSync(outputVideo);
-    //                 resolve(output);
-    //             })
-    //         });
-    //     });
+        // let filePaths = dialog.showOpenDialogSync({
+        //     title: "打开……",
+        //     properties: ['openFile', 'multiSelections'],
+        //     filters: [
+        //         { name: '合并多个视频+1个音频', extensions: ['mov', 'avi', 'mp4','mp3', 'jpg', 'png', 'gif'] }
+        //     ]
+        // });
+        // if (filePaths) {
+        //     let extnames=Array.from(filePaths,f=>path.extname(f));
+        //     let mp3=filePaths[extnames.indexOf('.mp3')];
+        //     filePaths[extnames.indexOf('.mp3')]=null;
+        //     // console.log(filePaths)
+        //     let videos=filePaths.filter(f=>f);
+        //     // console.log(extnames.indexOf('.mp3'))
+        //     return new Promise((resolve, reject) => {
+        //         mergeVideos(videos).then(outputVideo=>{
+        //             addMusicToVideo(outputVideo,mp3).then(output=>{
+        //                 fs.unlinkSync(outputVideo);
+        //                 resolve(output);
+        //             })
+        //         });
+        //     });
 
     // }
 }

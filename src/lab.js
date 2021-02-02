@@ -4,25 +4,38 @@
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
 
-const ffmpeg=require('./ffmpeg');
+const ffmpeg = require('./ffmpeg');
 
-class Base{
-    constructor(){}
-    createTextImage(txt,fontSize,color){
-        let canvas=document.createElement('canvas'),
-            ctx=canvas.getContext('2d');
-        canvas.width=480;
-        canvas.height=32;
-        ctx.font=`${fontSize}px Arial`;
-        let font=ctx.measureText(txt);
-        canvas.height=font.fontBoundingBoxAscent+font.fontBoundingBoxDescent;
-        canvas.width=font.width;
-        ctx.fillStyle=color||"black";
-        ctx.textAlign="start";
-        ctx.textBaseline="top";
-        ctx.fillText(txt,0,0);
-        let base64=canvas.toDataURL('image/png');
-        return {base64,width:canvas.width,height:canvas.height}
+class Base {
+    constructor() {}
+    createTextImage(txt, fontSize = 24, color = "black") {
+        let canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
+        let x = 2;
+        // canvas.width = 480;
+        // canvas.height = 32;
+        ctx.font = `${fontSize*x}px Arial`;
+        let font = ctx.measureText(txt);
+        canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+        canvas.width = (font.width) + 10;
+
+        ctx.fillStyle = color;
+        ctx.textAlign = "start";
+        ctx.textBaseline = "top";
+        ctx.font = `${fontSize*x}px Arial`;
+        ctx.fillText(txt, 5, 10);
+
+        let base64 = canvas.toDataURL('image/png');
+        return { base64, width: canvas.width, height: canvas.height }
+    }
+    createImage(url) {
+        return new Promise((resolve, reject) => {
+            let _img = new Image();
+            _img.src = url;
+            _img.onload = function() {
+                resolve(_img);
+            }
+        })
     }
 }
 
@@ -103,7 +116,7 @@ class AI {
 
 
 module.exports = {
-    ai:new AI(),
-    base:new Base(),
-    video:ffmpeg
+    ai: new AI(),
+    base: new Base(),
+    video: ffmpeg
 };
