@@ -6,10 +6,9 @@ const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Rewrite = require("./rewrite");
 const db = require('./db');
-const ffmpeg=require('./ffmpeg');
 const Log=require('./log');
 
-ffmpeg.mergeVideos(remote.dialog);
+const ffmpeg=require('./ffmpeg');
 
 (() => {
         //改写代码

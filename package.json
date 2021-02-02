@@ -1,6 +1,6 @@
 {
     "name": "design-ai-lab",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "智能设计实验工具 Artificial Intelligence for Graph Design",
     "main": "main.js",
     "scripts": {

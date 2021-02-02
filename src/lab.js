@@ -1,6 +1,30 @@
+//lab提供封装好的功能
+
+
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
 
+const ffmpeg=require('./ffmpeg');
+
+class Base{
+    constructor(){}
+    createTextImage(txt,fontSize,color){
+        let canvas=document.createElement('canvas'),
+            ctx=canvas.getContext('2d');
+        canvas.width=480;
+        canvas.height=32;
+        ctx.font=`${fontSize}px Arial`;
+        let font=ctx.measureText(txt);
+        canvas.height=font.fontBoundingBoxAscent+font.fontBoundingBoxDescent;
+        canvas.width=font.width;
+        ctx.fillStyle=color||"black";
+        ctx.textAlign="start";
+        ctx.textBaseline="top";
+        ctx.fillText(txt,0,0);
+        let base64=canvas.toDataURL('image/png');
+        return {base64,width:canvas.width,height:canvas.height}
+    }
+}
 
 class AI {
     constructor() {}
@@ -76,4 +100,10 @@ class AI {
     }
 }
 
-module.exports = new AI();
+
+
+module.exports = {
+    ai:new AI(),
+    base:new Base(),
+    video:ffmpeg
+};

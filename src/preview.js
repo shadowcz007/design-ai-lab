@@ -4,7 +4,7 @@ var mainWindow = (remote.getGlobal("_WINS")).mainWindow;
 
 const path = require('path');
 
-const AI = require('./ai');
+const Lab = require('./lab');
 
 
 //预加载的字体,站酷沧耳渔阳体
