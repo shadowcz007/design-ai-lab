@@ -8,7 +8,7 @@ const ffmpeg = require('./ffmpeg');
 
 class Base {
     constructor() {}
-    createTextImage(txt, fontSize = 24, color = "black") {
+    createTextImage(txt, fontSize = 24, color = "black", width = 300) {
         let canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d');
         let x = 2;
@@ -25,8 +25,22 @@ class Base {
         ctx.font = `${fontSize*x}px Arial`;
         ctx.fillText(txt, 5, 10);
 
-        let base64 = canvas.toDataURL('image/png');
-        return { base64, width: canvas.width, height: canvas.height }
+        let base64, height;
+
+        if (canvas.width > width) {
+            let nc = document.createElement('canvas'),
+                nctx = nc.getContext('2d');
+            nc.width = width;
+            nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+            nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+            base64 = nc.toDataURL('image/png');
+            height = nc.height;
+        } else {
+            base64 = canvas.toDataURL('image/png');
+            height = canvas.height;
+        }
+
+        return { base64, width: width, height: height }
     }
     createImage(url) {
         return new Promise((resolve, reject) => {

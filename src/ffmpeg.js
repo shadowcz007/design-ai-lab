@@ -14,12 +14,12 @@ const dialog = remote.dialog;
 //     console.log(font)
 // });
 
-function createOutputName(input, type) {
+function createOutputName(input, type, hardExtname) {
     let dirname = path.dirname(input),
         basename = path.basename(input),
         extname = path.extname(input);
     return {
-        output: path.join(dirname, basename.replace(extname, "") + `_${type}` + extname),
+        output: path.join(dirname, basename.replace(extname, "") + `_${type}` + (hardExtname || extname)),
         dirname,
         basename,
         extname
@@ -29,23 +29,33 @@ function createOutputName(input, type) {
 //video转frame
 function resize(input, size = '480x?', aspect = "9:16", background = "#35A5FF") {
     return new Promise((resolve, reject) => {
-        let { output } = createOutputName(input, 'resize');
-        ffmpeg(input)
-            .videoCodec('libx264')
-            .format('mp4')
-            .size(size)
-            .aspect(aspect)
-            .autoPad(background)
-            .outputFps(24)
-            .output(output)
-            .on('progress', function(progress) {
-                console.log('Processing: ' + progress.percent + '% done');
-            })
-            .on('end', function() {
-                console.log('Finished processing');
-                resolve(output);
-            })
-            .run();
+
+        let { output } = createOutputName(input, 'resize', '.mp4');
+
+        getMediaDurationAndType(input).then(({ duration, type }) => {
+            // console.log(duration, type)
+            // if (duration == 'N/A' || duration < 3 || type == 'img') duration = 3;
+            // if (extname)
+            var r = ffmpeg(input)
+                .videoCodec('libx264')
+                .format('mp4')
+                .size(size)
+                .aspect(aspect)
+                .autoPad(background)
+            if (type == 'img') r = r.loop(3);
+            r.outputFps(24)
+                .output(output)
+                .on('progress', function(progress) {
+                    console.log('Processing: ' + progress.percent + '% done');
+                })
+                .on('end', function() {
+                    console.log('Finished processing');
+                    resolve(output);
+                })
+                .run();
+        })
+
+
     });
 }
 
@@ -101,28 +111,6 @@ function extract(input, fadeIn = 10, fadeOut = 10) {
 
 // }
 
-// function drawTextForFramesAndReadTextImage(inp, textImage) {
-//     return new Promise((resolve, reject) => {
-//         //合成字幕
-//         // let textImage=textInputs[index];
-//         // console.log(textImage.base64.split(";base64,"))
-//         let base64 = textImage.base64.replace(/^data:image\/\w+;base64,/, "");
-//         // data:image/png
-//         var dataBuffer = Buffer.from(base64, 'base64');
-
-//         Jimp.read(dataBuffer)
-//             .then(image => {
-//                 extract(inp).then(out => {
-
-//                     drawTextForFrames(out.frames, image, parseInt((480 - textImage.width) / 2), 100).then(frames => {
-//                         out.frames = frames;
-//                         resolve(out)
-//                     });
-//                 })
-//             });
-//     });
-
-
 // }
 
 // function drawTextForFrames(frames, fontImage, x, y) {
@@ -155,18 +143,25 @@ function drawText(videoFilePath, waterMarkFilePath, x = 100, y = 100) {
 }
 
 // get the video duration
-function getMediaDuration(file) {
+function getMediaDurationAndType(file) {
     return new Promise((resolve, reject) => {
         ffmpeg.ffprobe(file, (_err, metadata) => {
             if (_err === null) {
-                // console.log(metadata.format.duration)
-                resolve(metadata.format.duration);
+                console.log('===', metadata.format.format_name)
+
+                resolve({
+                    duration: metadata.format.duration,
+                    type: getFileType(metadata.format.format_name)
+                });
             } else {
                 reject(_err);
             }
         });
     });
 };
+
+
+
 
 //裁音频
 function cutMusic(audio, time = 5) {
@@ -177,7 +172,7 @@ function cutMusic(audio, time = 5) {
     let outputMp3 = path.join(dirname, basename.replace(extname, "") + `_${time}s.mp3`);
 
     return new Promise((resolve, reject) => {
-        getMediaDuration(audio).then(duration => {
+        getMediaDurationAndType(audio).then(({ duration, type }) => {
             ffmpeg()
                 .input(audio)
                 .output(outputMp3)
@@ -205,7 +200,7 @@ function addMusicToVideo(video, music) {
     // console.log(basename.replace(extname,""))
     let outputfile = path.join(dirname, basename.replace(extname, "") + "_music" + extname);
     return new Promise((resolve, reject) => {
-        getMediaDuration(video).then(duration => {
+        getMediaDurationAndType(video).then(({ duration, type }) => {
             cutMusic(music, duration).then(music_output => {
                 ffmpeg()
                     .videoCodec('libx264')
@@ -264,19 +259,24 @@ function pipe(inputs, textInputs) {
                 Promise.all(
                     Array.from(inn, (inp, index) => drawText(inp, watermarks[index]))
                 ).then(innn => {
-                    console.log(inn)
-                        //加水印后提取视频帧
+                    // console.log(inn)
+                    //删除
+                    inn.forEach(inp => fs.unlinkSync(inp));
+                    //加水印后提取视频帧
                     Promise.all(
                         Array.from(innn, inp => extract(inp))
                     ).then(values => {
-                        console.log(innn)
 
-                        console.log(watermarks)
+                        // console.log(innn)//删除
+                        innn.forEach(inp => fs.unlinkSync(inp));
+                        // console.log(watermarks)
+                        watermarks.forEach(inp => fs.unlinkSync(inp));
 
                         // [{
                         //     filePath: outputDir,
                         //     frames: outputFrames
                         // }]
+
                         values.forEach(vs => vs.frames.forEach(frame => {
                             frames.push({
                                 frame: frame,
@@ -431,6 +431,18 @@ function createShortVideoFromLocal(files = []) {
     }
 }
 
+function getFileType(formatName) {
+
+    if (formatName.match("image") || formatName.match('png')) return 'img';
+    if (Array.from(['mov', 'avi', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f) > 0) return "video";
+    if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f) > 0) return "audio";
+
+    // if (filePaths[0]) {
+    //     count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+    //     if (count.length > 0) type = "img";
+    // }
+}
+
 //完成视频及音频合成
 function createShortVideoInput() {
     // console.log(this)
@@ -438,7 +450,7 @@ function createShortVideoInput() {
         title: "打开……",
         properties: ['openFile'],
         filters: [
-            { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpg', 'png', 'gif'] }
+            { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
         ]
     });
 
@@ -448,7 +460,7 @@ function createShortVideoInput() {
         if (count.length > 0) type = "video";
         count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
         if (count.length > 0) type = "audio";
-        count = Array.from(['jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+        count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
         if (count.length > 0) type = "img";
     }
 
