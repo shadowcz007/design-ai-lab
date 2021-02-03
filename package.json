@@ -1,14 +1,16 @@
 {
     "name": "design-ai-lab",
-    "version": "0.0.6",
-    "description": "智能设计实验工具 Artificial Intelligence for Graph Design",
+    "version": "0.0.7",
+    "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {
-        "start": "electron .",
+        "start": "NODE_ENV=development electron .",
         "pack": "electron-builder --dir",
         "dist": "electron-builder --macos --linux --windows"
     },
+    "homepage": "https://github.com/shadowcz007/design-ai-lab/",
     "repository": "https://github.com/shadowcz007/design-ai-lab.git",
+    "bugs": "https://github.com/shadowcz007/design-ai-lab/issues",
     "keywords": [
         "AI",
         "design",
@@ -25,6 +27,7 @@
     "dependencies": {
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "about-window": "^1.13.4",
         "blockly": "^4.20201217.0",
         "colorthief": "^2.3.2",
         "electron-json-storage": "^4.3.0",
@@ -35,7 +38,10 @@
         "jimp": "^0.16.1",
         "lowdb": "^1.0.0",
         "md5": "^2.3.0",
-        "monaco-editor": "^0.21.3"
+        "monaco-editor": "^0.21.3",
+        "muuri": "^0.9.3",
+        "object-hash": "^2.1.1",
+        "timeago.js": "^4.0.2"
     },
     "build": {
         "appId": "mixlab.designailab",

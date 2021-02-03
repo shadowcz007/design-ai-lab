@@ -8,8 +8,10 @@ class Editor {
         this.container = container;
         this.executeJavaScript = executeJavaScript;
         this.editor = null;
-        this.init();
+        this.container?this.init():null;
 
+        this.onMouseUp=null;
+        this.onMouseDown=null;
     }
 
     init() {
@@ -52,9 +54,26 @@ class Editor {
             // this.editor.onDidBlurEditorText(()=>{
             //     this.execute()
             // });
-            // this.editor.onDidFocusEditorText(()=>{
-            //     this.execute()
+
+
+            this.editor.onMouseDown(()=>{
+                this.onMouseDown();
+                // this.isDrag=1;
+            });
+            this.editor.onMouseUp(()=>{
+                this.onMouseUp();
+                // this.isDrag=0;
+            });
+            
+            // this.editor.onMouseMove(()=>{
+            //     if(this.isDrag===1){
+            //         this.onDrag();
+            //     }
             // });
+
+
+
+            
             this.editor.onDidChangeModelContent(() => {
                 this.execute();
                 // console.log("----")

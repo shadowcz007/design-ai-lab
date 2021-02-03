@@ -18,7 +18,7 @@ function add(info) {
 
 function create(text) {
     let className = "log_" + md5(text);
-    let findLog = document.querySelector("#log").querySelector("." + className);
+    let findLog = document.querySelector("#log .content").querySelector("." + className);
     if (findLog) {
         if (findLog.getAttribute("data-count") != "99+" && parseInt(findLog.getAttribute("data-count")) + 1 >= 99) {
             findLog.setAttribute("data-count", "99+");
@@ -34,28 +34,28 @@ function create(text) {
         div.className = className;
         div.setAttribute("data-count", 1);
         div.setAttribute("data-time", (new Date()).getTime());
-        document.querySelector("#log").appendChild(div);
+        document.querySelector("#log .content").appendChild(div);
     };
 
     
 }
 
 function sort(){
-    let findLogs = document.querySelector("#log").children;
+    let findLogs = document.querySelector("#log .content").children;
     findLogs =Array.from(findLogs,l=>{
         return {
             div:l,
             time:parseInt(l.getAttribute("data-time"))
         }
     }).sort((b,a)=>a.time-b.time);
-    document.querySelector("#log").innerHTML="";
+    document.querySelector("#log .content").innerHTML="";
     findLogs.forEach(g=>{
-        document.querySelector("#log").appendChild(g.div);
+        document.querySelector("#log .content").appendChild(g.div);
     })
 }
 
 function clear() {
-    document.querySelector("#log").innerHTML = "";
+    document.querySelector("#log .content").innerHTML = "";
 }
 
 

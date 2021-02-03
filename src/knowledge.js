@@ -13,8 +13,8 @@ class Knowledge {
 
     }
     init() {
-        this.courseHtml != null ? this.course.innerHTML = this.courseHtml : null;
-        this.readmeHtml != null ? this.readme.innerHTML = this.readmeHtml : null;
+        this.courseHtml&&this.course != null ? this.course.innerHTML = this.courseHtml : null;
+        this.readmeHtml&&this.course != null ? this.readme.innerHTML = this.readmeHtml : null;
     }
     get() {
         this.courseHtml = this.course.innerHTML;
@@ -35,6 +35,7 @@ class Knowledge {
         } else {
             this.readOnly = !this.readOnly;
         }
+        if(!(this.course&&this.readme)) return this.readOnly;
         // console.log(this.readOnly)
         if (this.readOnly) {
             this.course.removeAttribute('contenteditable');

@@ -1,11 +1,15 @@
 const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog} = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
+const openAboutWindow = require('about-window').default;
+
 const package = require("./package.json");
 // console.log(package);
 
-// const dataPath = storage.getDataPath();
-// console.log(process);
+const dataPath = storage.getDataPath();
+// console.log(dataPath,path.join(dataPath, "db.json"));
+global._DBPATH=path.join(dataPath, "db.json");
+
 //平台
 const _IS_MAC = process.platform === 'darwin';
 
@@ -75,7 +79,8 @@ function createWindow(key, opts, workAreaSize) {
     // 加载xxx.html
     win.loadFile(opts.html);
     // 打开调试工具
-    win.webContents.openDevTools();
+    if (process.env.NODE_ENV === 'development') win.webContents.openDevTools();
+
     if (opts.show === true) win.webContents.once("dom-ready", () => {
         win.show();
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
@@ -96,6 +101,7 @@ function initWindow() {
     config.mainWindow.width = workAreaSize.width - config.previewWindow.width - 20;
 
     storage.get('app', function(error, data) {
+        // console.log('storage',data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
         if (data && data.public === 1) {
@@ -106,6 +112,9 @@ function initWindow() {
             config.previewWindow.width = data.size[0];
             config.previewWindow.height = data.size[1];
             config.previewWindow.resizable = false;
+        }else{
+            //主窗口显示在欢迎界面
+            
         }
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
@@ -155,15 +164,34 @@ function initMenu(modeMenu) {
         ...(_IS_MAC ? [{
             label: package.name,
             submenu: [
-                { role: 'about', label: `关于 v${package.version}` },
+                {
+                    label: '关于',
+                    click: () =>
+                        openAboutWindow({
+                            icon_path: path.join(__dirname, 'logo.png'),
+                            product_name:'Design.ai Lab',
+                            copyright: 'Copyright (c) 2021 shadow',
+                            adjust_window_size:true,
+                            bug_link_text:"反馈bug",
+                            package_json_dir: __dirname,
+                            open_devtools: process.env.NODE_ENV === 'development',
+                            css_path:path.join(__dirname, 'src/style.css'),
+                        }),
+                },
                 { type: 'separator' },
-                // { role: 'services' },
+                // {
+                //     label: '反馈',
+                //     click: async() => {
+                //         const { shell } = require('electron')
+                //         await shell.openExternal('https://electronjs.org')
+                //     }
+                // },
                 // { type: 'separator' },
                 // { role: 'hide' },
                 // { role: 'hideothers' },
                 // { role: 'unhide' },
                 // { type: 'separator' },
-                { role: 'quit', label: '关闭' }
+                { role: 'quit', label: '退出' }
             ]
         }] : []),
         // { role: 'fileMenu' }
@@ -171,18 +199,36 @@ function initMenu(modeMenu) {
             label: '文件',
             submenu: [{
                     label: '打开',
-                    click: async() => {
-                        const { shell } = require('electron')
-                        await shell.openExternal('https://electronjs.org')
-                    }
+                    accelerator:'CmdOrCtrl+O',
+                    click: () => global._WINS.mainWindow.webContents.send('open-file')
                 },
                 {
-                    label: '新建'
+                    label: '新建',
+                    accelerator:'CmdOrCtrl+N',
+                    click: () => global._WINS.mainWindow.webContents.send('new-file')
                 },
                 {
-                    label: '另存为'
+                    label: '另存为',
+                    accelerator:'CmdOrCtrl+S',
+                    click: () => global._WINS.mainWindow.webContents.send('save-file')
                 },
-                _IS_MAC ? { role: 'close', label: '关闭' } : { role: 'quit', label: '关闭' }
+                { type: 'separator' },
+                {
+                    label: '编辑',
+                    accelerator:'CmdOrCtrl+E',
+                    click: () => global._WINS.mainWindow.webContents.send('edit-file')
+                },
+                {
+                    label: '发布',
+                    accelerator:'CmdOrCtrl+P',
+                    click: () => global._WINS.mainWindow.webContents.send('public-file')
+                },
+                { type: 'separator' },
+                {
+                    label: '关闭',
+                    accelerator:'CmdOrCtrl+W',
+                    click: () => global._WINS.mainWindow.webContents.send('close-file')
+                }
             ]
         },
         { role: 'editMenu' },
@@ -241,4 +287,4 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function() {
     if (process.platform !== 'darwin') app.quit()
-})
+});

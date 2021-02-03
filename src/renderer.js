@@ -2,13 +2,18 @@
 const { ipcRenderer, remote } = require("electron");
 const md5 = require('md5');
 const fs = require("fs");
+const timeago=require('timeago.js');
+const Muuri=require("muuri");
+// console.log(timeago)
+
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Rewrite = require("./rewrite");
 const db = require('./db');
 const Log=require('./log');
+// const { read } = require("jimp");
+// const ffmpeg=require('./ffmpeg');
 
-const ffmpeg=require('./ffmpeg');
 
 (() => {
         //改写代码
@@ -124,16 +129,145 @@ const ffmpeg=require('./ffmpeg');
         });
     }
 
-    //GUI
-    const newFile = document.querySelector("#new-file"),
-        editFile = document.querySelector("#edit-file"),
-        openFile = document.querySelector("#open-file"),
-        saveFile = document.querySelector("#save-file"),
-        publicFile = document.querySelector("#public-file");
 
-    openFile.addEventListener("click", e => {
+    // 缓存
+    document.querySelector("#course")?.addEventListener("input", e => {
         e.preventDefault();
+        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+    });
+    document.querySelector("#readme")?.addEventListener("input", e => {
+        e.preventDefault();
+        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+    });
 
+
+    //GUI
+    // 布局
+    window.grid=initGrid();
+    editor.onMouseUp=function(){
+        console.log("onMouseUp",window.grid)
+    }
+    editor.onMouseDown=function(){
+        // grid.destroy();
+        // grid=initGrid(false);
+        console.log("onMouseDown",window.grid)
+    }
+    function initGrid(dragEnabled=true) {
+        let grid = new Muuri('.grid', {
+            dragEnabled: true,
+            layoutOnInit: false
+        }).on('move', function () {
+            saveLayout(grid);
+        });
+
+        let layout = window.localStorage.getItem('layout');
+        if (layout) {
+            loadLayout(grid, layout);
+        } else {
+            grid.layout(true);
+        };
+
+        window.addEventListener('load',()=> grid.refreshItems().layout());
+
+        grid.on('dragReleaseEnd', function (item) {
+            console.log(item);
+        });
+
+        return grid;
+    }
+
+    function serializeLayout(grid) {
+        var itemIds = grid.getItems().map(function (item) {
+            return item.getElement().getAttribute('data-id');
+        });
+        return JSON.stringify(itemIds);
+    }
+
+    function saveLayout(grid) {
+        var layout = serializeLayout(grid);
+        window.localStorage.setItem('layout', layout);
+    }
+
+    function loadLayout(grid, serializedLayout) {
+        var layout = JSON.parse(serializedLayout);
+        var currentItems = grid.getItems();
+        var currentItemIds = currentItems.map(function (item) {
+            return item.getElement().getAttribute('data-id')
+        });
+        var newItems = [];
+        var itemId;
+        var itemIndex;
+
+        for (var i = 0; i < layout.length; i++) {
+            itemId = layout[i];
+            itemIndex = currentItemIds.indexOf(itemId);
+            if (itemIndex > -1) {
+            newItems.push(currentItems[itemIndex])
+            }
+        }
+
+        grid.sort(newItems, {layout: 'instant'});
+    };
+
+
+
+    //ui
+    const editFile = document.querySelector("#edit-file"),
+        // newFile = document.querySelector("#new-file"),
+        // openFile = document.querySelector("#open-file"),
+        // saveFile = document.querySelector("#save-file"),
+        publicFile = document.querySelector("#public-file");
+    const practiceBtn = document.querySelector("#practice-btn");
+
+    function addEventListener(element,fn){
+        let isClicked=false;
+        element?.addEventListener("click", e => {
+            e.preventDefault();
+            if(isClicked===true) return;
+            isClicked=true;
+            fn();
+            setTimeout(()=>{
+                isClicked=false;
+            },500);
+        });
+    }
+
+    //打开文件
+    // addEventListener(openFile,openFileFn);
+    //编辑/预览 切换
+    addEventListener(editFile,editFileFn);
+    //新建
+    // addEventListener(newFile,newFileFn);
+    //保存
+    // addEventListener(saveFile,saveFileFn);
+    //发布
+    addEventListener(publicFile,pubilcFn);
+    //实时编辑代码
+    addEventListener(practiceBtn,practiceFn);
+
+    //打开文件
+    ipcRenderer.on("open-file",openFileFn);
+    //编辑/预览 切换
+    ipcRenderer.on("edit-file",editFileFn);
+    //新建
+    ipcRenderer.on("new-file",newFileFn);
+    //保存
+    ipcRenderer.on("save-file",saveFileFn);
+    //关闭
+    ipcRenderer.on("close-file",closeFn);
+    //发布
+    ipcRenderer.on("public-file",pubilcFn);
+   
+    //初始状态在 欢迎界面
+    window.addEventListener('load',closeFn);
+
+    //显示代码错误
+    ipcRenderer.on("executeJavaScript-result", (event, arg) => {
+        Log.add(arg);
+    });
+
+
+    function openFileFn(){
         let filePath = remote.dialog.showOpenDialogSync({
             title: "打开……",
             properties: ['openFile'],
@@ -147,43 +281,48 @@ const ffmpeg=require('./ffmpeg');
             res = JSON.parse(res);
             knowledge.set(res.knowledge);
             editor.setCode(res.code);
-            saveFile.style.display = "none";
+            // saveFile.style.display = "none";
             editFile.style.display = "block";
             // openFile.style.display="none";
-            newFile.style.display = "block";
+            // newFile.style.display = "block";
             knowledge.toggle(true);
 
             localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
             localStorage.setItem("code", editor.getCode());
+            localStorage.removeItem('layout');
 
             //存至数据库
             db.add(res);
+
+            document.querySelector(".grid").style.display="block";
+            document.getElementById("blank-pannel").style.display="none";
+            
         };
-    });
-    //编辑/预览 切换
-    editFile.addEventListener("click", e => {
-        e.preventDefault();
+    }
+
+    function editFileFn(){
         let isReadOnly = knowledge.toggle();
         // console.log(isReadOnly)
         if (!isReadOnly) {
             //编辑状态
             editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
-            document.getElementById("knowledge-pannel").classList.remove("knowledge-pannel-small");
-            document.getElementById("editor-pannel").classList.remove("editor-pannel-large");
+            // document.getElementById("knowledge-pannel").classList.remove("knowledge-pannel-small");
+            document.getElementById("knowledge-pannel").classList.add("pannel-large");
+            grid.destroy();
         } else {
             //预览状态
             editFile.innerHTML = `<i class="fas fa-toggle-on"></i>`;
+            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+            grid=initGrid();
         }
-        newFile.style.display = "block";
-        saveFile.style.display = "block";
+        // newFile.style.display = "block";
+        // saveFile.style.display = "block";
+    }
 
-    });
-    //新建
-    newFile.addEventListener("click", e => {
-        e.preventDefault();
-        saveFile.style.display = "block";
+    function newFileFn(){
+        // saveFile.style.display = "block";
         //editFile.style.display = "none";
-        newFile.style.display = "none";
+        // newFile.style.display = "none";
         //编辑状态
         editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
         knowledge.toggle(false);
@@ -191,15 +330,18 @@ const ffmpeg=require('./ffmpeg');
                 readme: "",
                 course: ""
             })
-            // console.log(knowledge)
+        //console.log(document.getElementById("editor-pannel"))
+        //document.getElementById("editor-pannel").classList.remove("pannel-large");
         editor.setCode('//Hello AI world!');
         localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         localStorage.setItem("code", editor.getCode());
-        openPractice();
-    });
-    saveFile.addEventListener("click", e => {
-        e.preventDefault();
+        localStorage.removeItem('layout');
+        grid.destroy();
+        grid=initGrid();
+        // openPracticeFn();
+    }
 
+    function saveFileFn(){
         localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         localStorage.setItem("code", editor.getCode());
 
@@ -214,52 +356,77 @@ const ffmpeg=require('./ffmpeg');
                     if (err) console.error(err);
                     console.log("保存成功");
                     knowledge.toggle(true);
-                    saveFile.style.display = "none";
+                    // saveFile.style.display = "none";
                     editFile.style.display = "block";
-                    newFile.style.display = "block";
+                    // newFile.style.display = "block";
                 });
             })
             
         };
         // console.log(filePath)
-    });
-    //发布
-    publicFile.addEventListener("click", e => {
-        e.preventDefault();
-        pubilc();
-    });
+    }
 
+    function closeFn(){
+        // console.log('closeFn')
+        document.querySelector(".grid").style.display="none";
+        document.getElementById("blank-pannel").style.display="block";
 
-    document.querySelector("#course").addEventListener("input", e => {
-        e.preventDefault();
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-    });
-    document.querySelector("#readme").addEventListener("input", e => {
-        e.preventDefault();
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-    });
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        if (previewWindow && mainWindow) {
+            previewWindow.hide();
+            mainWindow.show();
+        };
+        
+        let div=document.createDocumentFragment();
+        Array.from(db.getAll(),d=>{
+            div.appendChild(createCard(d));
+        });
+        document.getElementById("recent-files").innerHTML='';
+        document.getElementById("recent-files").appendChild(div);
+        
+    }
 
-    const practiceBtn = document.querySelector("#practice-btn");
-    // console.log(saveBtn)
-    practiceBtn.addEventListener("click", e => {
+    function createCard(data){
+        let div=document.createElement('div');
+        div.className="card";
+        let img=new Image();
+        img.src=data.poster;
+        div.appendChild(img);
+        let readme=document.createElement('h5');
+        readme.innerHTML=data.knowledge.readme;
+        div.appendChild(readme);
 
+        let t=document.createElement('p');
+        readme.innerHTML=data.knowledge.readme;
+        timeago.format(data.createDate, 'zh_CN');
+
+        console.log(data)
+        return div;
+    }
+
+    function practiceFn(){
         let t = editor.toggle();
-
         if (t === true) {
+            document.getElementById("editor-pannel").classList.remove("pannel-large");
+            grid=initGrid();
             practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
             editor.execute();
             localStorage.setItem("code", editor.getCode());
             editor.format();
         } else {
-            openPractice();
+            //编程模式
+            grid.destroy();
+            openPracticeFn();
         };
+    }
 
-    });
-
-    function openPractice() {
-        document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
-        document.getElementById("editor-pannel").classList.add("editor-pannel-large");
+    function openPracticeFn() {
+        // document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
+        document.getElementById("editor-pannel").classList.add("pannel-large");
         practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
+        
+        // grid=initGrid(false);
         previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
         if (previewWindow && mainWindow) {
@@ -274,9 +441,9 @@ const ffmpeg=require('./ffmpeg');
         };
     };
 
-    function pubilc() {
+    function pubilcFn() {
         editor.toggle(false);
-        openPractice();
+        openPracticeFn();
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
         mainWindow.hide();
         previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
@@ -296,35 +463,5 @@ const ffmpeg=require('./ffmpeg');
             if (error) throw error;
         });
     };
-
-    ipcRenderer.on("public-file", (event, arg) => {
-        // console.log(arg)
-        pubilc(arg);
-    });
-
+    
 })();
-
-
-ipcRenderer.on("executeJavaScript-result", (event, arg) => {
-    // console.log(arg)
-    Log.add(arg);
-});
-
-
-
-
-// document.getElementById('run').addEventListener("click",()=>{
-//     loadImage().then(image=>{
-
-//         let canvas = document.createElement('canvas');
-//         canvas.style.width="300px";
-//         canvas.width = image.naturalWidth;			  			
-//         canvas.height = image.naturalHeight;
-//         let ctx=canvas.getContext('2d');
-//         ctx.drawImage(image,0,0,canvas.width,canvas.height);
-//         document.body.appendChild(canvas);
-
-//         loadface(ctx);
-//         loadtext(ctx);
-//     })
-// })
