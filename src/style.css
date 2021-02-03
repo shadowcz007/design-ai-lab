@@ -1,0 +1,401 @@
+/* about window */
+
+.logo {
+    text-align: center;
+}
+
+#app-icon {
+    width: 88px;
+    height: 88px;
+}
+
+.clickable :hover {
+    border-bottom: 1px solid rgb(128, 116, 240);
+}
+
+
+/* main window */
+
+body {
+    background-color: #eee;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+header {
+    background-color: #333333;
+    display: flex;
+    justify-content: space-between;
+}
+
+header p {
+    min-width: 200px;
+}
+
+header h1 {
+    color: rgb(50, 52, 62);
+    font-size: 32px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 12px 0 12px;
+    font-family: monospace;
+}
+
+header span {
+    font-size: 10px;
+    color: #9db3c5;
+    background-color: rgb(253 253 220);
+    padding: 0px 6px;
+    margin: 0 4px;
+    font-weight: 500;
+}
+
+header .btns {
+    justify-content: space-between;
+    margin: 0;
+    padding: 2px;
+    min-width: 150px;
+}
+
+header .btns div {
+    display: flex;
+}
+
+main {
+    /* display: flex;
+    justify-content: space-between;
+    align-items: flex-start; */
+    /* position: absolute;
+    max-width: 1280px; */
+    /* width: 100%;
+    min-width: 400px;  */
+    /* margin-top: 32px;
+    padding-bottom: 44px; */
+}
+
+footer {
+    position: fixed;
+    /* background-color: #333333; */
+    margin: 0;
+    padding: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+footer p {
+    color: #333333;
+    font-size: 12px;
+    padding: 4px 12px;
+    text-align: right;
+    font-weight: 300;
+}
+
+p {
+    padding: 0;
+    margin: 0;
+}
+
+img {
+    margin: 24px;
+    background-position: 0 0, 5px 5px;
+    background-size: 10px 10px;
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
+}
+
+button {
+    color: rgb(109, 86, 214);
+    padding: 4px 16px;
+    margin: 4px;
+    display: flex;
+    box-shadow: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 300;
+    cursor: pointer;
+    background: none;
+    border: none;
+    user-select: none;
+    /* border-radius: 14px; */
+    outline: none;
+}
+
+button:hover {
+    background-color: rgb(109, 86, 214);
+    color: white;
+}
+
+.btns {
+    /* margin: 8px 0 0 12px; */
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+}
+
+.btn-small {
+    margin: 2px;
+    font-size: 12px;
+    border: none;
+    border-radius: 0;
+    /* box-shadow: inset 1px 1px 1px grey; */
+    font-size: 16px;
+    color: mediumpurple;
+    font-weight: 500;
+    padding: 2px 8px;
+}
+
+
+/* 布局---start---- */
+
+.grid {
+    position: relative;
+    margin-top: 4px;
+}
+
+.pannel {
+    background-color: #1b1b1b;
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    margin: 5px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.pannel.muuri-item-hidden {
+    z-index: 0;
+}
+
+.pannel.muuri-item-releasing {
+    z-index: 2;
+}
+
+.pannel.muuri-item-dragging {
+    z-index: 3;
+}
+
+.pannel.muuri-item-dragging .item-content {
+    background: blue;
+}
+
+.pannel.muuri-item-releasing .item-content {
+    background: blueViolet;
+}
+
+.pannel-large {
+    width: 100% !important;
+    position: fixed!important;
+    top: 0!important;
+    height: 100vh!important;
+    z-index: 99!important;
+    margin: 0!important;
+    left: 0 !important;
+    background-color: #1b1b1b!important;
+}
+
+
+/* 布局--end---- */
+
+#knowledge-pannel {
+    min-height: 480px;
+    height: calc(100vh - 24px);
+    width: calc(50% - 10px);
+    min-width: 240px;
+    background-color: white;
+}
+
+#editor-pannel {
+    min-height: 480px;
+    height: calc(100vh - 24px);
+    width: calc(50% - 10px);
+    min-width: 240px;
+}
+
+#knowledge-pannel .btns {
+    background-color: #1b1b1b;
+}
+
+#edit-file {
+    box-shadow: none;
+    background: none;
+    font-size: 14px;
+}
+
+#edit-file:hover {
+    background: rgb(128, 116, 240)
+}
+
+#readme {
+    min-height: 88px;
+    padding: 14px;
+    background-color: #eee;
+}
+
+.readme-show {
+    padding: 12px;
+    min-height: auto!important;
+    font-size: 18px;
+    font-weight: 500;
+    background-color: lemonchiffon!important;
+}
+
+.readme-show>div {
+    padding: 2px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.readme-show>p {
+    padding: 2px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.pannel-large #course {
+    height: 100%;
+}
+
+#course {
+    min-height: 300px;
+    background: white;
+    padding: 12px;
+}
+
+.course-show {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1b1b1b;
+}
+
+.course-show>div {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #333333
+}
+
+.course-show>p {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #333333
+}
+
+#editor {
+    /* width: calc(50% - 4px);*/
+    height: 100%;
+}
+
+#editor-container {
+    height: 100%;
+}
+
+#log {
+    overflow: scroll;
+    height: 20%;
+    min-height: 200px;
+    width: 100%;
+    min-width: 500px;
+    background: white;
+    display: none;
+}
+
+#log .content {
+    display: flex;
+    font-size: 10px;
+    padding: 2px 12px;
+    margin: 2px 0;
+}
+
+#log .content>div::before {
+    content: attr(data-count);
+    font-size: 8px;
+    background: #75beff;
+    width: 12px;
+    height: 12px;
+    margin: 0 6px;
+    display: block;
+    text-align: center;
+    line-height: 14px;
+    border-radius: 100%;
+}
+
+#blank-pannel {
+    display: none;
+}
+
+#blank-pannel p {
+    margin: 0 12px;
+    font-size: 12px;
+    color: dimgrey;
+}
+
+#blank-pannel h1 {
+    color: rgb(50, 52, 62);
+    font-size: 32px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 12px 0 12px;
+    font-family: monospace;
+}
+
+#blank-pannel span {
+    font-size: 10px;
+    color: #9db3c5;
+    background-color: rgb(253 253 220);
+    padding: 0px 6px;
+    margin: 0 4px;
+    font-weight: 500;
+}
+
+#recent-files {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 44px;
+}
+
+#recent-files .card {
+    display: flex;
+    background-color: white;
+    margin: 8px;
+    justify-content: space-between;
+    width: 400px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.card img {
+    width: 88px;
+    height: auto;
+}
+
+.card .content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.card .content h5 {
+    color: rgb(50, 52, 62);
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 12px 0 12px;
+    font-family: monospace;
+    display: block;
+    height: 44px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.card .content :hover {
+    /* box-shadow: 1px 1px 1px black; */
+}

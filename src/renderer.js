@@ -2,15 +2,16 @@
 const { ipcRenderer, remote } = require("electron");
 const md5 = require('md5');
 const fs = require("fs");
-const timeago=require('timeago.js');
-const Muuri=require("muuri");
+const timeago = require('timeago.js');
+const Muuri = require("muuri");
+
 // console.log(timeago)
 
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Rewrite = require("./rewrite");
 const db = require('./db');
-const Log=require('./log');
+const Log = require('./log');
 // const { read } = require("jimp");
 // const ffmpeg=require('./ffmpeg');
 
@@ -130,15 +131,7 @@ const Log=require('./log');
     }
 
 
-    // 缓存
-    document.querySelector("#course")?.addEventListener("input", e => {
-        e.preventDefault();
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-    });
-    document.querySelector("#readme")?.addEventListener("input", e => {
-        e.preventDefault();
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-    });
+    
 
 
     //GUI
@@ -219,7 +212,7 @@ const Log=require('./log');
         publicFile = document.querySelector("#public-file");
     const practiceBtn = document.querySelector("#practice-btn");
 
-    function addEventListener(element,fn){
+    function addClickEventListener(element,fn){
         let isClicked=false;
         element?.addEventListener("click", e => {
             e.preventDefault();
@@ -233,17 +226,17 @@ const Log=require('./log');
     }
 
     //打开文件
-    // addEventListener(openFile,openFileFn);
+    // addClickEventListener(openFile,openFileFn);
     //编辑/预览 切换
-    addEventListener(editFile,editFileFn);
+    addClickEventListener(editFile,editFileFn);
     //新建
-    // addEventListener(newFile,newFileFn);
+    // addClickEventListener(newFile,newFileFn);
     //保存
-    // addEventListener(saveFile,saveFileFn);
+    // addClickEventListener(saveFile,saveFileFn);
     //发布
-    addEventListener(publicFile,pubilcFn);
+    addClickEventListener(publicFile,pubilcFn);
     //实时编辑代码
-    addEventListener(practiceBtn,practiceFn);
+    addClickEventListener(practiceBtn,practiceFn);
 
     //打开文件
     ipcRenderer.on("open-file",openFileFn);
@@ -279,24 +272,9 @@ const Log=require('./log');
             // 
             let res = fs.readFileSync(filePath[0], 'utf-8');
             res = JSON.parse(res);
-            knowledge.set(res.knowledge);
-            editor.setCode(res.code);
-            // saveFile.style.display = "none";
-            editFile.style.display = "block";
-            // openFile.style.display="none";
-            // newFile.style.display = "block";
-            knowledge.toggle(true);
-
-            localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-            localStorage.setItem("code", editor.getCode());
-            localStorage.removeItem('layout');
-
-            //存至数据库
-            db.add(res);
-
-            document.querySelector(".grid").style.display="block";
-            document.getElementById("blank-pannel").style.display="none";
             
+            openFile(res);
+             
         };
     }
 
@@ -320,9 +298,8 @@ const Log=require('./log');
     }
 
     function newFileFn(){
-        // saveFile.style.display = "block";
-        //editFile.style.display = "none";
-        // newFile.style.display = "none";
+        document.querySelector(".grid").style.display="block";
+        document.getElementById("blank-pannel").style.display="none";
         //编辑状态
         editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
         knowledge.toggle(false);
@@ -338,6 +315,13 @@ const Log=require('./log');
         localStorage.removeItem('layout');
         grid.destroy();
         grid=initGrid();
+
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        if (previewWindow && mainWindow) {
+            previewWindow.hide();
+            mainWindow.show();
+        };
         // openPracticeFn();
     }
 
@@ -387,21 +371,49 @@ const Log=require('./log');
         
     }
 
+    function openFile(res){
+        knowledge.set(res.knowledge);
+            editor.setCode(res.code);
+            // saveFile.style.display = "none";
+            editFile.style.display = "block";
+            // openFile.style.display="none";
+            // newFile.style.display = "block";
+            knowledge.toggle(true);
+
+            localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+            localStorage.setItem("code", editor.getCode());
+            localStorage.removeItem('layout');
+            
+            //存至数据库
+            db.add(res);
+
+            document.querySelector(".grid").style.display="block";
+            document.getElementById("blank-pannel").style.display="none";
+
+            grid.destroy();
+            grid=initGrid();
+
+            openPractice();
+    }
+
     function createCard(data){
         let div=document.createElement('div');
         div.className="card";
         let img=new Image();
         img.src=data.poster;
         div.appendChild(img);
+        let content=document.createElement('div');
+        content.className="content";
+        div.appendChild(content);
         let readme=document.createElement('h5');
         readme.innerHTML=data.knowledge.readme;
-        div.appendChild(readme);
-
+        content.appendChild(readme);
+    
         let t=document.createElement('p');
-        readme.innerHTML=data.knowledge.readme;
-        timeago.format(data.createDate, 'zh_CN');
-
-        console.log(data)
+        t.innerHTML=timeago.format(data.createDate, 'zh_CN');
+        content.appendChild(t);
+        // console.log(data)
+        addClickEventListener(div,()=>openFile(data));
         return div;
     }
 
@@ -418,15 +430,22 @@ const Log=require('./log');
             //编程模式
             grid.destroy();
             openPracticeFn();
+
         };
     }
 
     function openPracticeFn() {
         // document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
         document.getElementById("editor-pannel").classList.add("pannel-large");
+        document.getElementById("log").style.display="block";
+        document.getElementById("editor-container").style.height="80%";
         practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
         
         // grid=initGrid(false);
+        openPractice();
+    };
+
+    function openPractice(){
         previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
         if (previewWindow && mainWindow) {
@@ -439,7 +458,7 @@ const Log=require('./log');
                 editor.format();
             })
         };
-    };
+    }
 
     function pubilcFn() {
         editor.toggle(false);
