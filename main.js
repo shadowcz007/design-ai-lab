@@ -18,6 +18,8 @@ global._WINS = {};
 
 const _INDEX_HTML = path.join(__dirname, 'src/index.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
+const _READ_HTML = path.join(__dirname, 'src/read.html');
+// const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 
 let appIcon;
@@ -48,7 +50,20 @@ const config = {
         resizable: true,
         titleBarStyle: "hiddenInset",
         html: _PRE_HTML
-    }
+    },
+    readWindow: {
+        width: 800,
+        height: 600,
+        minHeight: 400,
+        minWidth: 500,
+        align: 'topLeft',
+        title: "阅读",
+        show: false,
+        closable: true,
+        resizable: true,
+        titleBarStyle: "default",
+        html: _READ_HTML
+    },
 }
 
 function createWindow(key, opts, workAreaSize) {
@@ -77,7 +92,12 @@ function createWindow(key, opts, workAreaSize) {
     });
 
     // 加载xxx.html
-    win.loadFile(opts.html);
+    if (opts.html.match("https://")) {
+        win.loadURL(opts.html);
+    } else {
+        win.loadFile(opts.html);
+    }
+
     // 打开调试工具
     if (process.env.NODE_ENV === 'development') win.webContents.openDevTools();
     // console.log(opts)
@@ -128,6 +148,15 @@ function initWindow() {
 function initAppIcon() {
     appIcon = new Tray(path.join(__dirname, "assets/appIcon.png"));
     const contextMenu = Menu.buildFromTemplate([{
+            label: '阅读',
+            type: 'normal',
+            checked: false,
+            click: async() => {
+                global._WINS.mainWindow.hide();
+                global._WINS.previewWindow.hide();
+                global._WINS.readWindow.show();
+            }
+        }, {
             label: '编辑',
             type: 'normal',
             checked: false,

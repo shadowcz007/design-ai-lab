@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>READ</title>
+
+    <link rel="stylesheet" href="../node_modules/pdfjs-dist/web/pdf_viewer.css">
+    
+    <!-- <meta name="google-translate-customization" content="9f841e7780177523-3214ceb76f765f38-gc38c6fe6f9d06436-c"></meta> -->
+    <script type="text/javascript" src="https://translate.google.cn/translate_a/element.js?cb=googleTranslateElementInit"></script>
+   
+    <style>
+      main{
+        width: 100%;
+        display: flex;
+        overflow: hidden;
+      }
+
+      #pageContainer{
+        width: 50%;
+        
+      }
+        #my-note{
+              width: calc(50% - 24px);
+            height: 100vh;
+            background-color: #eee;
+            outline: none;
+            position: fixed;
+            padding: 24px;
+            top: 0;
+            right: 0;
+            overflow-y: scroll;
+          }
+          .note-text{
+              padding: 24px;
+              font-size: 16px;
+              font-weight: 300;
+          }
+          #viewer{
+              outline: none;
+              width: 100%;
+              overflow: scroll;
+          }
+          .pdf-pages{
+              display: flex;
+              align-items: center;
+              justify-content: center;
+          }
+          .textLayer{
+              opacity: 1!important;
+          }
+          .textLayer ::selection {
+              background: rgb(31 232 255 / 21%)!important;
+          }
+
+          .goog-te-combo{
+            outline: none;
+          }
+
+    </style>
+</head>
+<body>
+  <main>
+
+    <div id="pageContainer">
+      <div id="viewer" class="pdfViewer"></div>
+  </div>
+
+  <div id="my-note" contenteditable></div>
+
+
+  
+  </main>
+  
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+          window.g=new google.translate.TranslateElement({
+            pageLanguage: 'en', 
+            layout: google.translate.TranslateElement.InlineLayout.Cj}, 
+            'my-note');
+        }
+
+const path=require('path');
+const pdfjsLib=require("pdfjs-dist");
+// console.log(pdfjsLib)
+
+var CMAP_URL = path.join(__dirname,"../node_modules/pdfjs-dist/cmaps/");
+var CMAP_PACKED = true;
+
+var PDF_PATH = path.join(__dirname,'../examples/Gavin Lew, Robert M. Schumacher Jr. - AI and UX_ Why Artificial Intelligence Needs User Experience (2020, Apress) - libgen.li.pdf');
+// var PAGE_NUMBER = 1;
+// var PAGE_SCALE = 1;
+// var SVG_NS = "http://www.w3.org/2000/svg";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =path.join(__dirname,"../node_modules/pdfjs-dist/build/pdf.worker.js");
+// console.log(pdfjsLib.GlobalWorkerOptions.workerSrc)
+//字典，存储英中结果
+// let textsMap={};
+// let pdfDocument;
+// function buildSVG(viewport, textContent) {
+//   // Building SVG with size of the viewport (for simplicity)
+//   var svg = document.createElementNS(SVG_NS, "svg:svg");
+//   svg.setAttribute("width", viewport.width + "px");
+//   svg.setAttribute("height", viewport.height + "px");
+//   // items are transformed to have 1px font size
+//   svg.setAttribute("font-size", 1);
+//   svg.style.outline='1px solid gray';
+
+//   // processing all items
+//   textContent.items.forEach(function (textItem) {
+//     // we have to take in account viewport transform, which includes scale,
+//     // rotation and Y-axis flip, and not forgetting to flip text.
+//     var tx = pdfjsLib.Util.transform(
+//       pdfjsLib.Util.transform(viewport.transform, textItem.transform),
+//       [1, 0, 0, -1, 0, 0]
+//     );
+//     var style = textContent.styles[textItem.fontName];
+//     // adding text element
+//     var text = document.createElementNS(SVG_NS, "svg:text");
+    
+//     text.setAttribute("transform", "matrix(" + tx.join(" ") + ")");
+//     text.setAttribute("font-family", style.fontFamily);
+//     text.textContent = textItem.str;
+//     // console.log(text.outerHTML);
+//     let id=md5(text.outerHTML);
+//     text.setAttribute('id','_'+id);
+//     text.setAttribute('data-text',textItem.str);
+//     textsMap[id]={
+//         en:textItem.str,
+//         zh:null
+//     };
+//     svg.appendChild(text);
+
+//   });
+//   return svg;
+// };
+
+// function loadPdfDoc(){
+//     return new Promise((resolve,reject)=>{
+//         if(!pdfDocument){
+//             // Loading document and page text content
+//             var loadingTask = pdfjsLib.getDocument({ url: PDF_PATH });
+//             loadingTask.promise.then(pdfDoc=> {
+//                 pdfDocument=pdfDoc;
+//                 resolve(pdfDocument);
+//             });
+//         }else{
+//             resolve(pdfDocument);
+//         }
+//     });
+// }
+
+// function pageLoaded() {
+//     return new Promise((resolve,reject)=>{
+//         loadPdfDoc().then(pdfDocument=>{
+//             let numPages=pdfDocument.numPages;
+//             Promise.all([
+//                 getPage(pdfDocument,PAGE_NUMBER),
+//                 getPage(pdfDocument,PAGE_NUMBER+1)
+//             ]).then(svgs=>{
+//                 let div=document.createElement('div');
+//                 div.setAttribute("contenteditable", "true");
+//                 div.className="pdf-pages";
+//                 Array.from(svgs,svg=>div.appendChild(svg));
+//                 document.getElementById("pageContainer").appendChild(div);
+//                 PAGE_NUMBER+=2;
+//                 resolve();
+//             }); 
+//         });
+//     });
+    
+// };
+
+// function getPage(pdfDocument,pageNum){
+//     return new Promise((resolve,reject)=>{
+//         pdfDocument.getPage(pageNum).then(page=> {
+//             var viewport = page.getViewport({ scale: PAGE_SCALE });
+//             page.getTextContent().then(textContent=>{
+//               // building SVG and adding that to the DOM
+//               let svg = buildSVG(viewport, textContent);
+//               resolve(svg);
+//             });
+//           });
+//     })
+    
+// };
+
+// function isTranslateDone(){
+//     //翻译完成
+//     let count=0;
+//     for (const id in textsMap) {
+//         let d=document.querySelector(`#_${id}`);
+//         if(d && !textsMap[id].zh){
+//             textsMap[id]={
+//                 en:textsMap[id].en,
+//                 zh:d.textContent
+//             };
+//         }else{
+//             count++;
+//         }
+//     };
+
+//     if(count>0) return setTimeout(isTranslateDone,1000); 
+
+//     window.g.dispose();
+//     for (const id in textsMap) {
+//         let d=document.querySelector(`#_${id}`);
+//         if(d){
+//             d.textContent=textsMap[id].zh;
+//         }
+//     };
+// }
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   if (typeof pdfjsLib === "undefined") return;
+  
+//   pageLoaded().then(()=>pageLoaded());
+
+//   //监听翻译完成的图片加载
+//   var  xxx_filter = {
+//     urls: ["file://translate.google.com/*"]
+//     };
+//     var session=require('electron').remote.session;  
+//     session.defaultSession.webRequest.onBeforeSendHeaders(xxx_filter, (details, callback) => {
+//         console.log(details)
+//         if(details.url.match('file://translate.google.com/')){
+ 
+//         }
+        
+//         callback(details);
+//     });
+
+// });
+
+const pdfjsViewer=require("pdfjs-dist/web/pdf_viewer");
+var eventBus = new pdfjsViewer.EventBus();
+
+// (Optionally) enable hyperlinks within PDF files.
+var pdfLinkService = new pdfjsViewer.PDFLinkService({
+  eventBus,
+});
+var container = document.getElementById("pageContainer");
+var pdfViewer = new pdfjsViewer.PDFViewer({
+  container,
+  eventBus,
+  linkService: pdfLinkService,
+  textLayerMode:1,
+});
+pdfLinkService.setViewer(pdfViewer);
+
+eventBus.on("pagesinit", function () {
+  pdfViewer.currentScaleValue = "page-width";
+});
+
+// Loading document.
+var loadingTask = pdfjsLib.getDocument({
+  url: PDF_PATH,
+  cMapUrl: CMAP_URL,
+  cMapPacked: CMAP_PACKED,
+});
+loadingTask.promise.then(function (pdfDocument) {
+  pdfViewer.setDocument(pdfDocument);
+  pdfLinkService.setDocument(pdfDocument, null);
+});
+
+//屏幕取词
+function getSelectionWords(isDb){
+    var selection = document.getSelection();
+    if(selection.toString()==='') return ;
+
+    let text=document.createElement('p');
+    text.innerText=selection.toString();
+    text.className='note-text';
+
+    if(isDb){
+      let textLayer=selection.anchorNode.parentElement;
+      text.innerText=textLayer.innerText;
+    }
+    // console.log(isDb,selection.toString(),selection.anchorNode.parentElement);
+    
+    Array.from(document.querySelectorAll("#my-note .note-text"),t=>t.remove());
+    document.querySelector("#my-note").appendChild(text);
+    
+};
+let isStart=false;
+document.querySelector("#viewer").addEventListener("click", ()=>{
+  isStart=true;
+}, false);
+document.querySelector("#viewer").addEventListener("mousemove",()=>{
+  if(isStart) getSelectionWords(false);
+});
+document.querySelector("#viewer").addEventListener("mouseup",()=>{
+  isStart=false;
+});
+
+document.querySelector("#viewer").addEventListener("dblclick", ()=>{
+  getSelectionWords(true)
+}, false);
+
+
+    </script>
+
+</body>
+</html>

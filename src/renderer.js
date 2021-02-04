@@ -1,11 +1,12 @@
 // 渲染进程
 const { ipcRenderer, remote } = require("electron");
 const md5 = require('md5');
-const fs = require("fs");
+const fs = require("fs"),path=require("path");
 const timeago = require('timeago.js');
 const Muuri = require("muuri");
 
-// console.log(timeago)
+// console.log(Marklib)
+
 
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");

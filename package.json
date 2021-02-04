@@ -43,6 +43,7 @@
         "monaco-editor": "^0.21.3",
         "muuri": "^0.9.3",
         "object-hash": "^2.1.1",
+        "pdfjs-dist": "^2.6.347",
         "timeago.js": "^4.0.2"
     },
     "build": {

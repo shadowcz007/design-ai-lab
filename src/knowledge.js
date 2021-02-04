@@ -10,7 +10,7 @@ renderer.code = function(code, language) {
     }
 };
 
-console.log(renderer)
+// console.log(renderer)
 class Knowledge {
     constructor(readme, course, knowledge) {
         this.readOnly = true;

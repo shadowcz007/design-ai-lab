@@ -413,5 +413,5 @@ button:hover {
 }
 
 .card:hover {
-    box-shadow: 1px 1px 1px black;
+    box-shadow: 0 0 20px 10px #c9e6ff;
 }
