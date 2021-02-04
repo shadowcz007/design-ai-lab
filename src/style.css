@@ -364,11 +364,27 @@ button:hover {
     width: 400px;
     align-items: center;
     cursor: pointer;
+    height: 200px;
 }
 
-.card img {
-    width: 88px;
-    height: auto;
+.card-body {
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 18px;
+}
+
+.card .img {
+    width: 148px;
+    margin: 18px;
+    border: 0.5px solid #efefef;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 88px;
 }
 
 .card .content {
@@ -396,6 +412,6 @@ button:hover {
     flex-direction: column;
 }
 
-.card .content :hover {
-    /* box-shadow: 1px 1px 1px black; */
+.card:hover {
+    box-shadow: 1px 1px 1px black;
 }

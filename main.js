@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog} = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog } = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
 const openAboutWindow = require('about-window').default;
@@ -8,7 +8,7 @@ const package = require("./package.json");
 
 const dataPath = storage.getDataPath();
 // console.log(dataPath,path.join(dataPath, "db.json"));
-global._DBPATH=path.join(dataPath, "db.json");
+global._DBPATH = path.join(dataPath, "db.json");
 
 //平台
 const _IS_MAC = process.platform === 'darwin';
@@ -80,9 +80,9 @@ function createWindow(key, opts, workAreaSize) {
     win.loadFile(opts.html);
     // 打开调试工具
     if (process.env.NODE_ENV === 'development') win.webContents.openDevTools();
-
-    if (opts.show === true) win.webContents.once("dom-ready", () => {
-        win.show();
+    // console.log(opts)
+    win.webContents.once("dom-ready", () => {
+        opts.show === true ? win.show() : null;
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
     });
     win.on("closed", () => {
@@ -101,7 +101,7 @@ function initWindow() {
     config.mainWindow.width = workAreaSize.width - config.previewWindow.width - 20;
 
     storage.get('app', function(error, data) {
-        // console.log('storage',data)
+        console.log('storage', data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
         if (data && data.public === 1) {
@@ -112,9 +112,10 @@ function initWindow() {
             config.previewWindow.width = data.size[0];
             config.previewWindow.height = data.size[1];
             config.previewWindow.resizable = false;
-        }else{
+        } else {
             //主窗口显示在欢迎界面
-            
+            //初始状态在 欢迎界面
+            config.mainWindow.executeJavaScript = `window.addEventListener('load',closeFn);`;
         }
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
@@ -163,19 +164,18 @@ function initMenu(modeMenu) {
         // { role: 'appMenu' }
         ...(_IS_MAC ? [{
             label: package.name,
-            submenu: [
-                {
+            submenu: [{
                     label: '关于',
                     click: () =>
                         openAboutWindow({
                             icon_path: path.join(__dirname, 'logo.png'),
-                            product_name:'Design.ai Lab',
+                            product_name: 'Design.ai Lab',
                             copyright: 'Copyright (c) 2021 shadow',
-                            adjust_window_size:true,
-                            bug_link_text:"反馈bug",
+                            adjust_window_size: true,
+                            bug_link_text: "反馈bug",
                             package_json_dir: __dirname,
                             open_devtools: process.env.NODE_ENV === 'development',
-                            css_path:path.join(__dirname, 'src/style.css'),
+                            css_path: path.join(__dirname, 'src/style.css'),
                         }),
                 },
                 { type: 'separator' },
@@ -199,34 +199,34 @@ function initMenu(modeMenu) {
             label: '文件',
             submenu: [{
                     label: '打开',
-                    accelerator:'CmdOrCtrl+O',
+                    accelerator: 'CmdOrCtrl+O',
                     click: () => global._WINS.mainWindow.webContents.send('open-file')
                 },
                 {
                     label: '新建',
-                    accelerator:'CmdOrCtrl+N',
+                    accelerator: 'CmdOrCtrl+N',
                     click: () => global._WINS.mainWindow.webContents.send('new-file')
                 },
                 {
                     label: '另存为',
-                    accelerator:'CmdOrCtrl+S',
+                    accelerator: 'CmdOrCtrl+S',
                     click: () => global._WINS.mainWindow.webContents.send('save-file')
                 },
                 { type: 'separator' },
                 {
                     label: '编辑',
-                    accelerator:'CmdOrCtrl+E',
+                    accelerator: 'CmdOrCtrl+E',
                     click: () => global._WINS.mainWindow.webContents.send('edit-file')
                 },
                 {
                     label: '发布',
-                    accelerator:'CmdOrCtrl+P',
+                    accelerator: 'CmdOrCtrl+P',
                     click: () => global._WINS.mainWindow.webContents.send('public-file')
                 },
                 { type: 'separator' },
                 {
                     label: '关闭',
-                    accelerator:'CmdOrCtrl+W',
+                    accelerator: 'CmdOrCtrl+W',
                     click: () => global._WINS.mainWindow.webContents.send('close-file')
                 }
             ]

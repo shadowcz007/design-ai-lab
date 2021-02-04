@@ -15,71 +15,69 @@ const Log = require('./log');
 // const { read } = require("jimp");
 // const ffmpeg=require('./ffmpeg');
 
+//改写代码
+//TODO 错误捕捉
+const rewrite = new Rewrite(["setup", "draw"]);
 
-(() => {
-        //改写代码
-        //TODO 错误捕捉
-        const rewrite = new Rewrite(["setup", "draw"]);
+//编辑器
+let previewWindow = null,
+    mainWindow = null;
 
-        //编辑器
-        let previewWindow = null,
-            mainWindow = null;
+const editor = new Editor(
+        document.querySelector("#editor"),
+        localStorage.getItem("code"),
+        (code) => {
+            previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+            //const code=this.editor.getValue();
 
-        const editor = new Editor(
-                document.querySelector("#editor"),
-                localStorage.getItem("code"),
-                (code) => {
-                    previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-                    //const code=this.editor.getValue();
+            //检查编辑器 写的代码 本身的错误
+            let isError = false;
+            try {
+                new Function(code.trim())();
+            } catch (error) {
+                //console.log(error)
+                Log.add(error);
+                isError = true;
+            };
 
-                    //检查编辑器 写的代码 本身的错误
-                    let isError = false;
-                    try {
-                        new Function(code.trim())();
-                    } catch (error) {
-                        //console.log(error)
-                        Log.add(error);
-                        isError = true;
-                    };
+            // // console.log(code)
+            // try {
+            //     code = rewrite.create(code.trim());
+            // } catch (error) {
+            //     //console.log(error)
+            //     Log.add(error);
+            // }
 
-                    // // console.log(code)
-                    // try {
-                    //     code = rewrite.create(code.trim());
-                    // } catch (error) {
-                    //     //console.log(error)
-                    //     Log.add(error);
-                    // }
+            // previewWindow.webContents.executeJavaScript(`
 
-                    // previewWindow.webContents.executeJavaScript(`
+            //     try {
+            //         if (p5.instance) { p5.instance.remove() };
+            //         document.querySelector("#p5").innerHTML = "";
+            //         ${code.trim()};
+            //         new p5(null, 'p5');
+            //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
+            //     } catch (error) {
+            //         console.log(error);
+            //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
+            //     };
 
-                    //     try {
-                    //         if (p5.instance) { p5.instance.remove() };
-                    //         document.querySelector("#p5").innerHTML = "";
-                    //         ${code.trim()};
-                    //         new p5(null, 'p5');
-                    //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-                    //     } catch (error) {
-                    //         console.log(error);
-                    //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-                    //     };
+            //     `, false)
+            //     .then((result) => {
+            //         //console.log("成功", result)
+            //         // editorElement.classList.remove("ui-error");
+            //         // editorElement.classList.add("ui-success");
+            //     }).catch(err => {
+            //         Log.add(err)
+            //             // console.log("失败")
+            //             // editorElement.classList.add("ui-error");
+            //             // editorElement.classList.remove("ui-success");
+            //     });
 
-                    //     `, false)
-                    //     .then((result) => {
-                    //         //console.log("成功", result)
-                    //         // editorElement.classList.remove("ui-error");
-                    //         // editorElement.classList.add("ui-success");
-                    //     }).catch(err => {
-                    //         Log.add(err)
-                    //             // console.log("失败")
-                    //             // editorElement.classList.add("ui-error");
-                    //             // editorElement.classList.remove("ui-success");
-                    //     });
+            if (isError) return;
 
-                    if (isError) return;
+            let preRun = ['preload', 'setup', 'draw'];
 
-                    let preRun = ['preload', 'setup', 'draw'];
-
-                    previewWindow.webContents.executeJavaScript(`
+            previewWindow.webContents.executeJavaScript(`
                 try {
                     if (p5.instance) { p5.instance.remove() };
                     document.querySelector("#p5").innerHTML = "";
@@ -251,15 +249,25 @@ const Log = require('./log');
     //发布
     ipcRenderer.on("public-file",pubilcFn);
    
-    //初始状态在 欢迎界面
-    window.addEventListener('load',closeFn);
+    
 
     //显示代码错误
     ipcRenderer.on("executeJavaScript-result", (event, arg) => {
         Log.add(arg);
     });
 
+    //仅显示主窗口,
+    //仅显示预览窗口
+    function showWinControl(mShow=true,pShow=true){
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+        if (previewWindow && mainWindow) {
+            pShow==true?previewWindow.show():previewWindow.hide();
+            mShow===true?mainWindow.show():mainWindow.hide();
+        };
+    };
 
+    //打开文件
     function openFileFn(){
         let filePath = remote.dialog.showOpenDialogSync({
             title: "打开……",
@@ -278,9 +286,9 @@ const Log = require('./log');
         };
     }
 
-    function editFileFn(){
-        let isReadOnly = knowledge.toggle();
-        // console.log(isReadOnly)
+    //编辑状态切换
+    function editFileFn(hardReadOnly=null){
+        let isReadOnly = knowledge.toggle(hardReadOnly);
         if (!isReadOnly) {
             //编辑状态
             editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
@@ -292,11 +300,10 @@ const Log = require('./log');
             editFile.innerHTML = `<i class="fas fa-toggle-on"></i>`;
             document.getElementById("knowledge-pannel").classList.remove("pannel-large");
             grid=initGrid();
-        }
-        // newFile.style.display = "block";
-        // saveFile.style.display = "block";
-    }
+        };
+    };
 
+    //新建文件
     function newFileFn(){
         document.querySelector(".grid").style.display="block";
         document.getElementById("blank-pannel").style.display="none";
@@ -348,8 +355,10 @@ const Log = require('./log');
             
         };
         // console.log(filePath)
-    }
+    };
 
+    
+    
     function closeFn(){
         // console.log('closeFn')
         document.querySelector(".grid").style.display="none";
@@ -373,44 +382,53 @@ const Log = require('./log');
 
     function openFile(res){
         knowledge.set(res.knowledge);
-            editor.setCode(res.code);
+        editor.setCode(res.code);
             // saveFile.style.display = "none";
-            editFile.style.display = "block";
+        // editFile.style.display = "block";
             // openFile.style.display="none";
             // newFile.style.display = "block";
-            knowledge.toggle(true);
+        knowledge.toggle(true);
 
-            localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-            localStorage.setItem("code", editor.getCode());
-            localStorage.removeItem('layout');
+        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+        localStorage.setItem("code", editor.getCode());
+        localStorage.removeItem('layout');
             
-            //存至数据库
-            db.add(res);
+        //存至数据库
+        db.add(res);
 
-            document.querySelector(".grid").style.display="block";
-            document.getElementById("blank-pannel").style.display="none";
+        document.querySelector(".grid").style.display="block";
+        document.getElementById("blank-pannel").style.display="none";
 
-            grid.destroy();
-            grid=initGrid();
+        grid.destroy();
+        grid=initGrid();
 
-            openPractice();
+        openPractice();
     }
 
     function createCard(data){
         let div=document.createElement('div');
         div.className="card";
-        let img=new Image();
-        img.src=data.poster;
-        div.appendChild(img);
+        
+        let card=document.createElement('div');
+        card.className="card-body";
+
+        let img=document.createElement('div');
+        img.className="img"
+        img.style.backgroundImage=`url(${data.poster})`
+        
         let content=document.createElement('div');
         content.className="content";
-        div.appendChild(content);
+        
         let readme=document.createElement('h5');
         readme.innerHTML=data.knowledge.readme;
-        content.appendChild(readme);
-    
+        
         let t=document.createElement('p');
         t.innerHTML=timeago.format(data.createDate, 'zh_CN');
+
+        div.appendChild(card);
+        card.appendChild(img);
+        card.appendChild(content);
+        content.appendChild(readme);
         content.appendChild(t);
         // console.log(data)
         addClickEventListener(div,()=>openFile(data));
@@ -432,55 +450,53 @@ const Log = require('./log');
             openPracticeFn();
 
         };
-    }
+    };
 
-    function openPracticeFn() {
+    //编程，UI状态
+    function openPracticeHtml(){
         // document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
         document.getElementById("editor-pannel").classList.add("pannel-large");
         document.getElementById("log").style.display="block";
         document.getElementById("editor-container").style.height="80%";
         practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
-        
-        // grid=initGrid(false);
-        openPractice();
-    };
+    }
 
-    function openPractice(){
-        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+    //编程功能，按钮
+    function openPracticeFn() {
+        openPracticeHtml();
+        openPractice(true,true);
+    };
+    //打开编程功能
+    function openPractice(mShow=true,pShow=true){
+        showWinControl(mShow,false);
         if (previewWindow && mainWindow) {
-            previewWindow.show();
-            previewWindow.webContents.reload();
             mainWindow.focus();
+            previewWindow.webContents.reload();
             previewWindow.webContents.once('dom-ready', () => {
                 editor.execute();
                 localStorage.setItem("code", editor.getCode());
                 editor.format();
+                pShow===true?previewWindow.show():previewWindow.hide();
             })
         };
-    }
-
-    function pubilcFn() {
-        editor.toggle(false);
-        openPracticeFn();
-        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
-        mainWindow.hide();
-        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-        previewWindow.setResizable(false);
-        previewWindow.setClosable(true);
-        // console.log(previewWindow.getSize())
-        const storage = require('electron-json-storage');
-        storage.set('app', {
-            public: 1,
-            executeJavaScript: `
-                                if (p5.instance) { p5.instance.remove() };
-                                document.querySelector("#p5").innerHTML = "";
-                                ${editor.getCode().trim()};
-                                new p5(null, 'p5');`,
-            size: previewWindow.getSize()
-        }, function(error) {
-            if (error) throw error;
-        });
     };
-    
-})();
+
+//发布按钮
+function pubilcFn() {
+    editor.toggle(false);
+    previewWindow.setResizable(false);
+    previewWindow.setClosable(true);
+    openPractice(false,true);
+    const storage = require('electron-json-storage');
+    storage.set('app', {
+        public: 1,
+        executeJavaScript: `
+                    if (p5.instance) { p5.instance.remove() };
+                    document.querySelector("#p5").innerHTML = "";
+                    ${editor.getCode().trim()};
+                    new p5(null, 'p5');`,
+        size: previewWindow.getSize()
+    }, function(error) {
+        if (error) throw error;
+    });
+};
