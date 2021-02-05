@@ -4,7 +4,7 @@ const md5 = require('md5');
 const fs = require("fs"),path=require("path");
 const timeago = require('timeago.js');
 const Muuri = require("muuri");
-
+const Resizer =require('resizer-cl');
 // console.log(Marklib)
 
 
@@ -26,11 +26,9 @@ let previewWindow = null,
 
 const editor = new Editor(
         document.querySelector("#editor"),
-        localStorage.getItem("code"),
         (code) => {
             previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
             //const code=this.editor.getValue();
-
             //检查编辑器 写的代码 本身的错误
             let isError = false;
             try {
@@ -108,8 +106,7 @@ const editor = new Editor(
 
     const knowledge = new Knowledge(
         document.querySelector("#readme"),
-        document.querySelector("#course"),
-        localStorage.getItem("knowledge"));
+        document.querySelector("#course"));
 
     //获得需要存储的数据
     function getSaveFileContent() {
@@ -134,8 +131,14 @@ const editor = new Editor(
 
 
     //GUI
+    //界面
+    
+    // console.log(Resizer)
+    let resizer=null;
+
     // 布局
-    window.grid=initGrid();
+    let grid=initGrid();
+
     editor.onMouseUp=function(){
         console.log("onMouseUp",window.grid)
     }
@@ -145,27 +148,33 @@ const editor = new Editor(
         console.log("onMouseDown",window.grid)
     }
     function initGrid(dragEnabled=true) {
-        let grid = new Muuri('.grid', {
-            dragEnabled: true,
-            layoutOnInit: false
-        }).on('move', function () {
-            saveLayout(grid);
-        });
+        try {
+            // console.log('initGrid')
+            let _grid = new Muuri('.grid', {
+                dragEnabled: true,
+                layoutOnInit: false
+            }).on('move', function () {
+                saveLayout(_grid);
+            });
 
-        let layout = window.localStorage.getItem('layout');
-        if (layout) {
-            loadLayout(grid, layout);
-        } else {
-            grid.layout(true);
-        };
+            let layout = window.localStorage.getItem('layout');
+            if (layout) {
+                loadLayout(_grid, layout);
+            } else {
+                _grid.layout(true);
+            };
 
-        window.addEventListener('load',()=> grid.refreshItems().layout());
+            window.addEventListener('load',()=> _grid.refreshItems().layout());
 
-        grid.on('dragReleaseEnd', function (item) {
-            console.log(item);
-        });
+            _grid.on('dragReleaseEnd', function (item) {
+                console.log(item);
+            });
 
-        return grid;
+            return _grid;
+        } catch (error) {
+            return null;
+        }
+        
     }
 
     function serializeLayout(grid) {
@@ -240,7 +249,10 @@ const editor = new Editor(
     //打开文件
     ipcRenderer.on("open-file",openFileFn);
     //编辑/预览 切换
-    ipcRenderer.on("edit-file",editFileFn);
+    ipcRenderer.on("edit-file",(event,arg)=>{
+        // console.log(arg)
+        editFileFn(arg.hardReadOnly);
+    });
     //新建
     ipcRenderer.on("new-file",newFileFn);
     //保存
@@ -290,15 +302,19 @@ const editor = new Editor(
     //编辑状态切换
     function editFileFn(hardReadOnly=null){
         let isReadOnly = knowledge.toggle(hardReadOnly);
+        showWinControl(true,true);
         if (!isReadOnly) {
+            // openPractice();
+            // console.log(grid)
             //编辑状态
-            editFile.innerHTML = `<i class="fas fa-toggle-off"></i>`;
+            editFile.innerHTML = `<i class="far fa-lightbulb"></i>`;
             // document.getElementById("knowledge-pannel").classList.remove("knowledge-pannel-small");
             document.getElementById("knowledge-pannel").classList.add("pannel-large");
-            grid.destroy();
+            grid?.destroy();
         } else {
             //预览状态
-            editFile.innerHTML = `<i class="fas fa-toggle-on"></i>`;
+            console.log("预览状态")
+            editFile.innerHTML = `<i class="far fa-eye"></i>`;
             document.getElementById("knowledge-pannel").classList.remove("pannel-large");
             grid=initGrid();
         };
@@ -318,24 +334,19 @@ const editor = new Editor(
         //console.log(document.getElementById("editor-pannel"))
         //document.getElementById("editor-pannel").classList.remove("pannel-large");
         editor.setCode('//Hello AI world!');
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-        localStorage.setItem("code", editor.getCode());
+        // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+        //localStorage.setItem("code", editor.getCode());
         localStorage.removeItem('layout');
         grid.destroy();
         grid=initGrid();
 
-        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
-        mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
-        if (previewWindow && mainWindow) {
-            previewWindow.hide();
-            mainWindow.show();
-        };
+        showWinControl(true,false);
         // openPracticeFn();
     }
 
     function saveFileFn(){
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-        localStorage.setItem("code", editor.getCode());
+        // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+        //localStorage.setItem("code", editor.getCode());
 
         let filePath = remote.dialog.showSaveDialogSync({
             title: "另存为……",
@@ -379,19 +390,15 @@ const editor = new Editor(
         document.getElementById("recent-files").innerHTML='';
         document.getElementById("recent-files").appendChild(div);
         
+        showWinControl(true,false);
     }
 
     function openFile(res){
         knowledge.set(res.knowledge);
         editor.setCode(res.code);
-            // saveFile.style.display = "none";
-        // editFile.style.display = "block";
-            // openFile.style.display="none";
-            // newFile.style.display = "block";
-        knowledge.toggle(true);
-
-        localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
-        localStorage.setItem("code", editor.getCode());
+       
+        // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
+        //localStorage.setItem("code", editor.getCode());
         localStorage.removeItem('layout');
             
         //存至数据库
@@ -439,27 +446,39 @@ const editor = new Editor(
     function practiceFn(){
         let t = editor.toggle();
         if (t === true) {
-            document.getElementById("editor-pannel").classList.remove("pannel-large");
-            grid=initGrid();
-            practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
-            editor.execute();
-            localStorage.setItem("code", editor.getCode());
-            editor.format();
+            closePracticeHtml();
         } else {
             //编程模式
-            grid.destroy();
+            grid?.destroy();
             openPracticeFn();
-
         };
     };
+
+    //编程，UI状态关闭
+    function closePracticeHtml(){
+        document.getElementById("editor-pannel").classList.remove("pannel-large");
+        document.getElementById("log").style.display="none";
+        document.body.querySelector('#frame').style.borderWidth='0px !important;'
+        grid=initGrid();
+        practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
+        editor.execute();
+        //localStorage.setItem("code", editor.getCode());
+        editor.format();
+    }
 
     //编程，UI状态
     function openPracticeHtml(){
         // document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
         document.getElementById("editor-pannel").classList.add("pannel-large");
         document.getElementById("log").style.display="block";
-        document.getElementById("editor-container").style.height="80%";
+        // document.getElementById("editor-container").style.height="80%";
         practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
+        if(resizer) return document.body.querySelector('#frame').style.borderWidth='12px';
+        resizer =new Resizer('#frame', {
+            grabSize: 10,
+            resize: 'vertical',
+            handle: 'bar'
+        });
     }
 
     //编程功能，按钮
@@ -475,16 +494,19 @@ const editor = new Editor(
             previewWindow.webContents.reload();
             previewWindow.webContents.once('dom-ready', () => {
                 editor.execute();
-                localStorage.setItem("code", editor.getCode());
+                //localStorage.setItem("code", editor.getCode());
                 editor.format();
                 pShow===true?previewWindow.show():previewWindow.hide();
-            })
+                previewWindow.setResizable(true);
+                previewWindow.setClosable(true);
+            });
         };
     };
 
 //发布按钮
 function pubilcFn() {
     editor.toggle(false);
+    showWinControl(false,true);
     previewWindow.setResizable(false);
     previewWindow.setClosable(true);
     openPractice(false,true);

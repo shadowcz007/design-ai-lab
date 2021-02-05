@@ -1,9 +1,10 @@
 const path = require('path');
 
 class Editor {
-    constructor(container, code, executeJavaScript) {
-        this.code = code || `//Hello AI world!`;
-
+    constructor(container, executeJavaScript) {
+        this.code = localStorage.getItem("code") || `//Hello AI world!`;
+        localStorage.setItem("code", this.code);
+        
         this.readOnly = true;
         this.container = container;
         this.executeJavaScript = executeJavaScript;
@@ -35,12 +36,34 @@ class Editor {
         // workaround monaco-css not understanding the environment
         self.module = undefined;
 
+        
+
         amdRequire(['vs/editor/editor.main'], () => {
+            //自定义主题
+            monaco.editor.defineTheme('BlackTheme', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [{ background: '#1d1e22' }],
+                colors: {
+                    // 相关颜色属性配置
+                    // 'editor.foreground': '#000000',
+                    'editor.background': '#1d1e22',     //背景色
+                    // 'editorCursor.foreground': '#8B0000',
+                    // 'editor.lineHighlightBackground': '#0000FF20',
+                    // 'editorLineNumber.foreground': '#008800',
+                    // 'editor.selectionBackground': '#88000030',
+                    // 'editor.inactiveSelectionBackground': '#88000015'
+                }
+            });
+            //设置自定义主题
+            monaco.editor.setTheme('BlackTheme');
+
+            
             // console.log("----")
             this.editor = monaco.editor.create(this.container, {
                 value: this.code,
                 language: 'javascript',
-                theme: 'vs-dark',
+                theme: 'BlackTheme',
                 automaticLayout: true,
                 foldingStrategy: 'indentation',
                 overviewRulerBorder: false, // 不要滚动条的边框
@@ -278,18 +301,20 @@ function handleFile(file) {
         // console.log(code)
         code = code || "";
         this.editor.setValue(code);
+        localStorage.setItem("code", this.getCode());
         // setTimeout(()=>{
         //     this.editor.getAction(['editor.action.formatDocument']).run();
         // },500)
     }
     execute() {
         // console.log(this)
-        const code = this.editor.getValue();
+        const code = this.getCode();
+        localStorage.setItem("code", code);
         this.executeJavaScript(code);
-
     }
     format() {
         this.editor.getAction(['editor.action.formatDocument']).run();
+        localStorage.setItem("code", this.getCode());
     }
     toggle() {
         this.readOnly = !this.readOnly;

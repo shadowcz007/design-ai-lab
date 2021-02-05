@@ -245,7 +245,7 @@ function initMenu(modeMenu) {
                 {
                     label: '编辑',
                     accelerator: 'CmdOrCtrl+E',
-                    click: () => global._WINS.mainWindow.webContents.send('edit-file')
+                    click: () => global._WINS.mainWindow.webContents.send('edit-file',{hardReadOnly:false})
                 },
                 {
                     label: '发布',

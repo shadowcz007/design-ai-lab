@@ -44,6 +44,7 @@
         "muuri": "^0.9.3",
         "object-hash": "^2.1.1",
         "pdfjs-dist": "^2.6.347",
+        "resizer-cl": "^2.4.0",
         "timeago.js": "^4.0.2"
     },
     "build": {

@@ -12,23 +12,22 @@ renderer.code = function(code, language) {
 
 // console.log(renderer)
 class Knowledge {
-    constructor(readme, course, knowledge) {
+    constructor(readme, course) {
         this.readOnly = true;
         this.course = course;
         this.readme = readme;
 
-        knowledge = JSON.parse(knowledge || "{}");
-        this.readmeHtml = knowledge.readme || '';
-        this.courseHtml = knowledge.course || '';
         this.init();
-
         this.toggle(true);
 
     }
     init() {
-        if (this.readmeHtml && this.readme != null) {
-            this.readme.setAttribute('data-md', this.readmeHtml);
-            this.readme.innerHTML = marked(this.readmeHtml);
+
+        let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
+        
+        if (this.readme != null) {
+            this.readme.setAttribute('data-md',knowledge.readme||'');
+            this.readme.innerHTML = marked(this.readme.getAttribute('data-md'));
             // 缓存
             this.readme.addEventListener("input", e => {
                 e.preventDefault();
@@ -36,9 +35,9 @@ class Knowledge {
                 localStorage.setItem("knowledge", JSON.stringify(this.get()));
             });
         }
-        if (this.courseHtml && this.course != null) {
-            this.course.setAttribute('data-md', this.courseHtml);
-            this.course.innerHTML = marked(this.courseHtml);
+        if (this.course != null) {
+            this.course.setAttribute('data-md',knowledge.course||'');
+            this.course.innerHTML = marked(this.course.getAttribute('data-md'));
             // 缓存
             this.course.addEventListener("input", e => {
                 e.preventDefault();
@@ -47,19 +46,18 @@ class Knowledge {
             });
         }
     }
+    set(json){
+        localStorage.setItem("knowledge",JSON.stringify(json));
+        this.init();
+        this.toggle(true);
+    }
     get() {
-        this.courseHtml = this.course.getAttribute('data-md');
-        this.readmeHtml = this.readme.getAttribute('data-md');
         return {
-            course: this.courseHtml,
-            readme: this.readmeHtml
+            course: this.course.getAttribute('data-md'),
+            readme: this.readme.getAttribute('data-md')
         };
     }
-    set(json) {
-        this.courseHtml = json.course;
-        this.readmeHtml = json.readme;
-        this.init();
-    }
+
     toggle(readOnly) {
         if (readOnly !== undefined && readOnly !== null) {
             this.readOnly = readOnly;
@@ -74,11 +72,10 @@ class Knowledge {
             this.readme.classList.add("readme-show");
             this.course.classList.add("course-show");
 
-            this.readme.setAttribute('data-md', this.readme.innerText);
-            this.course.setAttribute('data-md', this.course.innerText);
-
-            this.readme.innerHTML = marked(this.readme.innerText);
-            this.course.innerHTML = marked(this.course.innerText);
+            // this.readme.setAttribute('data-md', this.readme.innerText);
+            // this.course.setAttribute('data-md', this.course.innerText);
+            this.readme.innerHTML = marked(this.readme.getAttribute('data-md'));;
+            this.course.innerHTML = marked(this.course.getAttribute('data-md'));;
             //this.course.blur();
         } else {
             // this.course.style.outline='0.5px dotted green';
