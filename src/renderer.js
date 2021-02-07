@@ -12,99 +12,83 @@ const Resizer = require('resizer-cl');
 
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
-const Rewrite = require("./rewrite");
+const runtime = require("./runtime");
 const db = require('./db');
 const Log = require('./log');
 // const { read } = require("jimp");
 // const ffmpeg=require('./ffmpeg');
 
-//改写代码
-//TODO 错误捕捉
-const rewrite = new Rewrite(["setup", "draw"]);
 
 //编辑器
 let previewWindow = null,
     mainWindow = null;
 
+//捕捉previewWindow的错误
+function onPreviewWindowError(){
+    previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+    
+    setTimeout(()=>{
+        previewWindow.devToolsWebContents.executeJavaScript(
+            `
+        Array.from(document.querySelectorAll('.console-error-level .console-message-text'),ms=>ms.innerHTML);
+        `,false).then((result) => {
+            if(result.length===0) return Log.add('success');
+            result=Array.from(result,r=>{
+                let d=document.createElement('div');
+                d.innerHTML=r;
+                return d.innerText.split('\n')[0];
+            }).reverse();
+            Array.from(result,r=>Log.add(r));
+        });
+    },500);
+    
+};
+
+// onPreviewWindowError();
+
+
 const editor = new Editor(
         document.querySelector("#editor"),
         (code) => {
             previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+            let executeJavaScript=previewWindow.webContents.executeJavaScript;
             //const code=this.editor.getValue();
             //检查编辑器 写的代码 本身的错误
-            let isError = false;
-            try {
-                new Function(code.trim())();
-            } catch (error) {
-                //console.log(error)
-                Log.add(error);
-                isError = true;
-            };
-
-            // // console.log(code)
-            // try {
-            //     code = rewrite.create(code.trim());
-            // } catch (error) {
-            //     //console.log(error)
-            //     Log.add(error);
-            // }
-
-            // previewWindow.webContents.executeJavaScript(`
-
-            //     try {
-            //         if (p5.instance) { p5.instance.remove() };
-            //         document.querySelector("#p5").innerHTML = "";
-            //         ${code.trim()};
-            //         new p5(null, 'p5');
-            //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-            //     } catch (error) {
-            //         console.log(error);
-            //         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-            //     };
-
-            //     `, false)
-            //     .then((result) => {
-            //         //console.log("成功", result)
-            //         // editorElement.classList.remove("ui-error");
-            //         // editorElement.classList.add("ui-success");
-            //     }).catch(err => {
-            //         Log.add(err)
-            //             // console.log("失败")
-            //             // editorElement.classList.add("ui-error");
-            //             // editorElement.classList.remove("ui-success");
-            //     });
-
-            if (isError) return;
-
-            let preRun = ['preload', 'setup', 'draw'];
-
-            previewWindow.webContents.executeJavaScript(`
-                try {
+            //TODO 对预设库的调用，比如cv的兼容
+            
+            //是否是p5的代码
+            // if(runtime.isP5Function(code)){
+                let preRun = ['preload', 'setup', 'draw'];
+                //preRun会不断执行
+                executeJavaScript(`
+                    console.clear();
                     if (p5.instance) { p5.instance.remove() };
+                    if(!document.querySelector("#p5")){
+                        let div=document.createElement('div');
+                        div.id='p5';
+                        document.body.appendChild(div);
+                    };
                     document.querySelector("#p5").innerHTML = "";
                     ${code.trim()};
+                    if(window.gui) {
+                        document.querySelector("#gui-main").innerHTML="";
+                        gui();
+                    };
                     new p5(null, 'p5');
-                    ${Array.from(preRun,r=>`if(window.${r}) ${r}();`).join("\n")}
-                    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-                } catch (error) {
-                    console.log(error);
-                    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-                };
-                `, false)
-                .then((result) => {
-                    console.log("executeJavaScript", result)
-                        //Log.add('success')
-                        // editorElement.classList.remove("ui-error");
-                        // editorElement.classList.add("ui-success");
-                }).catch(err => {
-                    Log.add(err)
-                        // console.log("失败")
-                        // editorElement.classList.add("ui-error");
-                        // editorElement.classList.remove("ui-success");
-                });
-
+                    `, false)
+                    .then((result) => {
+                        onPreviewWindowError();
+                    }).catch((err)=>{
+                        onPreviewWindowError();
+                    });
+            // }
+            
         }
     );
+
+    //每次代码改变的时候，都会重新加载
+    // editor.onDidChangeModelContent=openPractice;
+
 
     const knowledge = new Knowledge(
         document.querySelector("#readme"),
@@ -227,6 +211,7 @@ const editor = new Editor(
         // saveFile = document.querySelector("#save-file"),
         publicFile = document.querySelector("#public-file");
     const practiceBtn = document.querySelector("#practice-btn");
+    // reloadBtn=document.querySelector("#reload-btn");
 
     function addClickEventListener(element,fn){
         let isClicked=false;
@@ -251,6 +236,9 @@ const editor = new Editor(
     // addClickEventListener(saveFile,saveFileFn);
     //发布
     addClickEventListener(publicFile,pubilcFn);
+
+    //重载代码
+    // addClickEventListener(reloadBtn,openPractice);
     //实时编辑代码
     addClickEventListener(practiceBtn,practiceFn);
 
@@ -283,8 +271,9 @@ const editor = new Editor(
         previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
         if (previewWindow && mainWindow) {
-            pShow==true?previewWindow.show():previewWindow.hide();
-            mShow===true?mainWindow.show():mainWindow.hide();
+            console.log('previewWindow.isVisible()',previewWindow.isVisible(),pShow)
+            if(previewWindow.isVisible()!==pShow) pShow==true?previewWindow.show():previewWindow.hide();
+            if(mainWindow.isVisible()!==mShow) mShow===true?mainWindow.show():mainWindow.hide();
         };
     };
 
@@ -306,19 +295,21 @@ const editor = new Editor(
             ]
         });
         if (filePath) {
-            // 
-            let res = fs.readFileSync(filePath[0], 'utf-8');
-            res = JSON.parse(res);
-            
-            openFile(res);
-
+            mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
+            mainWindow.webContents.reload();
+            mainWindow.webContents.once("dom-ready", () => {
+                // 
+                let res = fs.readFileSync(filePath[0], 'utf-8');
+                res = JSON.parse(res);
+                
+                openFile(res);
+            });
             changeAppIcon([
                 {
                     label:'发布',
                     click:pubilcFn
                 }
             ]);
-             
         };
     }
 
@@ -543,7 +534,7 @@ const editor = new Editor(
     };
     //打开编程功能
     function openPractice(mShow=true,pShow=true){
-        showWinControl(mShow,false);
+        showWinControl(mShow,pShow);
         if (previewWindow && mainWindow) {
             mainWindow.focus();
             previewWindow.webContents.reload();
@@ -551,7 +542,7 @@ const editor = new Editor(
                 editor.execute();
                 //localStorage.setItem("code", editor.getCode());
                 editor.format();
-                pShow===true?previewWindow.show():previewWindow.hide();
+                // pShow===true?previewWindow.show():previewWindow.hide();
                 previewWindow.setResizable(true);
                 previewWindow.setClosable(true);
             });

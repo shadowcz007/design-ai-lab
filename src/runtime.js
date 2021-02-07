@@ -1,16 +1,4 @@
 //TODO 错误捕捉
-// function draw() {
-//     try{
-//       background("#232dff");
-//       ellipse(150, 155, 40, 80);
-//       ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result','success');
-//     } catch (error) {
-//         console.log(error);
-//         ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',error);
-//     };
-
-//   }
-
 //esprima 把源码转化为抽象语法树
 const esprima = require('esprima');
 //estraverse 遍历并更新抽象语法树
@@ -18,6 +6,64 @@ const estraverse = require('estraverse');
 //抽象语法树还原成源码
 const escodegen = require('escodegen');
 
+const hash=require('object-hash');
+
+class Runtime{
+    constructor(){
+        this.p5Fn=['preload', 'setup', 'draw'];
+    }
+    parse(code){
+        let ast;
+        try {
+            ast = esprima.parse(code);
+            // console.log(ast)
+        } catch (error) {
+            console.log(error)
+        }
+        
+        return ast
+    }
+
+    hash(code){
+        //去掉 EmptyStatement 
+        let ast=this.parse(code.trim())||{};
+        if(ast&& ast.body) ast.body=ast.body.filter(b=>b.type!='EmptyStatement');
+        return hash(ast);
+    }
+    
+    isP5Function(code){
+        let ast=this.parse(code);
+        ast.body.forEach(b=>{
+            if(b.type==="FunctionDeclaration"&&this.p5Fn.includes(b.id.name)){
+                return true;
+            }
+        });
+        return false;
+    }
+    tryCatch(code){
+        code=code.trim();
+        let isError = false,
+        error=null;
+        try {
+            new Function(code)();
+        } catch (err) {
+            // console.log(err)
+            //Lab是内部库
+            if(err!='ReferenceError: Lab is not defined'){
+                isError = true;
+                error=err;
+            }
+        
+        };
+        return {isError,error}
+    }
+}
+
+
+
+
+//TODO 错误捕捉
+// const rewrite = new Runtime(["setup", "draw"]);
 class Rewrite {
     constructor(targetFunNames) {
         this.targetFunNames = targetFunNames || ["setup", "draw"];
@@ -89,4 +135,4 @@ class Rewrite {
     }
 };
 
-module.exports = Rewrite;
+module.exports =new Runtime();

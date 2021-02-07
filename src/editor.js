@@ -1,5 +1,7 @@
 const path = require('path');
 
+const runtime=require('./runtime');
+
 class Editor {
     constructor(container, executeJavaScript) {
         this.code = localStorage.getItem("code") || `//Hello AI world!`;
@@ -13,6 +15,11 @@ class Editor {
 
         this.onMouseUp=null;
         this.onMouseDown=null;
+        this.onDidChangeModelContent=null;
+
+        //上次一次代码的记录
+        this.codeId=runtime.hash(this.code);
+        this.now=window.performance.now();
     }
 
     init() {
@@ -94,12 +101,18 @@ class Editor {
             //     }
             // });
 
-
-
-            
             this.editor.onDidChangeModelContent(() => {
-                this.execute();
-                // console.log("----")
+                let id=runtime.hash(this.getCode());
+                let now=window.performance.now();
+                if(id!==this.codeId) {
+                    this.execute();
+                    // if(now-this.now>500){
+                        // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
+                        this.codeId=id;
+                        this.now=now;
+                    // }
+                    
+                };
             });
             // this.editor.getAction(['editor.action.formatDocument']).run();
 

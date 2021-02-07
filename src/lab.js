@@ -1,13 +1,108 @@
 //lab提供封装好的功能
 
-
+const cv=require('opencvjs-dist/build/opencv');
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
 
 const ffmpeg = require('./ffmpeg');
 
+
+//主要完成html的一些基本的操作
 class Base {
     constructor() {}
+
+    //默认直接添加到gui里，类似于p5的逻辑，创建即添加
+    add(dom){
+        document.querySelector("#gui-main").appendChild(dom);
+    }
+
+    createButton(text,eventListener){
+        let btn=document.createElement('button');
+        btn.innerText=text;
+        this.add(btn);
+        if(eventListener) btn.addEventListener('click',eventListener);
+        return {
+            data:null,
+            element:btn
+        }
+    }
+
+    createInput(type,text="",isMultiple=false,eventListener=null){
+        let fileExt=null,data=null;
+        if(type==="img") {
+            type="file";
+            fileExt="image";
+        };
+        if(type==="text") type="text";
+        if(type=="file"){
+            type="file";
+            fileExt="other";
+        }
+        let div=document.createElement('div');
+        let p=document.createElement('p');
+        p.innerText=text;
+
+        let input=document.createElement('input');
+        input.type=type;
+        if(isMultiple===true) input.setAttribute('multiple','multiple');
+        
+        function eventFn(e){
+            let res;
+            if(type=='file'){
+
+                if(isMultiple===true){
+                    //多个文件
+
+                }else{
+
+                    //单个文件
+
+                    let file=e.target.files[0];
+                    //图片
+                    if(fileExt==='image'&&file.type.match(fileExt)){
+                        //转成base64存data
+                        res= file.path;
+                    };
+                    //其他文件
+                    if(fileExt=="other"){
+                        res= file.path;
+                    }
+                }
+                
+            };
+            //eventListener,处理input的结果
+            if(eventListener) {
+                res=eventListener(res);
+            };
+            input.setAttribute('data',res);
+        }
+        input.addEventListener('change',eventFn);
+
+        div.appendChild(p);
+        div.appendChild(input);
+
+        this.add(div);
+        return {
+            data:()=>input.getAttribute('data'),
+            element:div
+        }
+    }
+
+    //创建canvas，返回ctx
+    createCanvas(width,height,className,id){
+        let canvas = document.createElement('canvas');
+        if(className) canvas.className=className;
+        if(id) canvas.id=id;
+        canvas.width=width;
+        canvas.height=height;
+        this.add(canvas);
+        return {
+            element:canvas,
+            data:null
+        }
+    }
+
+    //创建由文本图片，返回base64
     createTextImage(txt, fontSize = 24, color = "black", width = 300) {
         let canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d');
@@ -38,16 +133,26 @@ class Base {
         } else {
             base64 = canvas.toDataURL('image/png');
             height = canvas.height;
-        }
+        };
 
-        return { base64, width: width, height: height }
+        this.add(canvas);
+
+        return {
+            data:{ base64, width: width, height: height },
+            element:canvas
+        }
     }
+    //创建图片，根据url返回图片dom
     createImage(url) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = url;
             _img.onload = function() {
-                resolve(_img);
+                this.add(_img);
+                resolve({
+                    data:url,
+                    element:_img
+                });
             }
         })
     }
@@ -130,7 +235,10 @@ class AI {
 
 
 module.exports = {
-    ai: new AI(),
-    base: new Base(),
-    video: ffmpeg
+    Lab:{
+        base: new Base(),
+        ai: new AI(),
+        video: ffmpeg
+    },
+    cv:cv
 };
