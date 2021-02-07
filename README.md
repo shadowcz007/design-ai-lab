@@ -5,7 +5,7 @@
 智能设计实验工具 Artificial Intelligence for Graph Design
 
 - 使用JavaScript易于上手
-- 集成p5.js、ml4.js、tensorflow.js
+- 集成p5.js、tensorflow.js、opencv.js
 - 提供示例代码
 - 桌面软件，安装即用
 - 可发布为本地的桌面应用

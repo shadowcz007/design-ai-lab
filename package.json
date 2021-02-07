@@ -1,6 +1,6 @@
 {
     "name": "design-ai-lab",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {

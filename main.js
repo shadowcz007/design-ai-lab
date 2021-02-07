@@ -117,19 +117,19 @@ function createWindow(key, opts, workAreaSize) {
 
 function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
-    if(config.mainWindow){
+    if (config.mainWindow) {
         config.mainWindow.height = workAreaSize.height;
         config.mainWindow.width = workAreaSize.width - config.previewWindow.width - 20;
     };
-    
+
     storage.get('app', function(error, data) {
         console.log('storage', data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
         //  0 主窗口 1 主窗口 预览窗口 2 预览窗口
         if (data && data.status === 2) {
-            if(config.mainWindow) config.mainWindow.show = false;
-            if(config.previewWindow){
+            if (config.mainWindow) config.mainWindow.show = false;
+            if (config.previewWindow) {
                 config.previewWindow.show = true;
                 config.previewWindow.closable = true;
                 config.previewWindow.executeJavaScript = data.executeJavaScript;
@@ -137,10 +137,10 @@ function initWindow() {
                 config.previewWindow.height = data.size[1];
                 config.previewWindow.resizable = false;
             };
-        } else{
+        } else {
             //主窗口显示在欢迎界面
             //初始状态在 欢迎界面
-            if(config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',closeFn);`;
+            if (config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',closeFn);`;
         }
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);

@@ -1,25 +1,24 @@
 const path = require('path');
-
-const runtime=require('./runtime');
+const runtime = require('./runtime');
 
 class Editor {
     constructor(container, executeJavaScript) {
         this.code = localStorage.getItem("code") || `//Hello AI world!`;
         localStorage.setItem("code", this.code);
-        
+
         this.readOnly = true;
         this.container = container;
         this.executeJavaScript = executeJavaScript;
         this.editor = null;
-        this.container?this.init():null;
+        this.container ? this.init() : null;
 
-        this.onMouseUp=null;
-        this.onMouseDown=null;
-        this.onDidChangeModelContent=null;
+        this.onMouseUp = null;
+        this.onMouseDown = null;
+        this.onDidChangeModelContent = null;
 
         //上次一次代码的记录
-        this.codeId=runtime.hash(this.code);
-        this.now=window.performance.now();
+        this.codeId = runtime.hash(this.code);
+        this.now = window.performance.now();
     }
 
     init() {
@@ -43,7 +42,7 @@ class Editor {
         // workaround monaco-css not understanding the environment
         self.module = undefined;
 
-        
+
 
         amdRequire(['vs/editor/editor.main'], () => {
             //自定义主题
@@ -54,7 +53,7 @@ class Editor {
                 colors: {
                     // 相关颜色属性配置
                     // 'editor.foreground': '#000000',
-                    'editor.background': '#1d1e22',     //背景色
+                    'editor.background': '#1d1e22', //背景色
                     // 'editorCursor.foreground': '#8B0000',
                     // 'editor.lineHighlightBackground': '#0000FF20',
                     // 'editorLineNumber.foreground': '#008800',
@@ -65,7 +64,7 @@ class Editor {
             //设置自定义主题
             monaco.editor.setTheme('BlackTheme');
 
-            
+
             // console.log("----")
             this.editor = monaco.editor.create(this.container, {
                 value: this.code,
@@ -86,15 +85,15 @@ class Editor {
             // });
 
 
-            this.editor.onMouseDown(()=>{
+            this.editor.onMouseDown(() => {
                 this.onMouseDown();
                 // this.isDrag=1;
             });
-            this.editor.onMouseUp(()=>{
+            this.editor.onMouseUp(() => {
                 this.onMouseUp();
                 // this.isDrag=0;
             });
-            
+
             // this.editor.onMouseMove(()=>{
             //     if(this.isDrag===1){
             //         this.onDrag();
@@ -102,16 +101,16 @@ class Editor {
             // });
 
             this.editor.onDidChangeModelContent(() => {
-                let id=runtime.hash(this.getCode());
-                let now=window.performance.now();
-                if(id!==this.codeId) {
+                let id = runtime.hash(this.getCode());
+                let now = window.performance.now();
+                if (id !== this.codeId) {
                     this.execute();
                     // if(now-this.now>500){
-                        // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
-                        this.codeId=id;
-                        this.now=now;
+                    // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
+                    this.codeId = id;
+                    this.now = now;
                     // }
-                    
+
                 };
             });
             // this.editor.getAction(['editor.action.formatDocument']).run();
@@ -135,72 +134,73 @@ class Editor {
 
                 //lab扩展的功能
                 let ss = [{
-                    label: 'Lab.base.createTextImage',
-                    kind: 1,
-                    insertText: 'Lab.base.createTextImage(${1:txt},${2:fontSize},${3:color})',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '创建文本图片'
-                },
-                {
-                    label: 'Lab.ai.getColor',
-                    kind: 1,
-                    insertText: 'Lab.ai.getColor(${1:img})',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '主色提取'
-                },
-                {
-                    label: 'Lab.ai.getPalette',
-                    kind: 1,
-                    insertText: 'Lab.ai.getPalette(${1:img})',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '色板提取'
-                },
-                {
-                    label: 'Lab.ai.loadface',
-                    kind: 1,
-                    insertText: 'Lab.ai.loadface(${1:img})',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '人脸检测'
-                },{
-                    label: 'Lab.ai.loadtext',
-                    kind: 1,
-                    insertText: 'Lab.ai.loadtext(${1:img})',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '文本检测'
-                },{
-                    label: 'Lab.video.createShortVideoInput()',
-                    kind: 1,
-                    insertText: 'Lab.video.createShortVideoInput()',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '从本地打开视频'
-                },{
-                    label: 'Lab.video.createShortVideoFromLocal()',
-                    kind: 1,
-                    insertText: 'Lab.video.createShortVideoFromLocal()',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '短视频合成从本地'
-                }];
+                        label: 'Lab.base.createTextImage',
+                        kind: 1,
+                        insertText: 'Lab.base.createTextImage(${1:txt},${2:fontSize},${3:color})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '创建文本图片'
+                    },
+                    {
+                        label: 'Lab.ai.getColor',
+                        kind: 1,
+                        insertText: 'Lab.ai.getColor(${1:img})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '主色提取'
+                    },
+                    {
+                        label: 'Lab.ai.getPalette',
+                        kind: 1,
+                        insertText: 'Lab.ai.getPalette(${1:img})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '色板提取'
+                    },
+                    {
+                        label: 'Lab.ai.loadface',
+                        kind: 1,
+                        insertText: 'Lab.ai.loadface(${1:img})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '人脸检测'
+                    }, {
+                        label: 'Lab.ai.loadtext',
+                        kind: 1,
+                        insertText: 'Lab.ai.loadtext(${1:img})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '文本检测'
+                    }, {
+                        label: 'Lab.video.createShortVideoInput()',
+                        kind: 1,
+                        insertText: 'Lab.video.createShortVideoInput()',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '从本地打开视频'
+                    }, {
+                        label: 'Lab.video.createShortVideoFromLocal()',
+                        kind: 1,
+                        insertText: 'Lab.video.createShortVideoFromLocal()',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '短视频合成从本地'
+                    }
+                ];
 
                 //p5内部常用
                 let ts = [{
-                    label: 'windowWidth',
-                    kind: 0,
-                    insertText: 'windowWidth',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: '窗口内部宽度'
-                },{
-                    label: 'function setup(){}',
-                    kind: 1,
-                    insertText: 'function setup(){\n${1:}\n};',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: 'setup'
-                },{
-                    label: 'function draw(){}',
-                    kind: 1,
-                    insertText: 'function draw(){\n\n};',
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: 'draw'
-                },{
+                        label: 'windowWidth',
+                        kind: 0,
+                        insertText: 'windowWidth',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '窗口内部宽度'
+                    }, {
+                        label: 'function setup(){}',
+                        kind: 1,
+                        insertText: 'function setup(){\n${1:}\n};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: 'setup'
+                    }, {
+                        label: 'function draw(){}',
+                        kind: 1,
+                        insertText: 'function draw(){\n\n};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: 'draw'
+                    }, {
                         label: 'createCanvas(width:number,height:number)',
                         kind: 1,
                         insertText: 'createCanvas(${1:windowWidth},${2:windowHeight});',
@@ -208,16 +208,16 @@ class Editor {
                         detail: '创建画布'
                     },
                     {
-                        label:'createButton(displayText:string)',
-                        kind:1,
-                        insertText:'button = createButton(${1:displayText});'+`
+                        label: 'createButton(displayText:string)',
+                        kind: 1,
+                        insertText: 'button = createButton(${1:displayText});' + `
 button.position(0, 50);
 button.mousePressed(buttonEvent);
 function buttonEvent() {
     //
 }`,
-                      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                      detail: '创建按钮'
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '创建按钮'
                     },
                     {
                         label: 'createFileInput(handleFile:function)',

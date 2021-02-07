@@ -6,13 +6,13 @@ const estraverse = require('estraverse');
 //抽象语法树还原成源码
 const escodegen = require('escodegen');
 
-const hash=require('object-hash');
+const hash = require('object-hash');
 
-class Runtime{
-    constructor(){
-        this.p5Fn=['preload', 'setup', 'draw'];
+class Runtime {
+    constructor() {
+        this.p5Fn = ['preload', 'setup', 'draw'];
     }
-    parse(code){
+    parse(code) {
         let ast;
         try {
             ast = esprima.parse(code);
@@ -20,46 +20,44 @@ class Runtime{
         } catch (error) {
             console.log(error)
         }
-        
+
         return ast
     }
 
-    hash(code){
+    hash(code) {
         //去掉 EmptyStatement 
-        let ast=this.parse(code.trim())||{};
-        if(ast&& ast.body) ast.body=ast.body.filter(b=>b.type!='EmptyStatement');
+        let ast = this.parse(code.trim()) || {};
+        if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
         return hash(ast);
     }
-    
-    isP5Function(code){
-        let ast=this.parse(code);
-        ast.body.forEach(b=>{
-            if(b.type==="FunctionDeclaration"&&this.p5Fn.includes(b.id.name)){
+
+    isP5Function(code) {
+        let ast = this.parse(code);
+        ast.body.forEach(b => {
+            if (b.type === "FunctionDeclaration" && this.p5Fn.includes(b.id.name)) {
                 return true;
             }
         });
         return false;
     }
-    tryCatch(code){
-        code=code.trim();
+    tryCatch(code) {
+        code = code.trim();
         let isError = false,
-        error=null;
+            error = null;
         try {
             new Function(code)();
         } catch (err) {
             // console.log(err)
             //Lab是内部库
-            if(err!='ReferenceError: Lab is not defined'){
+            if (err != 'ReferenceError: Lab is not defined') {
                 isError = true;
-                error=err;
+                error = err;
             }
-        
+
         };
-        return {isError,error}
+        return { isError, error }
     }
 }
-
-
 
 
 //TODO 错误捕捉
@@ -135,4 +133,4 @@ class Rewrite {
     }
 };
 
-module.exports =new Runtime();
+module.exports = new Runtime();
