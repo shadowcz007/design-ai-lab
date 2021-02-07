@@ -22,8 +22,11 @@ body {
     padding: 0;
     user-select: none;
 }
+
+
 /* 课程代码提示的样式 */
-code{
+
+code {
     background-color: rgba(255, 0, 0, 0.2);
     color: orange;
     padding: 1px;
@@ -132,7 +135,7 @@ button {
 }
 
 button:hover {
-    background-color:#5a6074;
+    background-color: #5a6074;
     color: white;
 }
 
@@ -171,7 +174,7 @@ button:hover {
     height: 200px;
     margin: 5px;
     z-index: 1;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .pannel.muuri-item-hidden {
@@ -227,18 +230,19 @@ button:hover {
 }
 
 #knowledge-pannel .btns {
-    background-color:#1e1f26;
+    background-color: #1e1f26;
 }
-
 
 #readme {
     min-height: 88px;
     padding: 14px;
-    color:lemonchiffon;
-    /* background-color: #eee; */
+    color: lemonchiffon;
+    border-bottom: 1px dashed rgba(204, 204, 204, 0.2);
 }
-#readme,#course{
-    outline:none
+
+#readme,
+#course {
+    outline: none
 }
 
 .readme-show {
@@ -246,7 +250,7 @@ button:hover {
     /* min-height: auto!important; */
     font-size: 18px;
     font-weight: 500;
-    color:lemonchiffon;
+    color: lemonchiffon;
     /* background-color: lemonchiffon!important; */
 }
 
@@ -270,13 +274,13 @@ button:hover {
     min-height: 300px;
     /* background: white; */
     padding: 12px;
-    color:white
+    color: white
 }
 
 .course-show {
     font-size: 14px;
     font-weight: 400;
-    color:white
+    color: white
 }
 
 .course-show>div {
@@ -293,21 +297,21 @@ button:hover {
     color: white
 }
 
-
-
-#frame{
+#frame {
     min-height: 50vh;
     height: 100%;
 }
+
 #editor-container {
     height: calc(100% - 30px) !important;
 }
+
 #editor {
     /* width: calc(50% - 4px);*/
     height: 100%;
 }
-    
-.resizer{
+
+.resizer {
     cursor: row-resize !important;
     /* border-top: 1px solid rgba(255,255,255,0.05); */
     border-bottom: 12px solid #333642 !important;
@@ -330,7 +334,7 @@ button:hover {
     font-size: 12px;
     padding: 2px 12px;
     margin: 2px 0;
-    color:white;
+    color: white;
     flex-direction: column;
 }
 
@@ -355,11 +359,11 @@ button:hover {
 #blank-pannel p {
     margin: 0 12px;
     font-size: 12px;
-    color: dimgrey;
+    color: wheat;
 }
 
 #blank-pannel h1 {
-    color: rgb(50, 52, 62);
+    color: white;
     font-size: 32px;
     font-weight: 500;
     margin: 0;
@@ -369,7 +373,7 @@ button:hover {
 
 #blank-pannel span {
     font-size: 10px;
-    color: #9db3c5;
+    color: #3794ff;
     background-color: rgb(253 253 220);
     padding: 0px 6px;
     margin: 0 4px;

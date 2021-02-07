@@ -1,10 +1,12 @@
 // 渲染进程
 const { ipcRenderer, remote } = require("electron");
+const storage = require('electron-json-storage');
 const md5 = require('md5');
-const fs = require("fs"),path=require("path");
+const fs = require("fs"),
+    path = require("path");
 const timeago = require('timeago.js');
 const Muuri = require("muuri");
-const Resizer =require('resizer-cl');
+const Resizer = require('resizer-cl');
 // console.log(Marklib)
 
 
@@ -116,9 +118,15 @@ const editor = new Editor(
         previewWindow=previewWindow||(remote.getGlobal("_WINS")).previewWindow;
         (remote.getGlobal("_WINS")).previewWindow.webContents.capturePage().then(img=>{
             // console.log(img.toDataURL())
+            let knowledgeJson=knowledge.get();
+            
             resolve({   
                 poster:img.toDataURL(),
-                knowledge: knowledge.get(),
+                title:knowledgeJson.title,
+                knowledge: {
+                    readme:knowledgeJson.readme,
+                    course:knowledgeJson.course
+                },
                 code: editor.getCode(),
                 size: previewWindow.getSize()
             })
@@ -280,6 +288,14 @@ const editor = new Editor(
         };
     };
 
+    //动态改变系统托盘菜单
+    //items=[ { label,click} ]
+    function changeAppIcon(items=[]){
+        if(items.length==0) return;
+        let contextMenu =remote.Menu.buildFromTemplate(items);
+        remote.getGlobal('_APPICON').setContextMenu(contextMenu);
+    };
+
     //打开文件
     function openFileFn(){
         let filePath = remote.dialog.showOpenDialogSync({
@@ -295,6 +311,13 @@ const editor = new Editor(
             res = JSON.parse(res);
             
             openFile(res);
+
+            changeAppIcon([
+                {
+                    label:'发布',
+                    click:pubilcFn
+                }
+            ]);
              
         };
     }
@@ -303,6 +326,12 @@ const editor = new Editor(
     function editFileFn(hardReadOnly=null){
         let isReadOnly = knowledge.toggle(hardReadOnly);
         showWinControl(true,true);
+        changeAppIcon([
+            {
+                label:'发布',
+                click:pubilcFn
+            }
+        ]);
         if (!isReadOnly) {
             // openPractice();
             // console.log(grid)
@@ -341,31 +370,46 @@ const editor = new Editor(
         grid=initGrid();
 
         showWinControl(true,false);
-        // openPracticeFn();
+        changeAppIcon([
+            {
+                label:'保存',
+                click:saveFileFn
+            }
+        ]);
     }
 
     function saveFileFn(){
         // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         //localStorage.setItem("code", editor.getCode());
 
-        let filePath = remote.dialog.showSaveDialogSync({
-            title: "另存为……",
-            defaultPath: `AICODE_${(new Date()).getDay()}.json`
-        });
-        if (filePath) {
-            getSaveFileContent().then(res=>{
-
+        getSaveFileContent().then(res=>{
+            let filePath = remote.dialog.showSaveDialogSync({
+                title: "另存为……",
+                defaultPath:res.title.trim()+`.json`
+            });
+            if (filePath) {
+                res.title=path.basename;
                 fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     knowledge.toggle(true);
-                    // saveFile.style.display = "none";
-                    editFile.style.display = "block";
-                    // newFile.style.display = "block";
+                    remote.dialog.showMessageBox({
+                        type:'info',
+                        message:'保存成功',
+                        buttons:['好的']
+                    });
+
+                    changeAppIcon([
+                        {
+                            label:'发布',
+                            click:pubilcFn
+                        }
+                    ]);
+
                 });
-            })
-            
-        };
+            };
+
+        });
         // console.log(filePath)
     };
 
@@ -391,12 +435,23 @@ const editor = new Editor(
         document.getElementById("recent-files").appendChild(div);
         
         showWinControl(true,false);
+
+        changeAppIcon([
+            {
+                label:'新建',
+                click:newFileFn
+            }
+        ]);
+
     }
 
     function openFile(res){
         knowledge.set(res.knowledge);
         editor.setCode(res.code);
-       
+       //预览窗口的尺寸更新
+        previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
+        // res.size
+        previewWindow.setSize(...res.size);
         // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
         //localStorage.setItem("code", editor.getCode());
         localStorage.removeItem('layout');
@@ -503,6 +558,29 @@ const editor = new Editor(
         };
     };
 
+//保存窗口状态
+// 0 主窗口 1 主窗口 预览窗口 2 预览窗口
+function saveWindowsStatus(status=0){
+    let obj={
+        status: status,
+        size: previewWindow.getSize(),
+        mainWindow:{
+            show:mainWindow.isVisible(),
+            bound:mainWindow.getBounds()
+        }
+    };
+
+    if(status===2)  obj.executeJavaScript= `
+                    if (p5.instance) { p5.instance.remove() };
+                    document.querySelector("#p5").innerHTML = "";
+                    ${editor.getCode().trim()};
+                    new p5(null, 'p5');`;
+
+    storage.set('app', obj, function(error) {
+        if (error) throw error;
+    });
+}
+
 //发布按钮
 function pubilcFn() {
     editor.toggle(false);
@@ -510,16 +588,14 @@ function pubilcFn() {
     previewWindow.setResizable(false);
     previewWindow.setClosable(true);
     openPractice(false,true);
-    const storage = require('electron-json-storage');
-    storage.set('app', {
-        public: 1,
-        executeJavaScript: `
-                    if (p5.instance) { p5.instance.remove() };
-                    document.querySelector("#p5").innerHTML = "";
-                    ${editor.getCode().trim()};
-                    new p5(null, 'p5');`,
-        size: previewWindow.getSize()
-    }, function(error) {
-        if (error) throw error;
-    });
+    
+    saveWindowsStatus(2);
+    changeAppIcon([
+        {
+            label:'编辑',
+            click:()=>{
+                editFileFn(true);
+            }
+        }
+    ]);
 };

@@ -15,6 +15,7 @@ const _IS_MAC = process.platform === 'darwin';
 
 //全局变量
 global._WINS = {};
+global._APPICON = null;
 
 const _INDEX_HTML = path.join(__dirname, 'src/index.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
@@ -22,7 +23,6 @@ const _READ_HTML = path.join(__dirname, 'src/read.html');
 // const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 
-let appIcon;
 
 const config = {
     mainWindow: {
@@ -51,19 +51,19 @@ const config = {
         titleBarStyle: "hiddenInset",
         html: _PRE_HTML
     },
-    readWindow: {
-        width: 800,
-        height: 600,
-        minHeight: 400,
-        minWidth: 500,
-        align: 'topLeft',
-        title: "阅读",
-        show: false,
-        closable: true,
-        resizable: true,
-        titleBarStyle: "default",
-        html: _READ_HTML
-    },
+    // readWindow: {
+    //     width: 800,
+    //     height: 600,
+    //     minHeight: 400,
+    //     minWidth: 500,
+    //     align: 'topLeft',
+    //     title: "阅读",
+    //     show: false,
+    //     closable: true,
+    //     resizable: true,
+    //     titleBarStyle: "default",
+    //     html: _READ_HTML
+    // },
 }
 
 function createWindow(key, opts, workAreaSize) {
@@ -124,6 +124,7 @@ function initWindow() {
         console.log('storage', data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
+        // 3发布
         if (data && data.public === 1) {
             config.mainWindow.show = false;
             config.previewWindow.show = true;
@@ -146,48 +147,23 @@ function initWindow() {
 
 
 function initAppIcon() {
-    appIcon = new Tray(path.join(__dirname, "assets/appIcon.png"));
+    global._APPICON = new Tray(path.join(__dirname, "assets/appIcon.png"));
     const contextMenu = Menu.buildFromTemplate([{
-            label: '阅读',
-            type: 'normal',
-            checked: false,
-            click: async() => {
-                global._WINS.mainWindow.hide();
-                global._WINS.previewWindow.hide();
-                global._WINS.readWindow.show();
-            }
-        }, {
-            label: '编辑',
-            type: 'normal',
-            checked: false,
-            click: async() => {
-                global._WINS.mainWindow.show();
-                global._WINS.previewWindow.setClosable(false);
-                global._WINS.previewWindow.setResizable(true);
-            }
-        }, {
-            label: '发布',
-            type: 'normal',
-            checked: false,
-            click: async() => {
-                global._WINS.mainWindow.webContents.send('public-file', null);
-
-            }
-        },
-        // { label: '调取', type: 'radio' }
-    ]);
+        label: '编辑',
+        type: 'normal',
+        checked: false,
+        click: async() => {
+            global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: true });
+        }
+    }]);
 
 
-    // Make a change to the context menu
-    // contextMenu.items[0].checked = false;
-    // Call this again for Linux because we modified the context menu
-    appIcon.setContextMenu(contextMenu);
-    appIcon.setToolTip('design.ai');
-
-    return contextMenu.items
+    global._APPICON.setContextMenu(contextMenu);
+    global._APPICON.setToolTip('智能设计');
+    // return contextMenu
 }
 
-function initMenu(modeMenu) {
+function initMenu() {
 
     const template = [
         // { role: 'appMenu' }
@@ -245,7 +221,7 @@ function initMenu(modeMenu) {
                 {
                     label: '编辑',
                     accelerator: 'CmdOrCtrl+E',
-                    click: () => global._WINS.mainWindow.webContents.send('edit-file',{hardReadOnly:false})
+                    click: () => global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: false })
                 },
                 {
                     label: '发布',
@@ -260,13 +236,60 @@ function initMenu(modeMenu) {
                 }
             ]
         },
-        { role: 'editMenu' },
+        //{ role: 'editMenu' },
         {
-            label: '模式',
-            submenu: modeMenu
+            //role: 'editMenu',
+            label: '编辑',
+            submenu: [{
+                    label: '撤销',
+                    accelerator: 'CmdOrCtrl+Z',
+                    role: 'undo'
+                },
+                {
+                    label: '重做',
+                    accelerator: 'Shift+CmdOrCtrl+Z',
+                    role: 'redo'
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: '剪切',
+                    accelerator: 'CmdOrCtrl+X',
+                    role: 'cut'
+                },
+                {
+                    label: '拷贝',
+                    accelerator: 'CmdOrCtrl+C',
+                    role: 'copy'
+                },
+                {
+                    label: '粘贴',
+                    accelerator: 'CmdOrCtrl+V',
+                    role: 'paste'
+                },
+                {
+                    label: '全选',
+                    accelerator: 'CmdOrCtrl+A',
+                    role: 'selectall'
+                },
+            ]
         },
+        // {
+        //     label: '模式',
+        //     submenu: modeMenu.items
+        // },
+        // {
+        //     role: 'windowMenu'
+        // },
         {
-            role: 'windowMenu'
+            label: '窗口',
+            role: 'window',
+            submenu: [{
+                label: '最小化',
+                accelerator: 'CmdOrCtrl+M',
+                role: 'minimize'
+            }]
         },
         {
             role: 'help',
@@ -295,20 +318,14 @@ ipcMain.on('init-window', (event, arg) => {
 
 // 当应用完成初始化后
 app.whenReady().then(() => {
-    let modeMenu = initAppIcon();
-
-    initMenu(modeMenu);
-
+    initAppIcon()
+    initMenu();
     initWindow();
-
     app.on('activate', function() {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) initWindow()
-    })
-
-    // const ffmpeg=require('./src/ffmpeg');
-    // ffmpeg.start(dialog);
+    });
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

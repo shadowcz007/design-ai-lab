@@ -24,9 +24,9 @@ class Knowledge {
     init() {
 
         let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
-        
+
         if (this.readme != null) {
-            this.readme.setAttribute('data-md',knowledge.readme||'');
+            this.readme.setAttribute('data-md', knowledge.readme || '');
             this.readme.innerHTML = marked(this.readme.getAttribute('data-md'));
             // 缓存
             this.readme.addEventListener("input", e => {
@@ -36,7 +36,7 @@ class Knowledge {
             });
         }
         if (this.course != null) {
-            this.course.setAttribute('data-md',knowledge.course||'');
+            this.course.setAttribute('data-md', knowledge.course || '');
             this.course.innerHTML = marked(this.course.getAttribute('data-md'));
             // 缓存
             this.course.addEventListener("input", e => {
@@ -46,13 +46,17 @@ class Knowledge {
             });
         }
     }
-    set(json){
-        localStorage.setItem("knowledge",JSON.stringify(json));
+    set(json) {
+        localStorage.setItem("knowledge", JSON.stringify(json));
         this.init();
         this.toggle(true);
     }
     get() {
+        let div = document.createElement('div');
+        div.innerHTML = marked(this.readme.getAttribute('data-md'));
+
         return {
+            title: div.children[0].innerText,
             course: this.course.getAttribute('data-md'),
             readme: this.readme.getAttribute('data-md')
         };
