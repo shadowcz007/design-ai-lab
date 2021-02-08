@@ -7,6 +7,7 @@ const fs = require("fs"),
 const timeago = require('timeago.js');
 const Muuri = require("muuri");
 const Resizer = require('resizer-cl');
+const marked=require('marked');
 // console.log(Marklib)
 
 const Knowledge = require("./knowledge");
@@ -23,6 +24,7 @@ let previewWindow = null,
     mainWindow = null;
 
 //捕捉previewWindow的错误
+//TODO 捕捉console.log信息
 function onPreviewWindowError() {
     previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
 
@@ -35,7 +37,7 @@ function onPreviewWindowError() {
             result = Array.from(result, r => {
                 let d = document.createElement('div');
                 d.innerHTML = r;
-                return d.innerText.split('\n')[0];
+                return d.innerText.split('\n');
             }).reverse();
             Array.from(result, r => Log.add(r));
         });
@@ -76,8 +78,10 @@ const editor = new Editor(
                     new p5(null, 'p5');
                     `, false)
             .then((result) => {
+                // console.log("executeJavaScript-result")
                 onPreviewWindowError();
             }).catch((err) => {
+                //console.log("executeJavaScript-err")
                 onPreviewWindowError();
             });
         // }
@@ -137,6 +141,8 @@ editor.onMouseDown = function() {
     // grid.destroy();
     // grid=initGrid(false);
     console.log("onMouseDown", window.grid)
+
+    onPreviewWindowError();
 }
 
 function initGrid(dragEnabled = true) {
@@ -211,11 +217,11 @@ const editFile = document.querySelector("#edit-file"),
     // saveFile = document.querySelector("#save-file"),
     publicFile = document.querySelector("#public-file");
 const practiceBtn = document.querySelector("#practice-btn");
-// reloadBtn=document.querySelector("#reload-btn");
+const logdBtn=document.querySelector("#log-btn");
 
 function addClickEventListener(element, fn) {
     let isClicked = false;
-    element ? .addEventListener("click", e => {
+    if(element) element.addEventListener("click", e => {
         e.preventDefault();
         if (isClicked === true) return;
         isClicked = true;
@@ -242,6 +248,9 @@ addClickEventListener(publicFile, pubilcFn);
 //实时编辑代码
 addClickEventListener(practiceBtn, practiceFn);
 
+// log
+addClickEventListener(logdBtn,onPreviewWindowError);
+
 //打开文件
 ipcRenderer.on("open-file", openFileFn);
 //编辑/预览 切换
@@ -262,7 +271,9 @@ ipcRenderer.on("public-file", pubilcFn);
 
 //显示代码错误
 ipcRenderer.on("executeJavaScript-result", (event, arg) => {
-    Log.add(arg);
+    //Log.add(arg.message);
+    console.log(arg)
+    onPreviewWindowError();
 });
 
 //仅显示主窗口,
@@ -296,14 +307,16 @@ function openFileFn() {
     });
     if (filePath) {
         mainWindow = mainWindow || (remote.getGlobal("_WINS")).mainWindow;
-        mainWindow.webContents.reload();
-        mainWindow.webContents.once("dom-ready", () => {
-            // 
-            let res = fs.readFileSync(filePath[0], 'utf-8');
-            res = JSON.parse(res);
+        //mainWindow.webContents.reload();
+        // mainWindow.webContents.once("dom-ready", () => {
+        //     // 
+            
+        // });
+        let res = fs.readFileSync(filePath[0], 'utf-8');
+        res = JSON.parse(res);
 
-            openFile(res);
-        });
+        openFile(res);
+
         changeAppIcon([{
             label: '发布',
             click: pubilcFn
@@ -326,7 +339,7 @@ function editFileFn(hardReadOnly = null) {
         editFile.innerHTML = `<i class="far fa-lightbulb"></i>`;
         // document.getElementById("knowledge-pannel").classList.remove("knowledge-pannel-small");
         document.getElementById("knowledge-pannel").classList.add("pannel-large");
-        grid ? .destroy();
+        if(grid) grid.destroy();
     } else {
         //预览状态
         console.log("预览状态")
@@ -399,7 +412,11 @@ function saveFileFn() {
 
 
 function closeFn() {
+    //TODO 确定关闭？未保存将丢失
+
     // console.log('closeFn')
+    practiceFn(true);
+    
     document.querySelector(".grid").style.display = "none";
     document.getElementById("blank-pannel").style.display = "block";
 
@@ -427,12 +444,13 @@ function closeFn() {
 }
 
 function openFile(res) {
+    // console.log("openFile",res)
     knowledge.set(res.knowledge);
     editor.setCode(res.code);
     //预览窗口的尺寸更新
     previewWindow = previewWindow || (remote.getGlobal("_WINS")).previewWindow;
     // res.size
-    previewWindow.setSize(...res.size);
+    if(res.size)previewWindow.setSize(...res.size);
     // localStorage.setItem("knowledge", JSON.stringify(knowledge.get()));
     //localStorage.setItem("code", editor.getCode());
     localStorage.removeItem('layout');
@@ -443,10 +461,10 @@ function openFile(res) {
     document.querySelector(".grid").style.display = "block";
     document.getElementById("blank-pannel").style.display = "none";
 
-    grid.destroy();
+    if(grid) grid.destroy();
     grid = initGrid();
 
-    openPractice();
+    practiceFn(true);
 }
 
 function createCard(data) {
@@ -464,7 +482,8 @@ function createCard(data) {
     content.className = "content";
 
     let readme = document.createElement('h5');
-    readme.innerHTML = data.knowledge.readme;
+    readme.innerHTML = marked(data.knowledge.readme);
+    readme.innerText=readme.innerText;
 
     let t = document.createElement('p');
     t.innerHTML = timeago.format(data.createDate, 'zh_CN');
@@ -479,22 +498,24 @@ function createCard(data) {
     return div;
 }
 
-function practiceFn() {
-    let t = editor.toggle();
+function practiceFn(readOnly=null) {
+    let t = editor.toggle(readOnly);
     if (t === true) {
         closePracticeHtml();
     } else {
         //编程模式
-        grid ? .destroy();
+        if(grid) grid.destroy();
         openPracticeFn();
     };
 };
 
 //编程，UI状态关闭
 function closePracticeHtml() {
+    document.getElementById("knowledge-pannel").style.display="block";
     document.getElementById("editor-pannel").classList.remove("pannel-large");
     document.getElementById("log").style.display = "none";
     document.body.querySelector('#frame').style.borderWidth = '0px !important;'
+    if(grid) grid.destroy();
     grid = initGrid();
     practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
     editor.execute();
@@ -504,7 +525,7 @@ function closePracticeHtml() {
 
 //编程，UI状态
 function openPracticeHtml() {
-    // document.getElementById("knowledge-pannel").classList.add("knowledge-pannel-small");
+    document.getElementById("knowledge-pannel").style.display="none";
     document.getElementById("editor-pannel").classList.add("pannel-large");
     document.getElementById("log").style.display = "block";
     // document.getElementById("editor-container").style.height="80%";

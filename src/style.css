@@ -433,9 +433,9 @@ button:hover {
     margin: 0;
     padding: 0 12px 0 12px;
     font-family: monospace;
-    display: block;
+    /* display: block; */
     height: 44px;
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

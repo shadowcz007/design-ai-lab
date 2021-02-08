@@ -27,25 +27,39 @@ class Base {
         }
     }
 
-    createInput(type,text="",isMultiple=false,eventListener=null){
+    //TODO 多文件的支持 当文件过大的时候，opencv需要提示
+    //,isMultiple=false
+    createInput(type,text="",eventListener=null){
+        let isMultiple=false;
         let fileExt=null,data=null;
         if(type==="img") {
             type="file";
             fileExt="image";
-        };
-        if(type==="text") type="text";
-        if(type=="file"){
+        }else if (type==="text") {
+            type="text";
+        }else if(type=="file"){
             type="file";
             fileExt="other";
-        }
+        };
         let div=document.createElement('div');
+
+        //如果是图片，则多一个图片预览
+        div.className='input-image-default';
+
         let p=document.createElement('p');
         p.innerText=text;
 
         let input=document.createElement('input');
         input.type=type;
+        //多文件
         if(isMultiple===true) input.setAttribute('multiple','multiple');
-        
+        if(fileExt==="image") {
+            p.style.display="none";
+            input.style.display="none";
+        };
+
+        div.addEventListener('click',()=>input.click());
+
         function eventFn(e){
             let res;
             if(type=='file'){
@@ -62,7 +76,11 @@ class Base {
                     if(fileExt==='image'&&file.type.match(fileExt)){
                         //转成base64存data
                         res= file.path;
+                        div.className='input-image';
+                        // console.log(res)
+                        div.style.backgroundImage=`url(${encodeURI(res)})`;
                     };
+                    // console.log(file,file.type.match(fileExt))
                     //其他文件
                     if(fileExt=="other"){
                         res= file.path;
@@ -89,13 +107,16 @@ class Base {
     }
 
     //创建canvas，返回ctx
-    createCanvas(width,height,className,id){
+    createCanvas(width,height,className,id,show=false){
         let canvas = document.createElement('canvas');
         if(className) canvas.className=className;
         if(id) canvas.id=id;
         canvas.width=width;
         canvas.height=height;
+        canvas.style.width=width+'px';
+        canvas.style.height='auto';
         this.add(canvas);
+        if(show===false) canvas.style.display="none";
         return {
             element:canvas,
             data:null
@@ -170,12 +191,24 @@ class AI {
         return canvas
     }
     getColor(_img) {
-        let _im = _img.elt;
+        let _im=_img;
+        //兼容p5
+        if (_img instanceof p5.Element) _im = _img.elt;
+
         if (_im.complete) {
-            _img.mainColor = color(...colorThief.getColor(_im));
+            if(color&&color instanceof Function){
+                _img.mainColor = color(...colorThief.getColor(_im));
+            }else{
+                _img.mainColor = colorThief.getColor(_im);
+            }
+            
         } else {
             _im.addEventListener('load', function() {
-                _img.mainColor = color(...colorThief.getColor(_im));
+                if(color&&color instanceof Function){
+                    _img.mainColor = color(...colorThief.getColor(_im));
+                }else{
+                    _img.mainColor = colorThief.getColor(_im);
+                }
             });
         }
     };

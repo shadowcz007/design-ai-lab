@@ -21,3 +21,8 @@ function preload() {
 
     // console.log(ZKYYT)
 }
+window.onerror = function(message, source, lineno, colno, error) { 
+    console.log({message, source, lineno, colno, error})
+    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',{message, source, lineno, colno});
+}
+

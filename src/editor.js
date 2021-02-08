@@ -133,7 +133,22 @@ class Editor {
                 }];
 
                 //lab扩展的功能
-                let ss = [{
+                let ss = [
+                    {
+                        label: 'cv.COLOR_RGBA2GRAY',
+                        kind: 1,
+                        insertText: 'cv.COLOR_RGBA2GRAY',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '色彩模式'
+                    
+                 },
+                    {
+                    label: 'cv.cvtColor',
+                    kind: 1,
+                    insertText: 'cv.cvtColor(${1:src}, ${1:dst}, cv.COLOR_RGBA2GRAY, 0)',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    detail: '调整色彩模式'
+                },{
                         label: 'Lab.base.createTextImage',
                         kind: 1,
                         insertText: 'Lab.base.createTextImage(${1:txt},${2:fontSize},${3:color})',
@@ -311,10 +326,10 @@ function handleFile(file) {
         return this.editor.getValue();
     }
     setCode(code) {
+        localStorage.setItem("code",code);
         // console.log(code)
         code = code || "";
         this.editor.setValue(code);
-        localStorage.setItem("code", this.getCode());
         // setTimeout(()=>{
         //     this.editor.getAction(['editor.action.formatDocument']).run();
         // },500)
@@ -329,8 +344,10 @@ function handleFile(file) {
         this.editor.getAction(['editor.action.formatDocument']).run();
         localStorage.setItem("code", this.getCode());
     }
-    toggle() {
-        this.readOnly = !this.readOnly;
+    toggle(readOnly=null) {
+        if(readOnly===null) {this.readOnly = !this.readOnly}else{
+            this.readOnly=readOnly;
+        };
         this.editor.updateOptions({ readOnly: this.readOnly });
         return this.readOnly
     }
