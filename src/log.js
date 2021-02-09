@@ -1,4 +1,5 @@
 //Log GUI
+const md5 = require('md5');
 
 //executeJavaScriptResult
 function add(info) {
@@ -6,7 +7,7 @@ function add(info) {
     if (typeof(info) === 'object') {
         info = info.toString()
     };
-    console.log('executeJavaScriptResult----2', info)
+    // console.log('executeJavaScriptResult----2', info)
     if (info !== 'success') {
         create(info);
     } else {

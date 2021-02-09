@@ -3,8 +3,9 @@ const path = require('path');
 const storage = require('electron-json-storage');
 const openAboutWindow = require('about-window').default;
 
-const package = require("./package.json");
+const _package = require("./package.json");
 // console.log(package);
+global._PACKAGE=JSON.parse(JSON.stringify(_package));
 
 const dataPath = storage.getDataPath();
 // console.log(dataPath,path.join(dataPath, "db.json"));
@@ -46,9 +47,10 @@ const config = {
         align: 'topRight',
         title: "预览",
         show: false,
+        alwaysOnTop:true,
         closable: false,
         resizable: true,
-        titleBarStyle: "hiddenInset",
+        titleBarStyle: "default",
         html: _PRE_HTML
     },
     // readWindow: {
@@ -77,6 +79,8 @@ function createWindow(key, opts, workAreaSize) {
         y: 0,
         title: opts.title || "-",
         show: false,
+        // movable:opts.movable!=undefined ? opts.movable:true,
+        alwaysOnTop:opts.alwaysOnTop||false,
         closable: opts.closable,
         resizable: opts.resizable,
         titleBarStyle: opts.titleBarStyle,
@@ -136,11 +140,14 @@ function initWindow() {
                 config.previewWindow.width = data.size[0];
                 config.previewWindow.height = data.size[1];
                 config.previewWindow.resizable = false;
+                // config.previewWindow.movable=true;
+                config.previewWindow.alwaysOnTop= true;
+                config.previewWindow.title='';
             };
         } else {
             //主窗口显示在欢迎界面
             //初始状态在 欢迎界面
-            if (config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',closeFn);`;
+            if (config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',GUI.closeFn);`;
         }
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
@@ -172,7 +179,7 @@ function initMenu() {
     const template = [
         // { role: 'appMenu' }
         ...(_IS_MAC ? [{
-            label: package.name,
+            label: _package.name,
             submenu: [{
                     label: '关于',
                     click: () =>
@@ -231,6 +238,15 @@ function initMenu() {
                     label: '发布',
                     accelerator: 'CmdOrCtrl+P',
                     click: () => global._WINS.mainWindow.webContents.send('public-file')
+                },
+                { type: 'separator' },
+                {
+                    label:'重启',
+                    accelerator:'CmdOrCtrl+R',
+                    click:()=>{
+                        app.relaunch();
+                        app.exit(0);
+                    }
                 },
                 { type: 'separator' },
                 {

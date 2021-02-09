@@ -2,7 +2,7 @@ const path = require('path');
 const runtime = require('./runtime');
 
 class Editor {
-    constructor(container, executeJavaScript) {
+    init(container, executeJavaScript) {
         this.code = localStorage.getItem("code") || `//Hello AI world!`;
         localStorage.setItem("code", this.code);
 
@@ -10,7 +10,7 @@ class Editor {
         this.container = container;
         this.executeJavaScript = executeJavaScript;
         this.editor = null;
-        this.container ? this.init() : null;
+        this.container ? this.initMonaco() : null;
 
         this.onMouseUp = null;
         this.onMouseDown = null;
@@ -21,7 +21,7 @@ class Editor {
         this.now = window.performance.now();
     }
 
-    init() {
+    initMonaco() {
 
         const amdLoader = require('monaco-editor/min/vs/loader.js');
         const amdRequire = amdLoader.require;
@@ -204,6 +204,44 @@ class Editor {
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         detail: '窗口内部宽度'
                     }, {
+                        label:'noise(x, [y], [z])',
+                        kind: 0,
+                        insertText: 'noise(${1:x});',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '柏林噪声'
+                    },{
+                        label:'clear()',
+                        kind: 0,
+                        insertText: 'clear();',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '柏林噪声'
+                    },{
+                        label:'push()',
+                        kind: 0,
+                        insertText: 'push();',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '储存当时的绘画样式设置及变形'
+                    },{
+                        label:'pop()',
+                        kind: 0,
+                        insertText: 'pop();',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '恢复储存的绘画样式设置及变形'
+                    },{
+                        label:'translate(x, y, [z])',
+                        kind: 0,
+                        insertText: 'translate(x, y, [z]);',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '物件平移'
+                    },
+                    {
+                        label:'sin(angle)',
+                        kind: 0,
+                        insertText: 'sin(angle);',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        detail: '计算一个角度的正弦值'
+                    },
+                    {
                         label: 'function setup(){}',
                         kind: 1,
                         insertText: 'function setup(){\n${1:}\n};',
@@ -354,4 +392,4 @@ function handleFile(file) {
 }
 
 
-module.exports = Editor;
+module.exports =new Editor();

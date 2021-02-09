@@ -354,16 +354,19 @@ button:hover {
 
 #blank-pannel {
     display: none;
+    background: #eee;
+    height: 100vh;
+    overflow-y: scroll;
 }
 
 #blank-pannel p {
     margin: 0 12px;
     font-size: 12px;
-    color: wheat;
+    color: #9E9E9E;
 }
 
 #blank-pannel h1 {
-    color: white;
+    /* color: white; */
     font-size: 32px;
     font-weight: 500;
     margin: 0;
@@ -395,6 +398,7 @@ button:hover {
     align-items: center;
     cursor: pointer;
     height: 200px;
+    box-shadow: 0 0 3px 0px #c9e6ff
 }
 
 .card-body {
@@ -423,7 +427,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    align-items: flex-start;
+    align-items: flex-end;
 }
 
 .card .content h5 {
@@ -442,6 +446,27 @@ button:hover {
     flex-direction: column;
 }
 
+.card p{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card .version{
+    margin: 4px;
+}
+
+.card .close{
+    width: 32px;
+    height: 32px;
+    color: lightgray;
+    text-align: center;
+    line-height: 32px;
+}
+.card .close:hover{
+    background-color: #eee;
+}
+
 .card:hover {
-    box-shadow: 0 0 20px 10px #c9e6ff;
+    box-shadow: 0 0 20px 10px #c9e6ff!important;
 }

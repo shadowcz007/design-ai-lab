@@ -10,6 +10,16 @@ db.defaults({ posts: [] })
 
 const key="posts";
 
+function id(id){
+    return hash(id);
+}
+
+function removeById(id){
+  return db.get(key)
+    .remove({ id })
+    .write()
+}
+
 function add(data) {
     data=Object.assign({
         id:hash(data),
@@ -33,6 +43,7 @@ function add(data) {
 function getAll() {
     return db.get(key)
         .sortBy('createDate')
+        .reverse()
         .take(10)
         .value()
 }
@@ -48,7 +59,9 @@ function removeAll(){
 }
 
 module.exports = {
+    id,
     add,
     getAll,
+    removeById,
     removeAll
 }

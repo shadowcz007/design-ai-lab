@@ -9,11 +9,20 @@ const ffmpeg = require('./ffmpeg');
 
 //主要完成html的一些基本的操作
 class Base {
-    constructor() {}
+    constructor() {
+        this.isDisplay();
+    }
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
     add(dom){
         document.querySelector("#gui-main").appendChild(dom);
+        this.isDisplay();
+    }
+
+    //当没有子元素的时候，隐藏，有则开启
+    isDisplay(){
+        let children=document.querySelector("#gui-main").children;
+        document.querySelector("#gui-main").style.display=(children.length==0?"none":"flex");
     }
 
     createButton(text,eventListener){
@@ -55,6 +64,8 @@ class Base {
         if(isMultiple===true) input.setAttribute('multiple','multiple');
         if(fileExt==="image") {
             p.style.display="none";
+            input.style.display="none";
+        }else if(fileExt=="other"){
             input.style.display="none";
         };
 

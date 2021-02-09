@@ -12,16 +12,17 @@ renderer.code = function(code, language) {
 
 // console.log(renderer)
 class Knowledge {
-    constructor(readme, course) {
+    init(readme, course) {
         this.readOnly = true;
         this.course = course;
         this.readme = readme;
 
-        this.init();
+        this.initDataAndDom();
         this.toggle(true);
 
+        this.marked=marked;
     }
-    init() {
+    initDataAndDom() {
 
         let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
 
@@ -48,7 +49,7 @@ class Knowledge {
     }
     set(json) {
         localStorage.setItem("knowledge", JSON.stringify(json));
-        this.init();
+        this.initDataAndDom();
         this.toggle(true);
     }
     get() {
@@ -62,12 +63,14 @@ class Knowledge {
         };
     }
 
-    toggle(readOnly) {
-        if (readOnly !== undefined && readOnly !== null) {
+    toggle(readOnly=null) {
+        // console.log(readOnly)
+        if (readOnly !== null) {
             this.readOnly = readOnly;
         } else {
             this.readOnly = !this.readOnly;
         }
+        console.log(this.readOnly)
         if (!(this.course && this.readme)) return this.readOnly;
         // console.log(this.readOnly)
         if (this.readOnly) {
@@ -97,4 +100,4 @@ class Knowledge {
 
 }
 
-module.exports = Knowledge;
+module.exports =new Knowledge();
