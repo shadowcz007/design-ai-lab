@@ -19,6 +19,7 @@
 
 
 
+
 **Clone and run for a quick way to see Electron in action.**
 
 基本的electron应用包括以下文件:
@@ -28,6 +29,8 @@
 - `src/index.html` - 一个html网页，是应用的渲染进程 **renderer process**.
 
 可查阅electron官方文档 [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start).
+
+
 
 ## 如何使用
 
