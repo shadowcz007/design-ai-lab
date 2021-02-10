@@ -55,9 +55,10 @@ class Knowledge {
     get() {
         let div = document.createElement('div');
         div.innerHTML = marked(this.readme.getAttribute('data-md'));
-
+        let title='';
+        if(div.children&&div.children[0]) title=div.children[0].innerText;
         return {
-            title: div.children[0].innerText,
+            title: title,
             course: this.course.getAttribute('data-md'),
             readme: this.readme.getAttribute('data-md')
         };

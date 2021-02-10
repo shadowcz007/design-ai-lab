@@ -13,15 +13,37 @@ class Runtime {
         this.p5Fn = ['preload', 'setup', 'draw'];
     }
     parse(code) {
-        let ast;
-        try {
-            ast = esprima.parse(code);
-            // console.log(ast)
-        } catch (error) {
-            console.log(error)
-        }
+            let ast;
+            try {
+                ast = esprima.parse(code);
+                // console.log(ast)
+            } catch (error) {
+                console.log(error)
+            }
 
+            return ast
+        }
+        //计算代码量
+    countCodeLines(code) {
+        //去掉 EmptyStatement 
+        let ast = this.parse(code.trim()) || {};
+        if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
+        ast = this.countType(ast);
         return ast
+    }
+
+    countType(ast) {
+        let ts = [];
+        // console.log(ast)
+        if (ast.type !== "Program") ts.push(ast);
+        if (ast.body) {
+            let body = ast.body;
+            if (!(body instanceof Array)) body = body.body;
+            let children = Array.from(body, b => this.countType(b));
+            children = children.flat();
+            ts = [...ts, ...children].flat();
+        };
+        return ts
     }
 
     hash(code) {

@@ -1,4 +1,4 @@
-![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/demo.png)
+![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/demo.jpg)
 
 # design-ai-lab
 
@@ -17,7 +17,6 @@
 
 - 海报合成工具
 
-![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/01.jpg)
 
 
 **Clone and run for a quick way to see Electron in action.**

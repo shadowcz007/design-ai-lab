@@ -139,6 +139,16 @@ button:hover {
     color: white;
 }
 
+.button-light {
+    color: #232323;
+    background-color: #e2e2e2;
+}
+
+.button-select {
+    color: yellow;
+    background-color: black;
+}
+
 .btns {
     /* margin: 8px 0 0 12px; */
     display: flex;
@@ -359,6 +369,13 @@ button:hover {
     overflow-y: scroll;
 }
 
+#blank-pannel .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-direction: row;
+}
+
 #blank-pannel p {
     margin: 0 12px;
     font-size: 12px;
@@ -381,6 +398,10 @@ button:hover {
     padding: 0px 6px;
     margin: 0 4px;
     font-weight: 500;
+}
+
+#blank-pannel .info {
+    padding: 44px;
 }
 
 #recent-files {
@@ -421,6 +442,11 @@ button:hover {
     height: 88px;
 }
 
+.card .img:hover {
+    outline: 4px solid yellow;
+    background-color: #ffff004a;
+}
+
 .card .content {
     height: 100%;
     width: 100%;
@@ -446,24 +472,25 @@ button:hover {
     flex-direction: column;
 }
 
-.card p{
+.card p {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: baseline;
 }
 
-.card .version{
+.card .version {
     margin: 4px;
 }
 
-.card .close{
+.card .close {
     width: 32px;
     height: 32px;
     color: lightgray;
     text-align: center;
     line-height: 32px;
 }
-.card .close:hover{
+
+.card .close:hover {
     background-color: #eee;
 }
 

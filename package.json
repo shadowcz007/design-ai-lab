@@ -1,6 +1,6 @@
 {
     "name": "design-ai-lab",
-    "version": "0.0.9",
+    "version": "0.1.0",
     "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {
@@ -12,11 +12,11 @@
     "repository": "https://github.com/shadowcz007/design-ai-lab.git",
     "bugs": "https://github.com/shadowcz007/design-ai-lab/issues",
     "keywords": [
-        "AI",
-        "design",
-        "graph design",
-        "lab",
-        "tool"
+        "Javascript",
+        "Tensorflow.js",
+        "p5.js",
+        "Design.ai Lab",
+        "Code Examples"
     ],
     "author": "shadow",
     "license": "MIT",
@@ -53,6 +53,14 @@
         "appId": "mixlab.designailab",
         "mac": {
             "category": "shadow.app.design.ai.lab"
-        }
+        },
+        "fileAssociations": [
+            {
+              "ext": "designlabplugin",
+              "name": "DesignLab File",
+              "role": "Editor",
+              "perMachine": true
+            }
+          ]
     }
 }

@@ -37,7 +37,7 @@
                 <div class="btns">
                     <button id="edit-file"><i class="far fa-eye"></i></button>
                 </div>
-                <div style="overflow-y: scroll;height: 100%;">
+                <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
                     <div id="readme">智能设计</div>
                     <div id="course">
                         <p>- 工具箱</p>
@@ -63,6 +63,7 @@
                 <div id="log">
                     <div class="btns">
                         <button id="log-btn"><i class="fas fa-ban"></i></button>
+                        <button id="devtool-btn"><i class="fab fa-dev"></i></button>
                     </div>
                     <div class="content"></div>
                 </div>
@@ -80,10 +81,20 @@
         </div>
 
         <div id="blank-pannel">
-            <div style='padding: 44px;'>
-                <h1>HELLO AI WORLD!</h1>
-                <p>关键词:<span>javascript</span>
-                    <span>tensorflow.js</span><span>p5.js</span><span>Code Examples</span></p>
+            <div class='head'>
+                <div class="info">
+                    <h1>HELLO AI WORLD!</h1>
+                    <!-- <p>关键词:<span>javascript</span>
+                        <span>tensorflow.js</span><span>p5.js</span><span>Code Examples</span></p>-->
+                </div>
+                <div>
+                    <button id="setup" class="button-light"><i class="fas fa-cog"></i></button>
+                </div>
+            </div>
+            <div style="display: flex;
+            padding: 0 48px;">
+                <button id="my-course-btn" class="button-select button-light">我的</button>
+                <button id="recent-btn" class="button-light" >最近</button>
             </div>
             <div id="recent-files">
 

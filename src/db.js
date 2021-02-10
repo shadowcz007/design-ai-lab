@@ -1,4 +1,8 @@
-const {remote}=require('electron');
+/**
+ * 用来保存未保存的文件的
+ * TODO 待改造 
+ */
+const { remote } = require('electron');
 const hash = require('object-hash');
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync');
@@ -8,36 +12,42 @@ const db = low(adapter);
 db.defaults({ posts: [] })
     .write();
 
-const key="posts";
+const key = "posts";
 
-function id(id){
+function id(id) {
     return hash(id);
 }
 
-function removeById(id){
-  return db.get(key)
-    .remove({ id })
-    .write()
+function removeById(id) {
+    return db.get(key)
+        .remove({ id })
+        .write()
 }
 
 function add(data) {
-    data=Object.assign({
-        id:hash(data),
-        createDate:(new Date()).getTime()
-    },data);
-    
+    delete data.create_time;
+    let poster = data.poster;
+    delete data.poster;
+    delete data.id;
+    console.log(data)
+    data = Object.assign(data, {
+        id: hash(data),
+        poster: poster,
+        create_time: (new Date()).getTime()
+    });
+
     // console.log(db.get(key).find({id:data.id}).value())
-    if(!db.get(key).find({id:data.id}).value()){
+    if (!db.get(key).find({ id: data.id }).value()) {
         db.get(key)
-        .push(data)
-        .write()
-    }else{
+            .push(data)
+            .write()
+    } else {
         db.get(key)
-        .find({id:data.id})
-        .assign({ createDate:data.createDate})
-        .write()
+            .find({ id: data.id })
+            .assign({ create_time: data.create_time })
+            .write()
     };
-    
+
 }
 
 function getAll() {
@@ -49,9 +59,9 @@ function getAll() {
 }
 
 
-function removeAll(){
+function removeAll() {
     Array.from(db.get(key)
-        .value(),v=>{
+        .value(), v => {
             db.get(key)
                 .remove(v)
                 .write()

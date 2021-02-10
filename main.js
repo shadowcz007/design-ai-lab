@@ -245,7 +245,7 @@ function initMenu() {
                     accelerator:'CmdOrCtrl+R',
                     click:()=>{
                         app.relaunch();
-                        app.exit(0);
+                        app.exit();
                     }
                 },
                 { type: 'separator' },

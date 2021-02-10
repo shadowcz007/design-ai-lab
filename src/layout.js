@@ -10,12 +10,18 @@ class Layout{
         return this.grid
     }
     init(dragEnabled=true){
+        document.querySelector('.grid').style.display='inherit';
+        document.querySelector('#editor-pannel').style.position='absolute';
+        document.querySelector('#knowledge-pannel').style.position='absolute';
         this.grid = this.initGrid(dragEnabled);
     }
     destroy(){
         if(this.grid) {
             this.grid.destroy();
         };
+        document.querySelector('.grid').style.display='flex';
+        document.querySelector('#editor-pannel').style.position='inherit';
+        document.querySelector('#knowledge-pannel').style.position='inherit';
     }
     reset(){
         this.destroy();
@@ -27,7 +33,7 @@ class Layout{
     }
     dragEnabled(dragEnabled=true){
         this.destroy();
-        this.initGrid(dragEnabled);
+        this.init(dragEnabled);
     }
     //初始化布局
     initGrid(dragEnabled = true) {

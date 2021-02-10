@@ -239,14 +239,15 @@ function pipe(inputs, textInputs) {
 
         let watermarks = [];
 
-        textInputs.forEach((t, i) => {
+        textInputs.forEach((base64, i) => {
             let {
                 dirname,
                 basename,
                 extname
             } = createOutputName(inputs[i], 'watermark');
             let filename = path.join(dirname, basename.replace(extname, "") + `_watermark_${i}.png`);
-            saveImage(t.base64, filename);
+            // console.log(t)
+            saveImage(base64, filename);
             watermarks.push(filename);
         });
 
