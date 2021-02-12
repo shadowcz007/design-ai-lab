@@ -1,4 +1,6 @@
 //Log GUI
+
+
 const md5 = require('md5');
 
 //executeJavaScriptResult
@@ -38,19 +40,19 @@ function create(text) {
         document.querySelector("#log .content").appendChild(div);
     };
 
-    
+
 }
 
-function sort(){
+function sort() {
     let findLogs = document.querySelector("#log .content").children;
-    findLogs =Array.from(findLogs,l=>{
+    findLogs = Array.from(findLogs, l => {
         return {
-            div:l,
-            time:parseInt(l.getAttribute("data-time"))
+            div: l,
+            time: parseInt(l.getAttribute("data-time"))
         }
-    }).sort((b,a)=>a.time-b.time);
-    document.querySelector("#log .content").innerHTML="";
-    findLogs.forEach(g=>{
+    }).sort((b, a) => a.time - b.time);
+    document.querySelector("#log .content").innerHTML = "";
+    findLogs.forEach(g => {
         document.querySelector("#log .content").appendChild(g.div);
     })
 }
@@ -60,6 +62,9 @@ function clear() {
 }
 
 
-module.exports={
-    add,create,clear,sort
+module.exports = {
+    add,
+    create,
+    clear,
+    sort
 }

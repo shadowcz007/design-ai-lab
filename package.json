@@ -4,7 +4,8 @@
     "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {
-        "start": "NODE_ENV=development electron .",
+        "start": "electron .",
+        "dev": "NODE_ENV=development electron .",
         "pack": "electron-builder --dir",
         "dist": "electron-builder --macos --linux --windows"
     },
@@ -54,13 +55,11 @@
         "mac": {
             "category": "shadow.app.design.ai.lab"
         },
-        "fileAssociations": [
-            {
-              "ext": "designlabplugin",
-              "name": "DesignLab File",
-              "role": "Editor",
-              "perMachine": true
-            }
-          ]
+        "fileAssociations": [{
+            "ext": "designlabplugin",
+            "name": "DesignLab File",
+            "role": "Editor",
+            "perMachine": true
+        }]
     }
 }

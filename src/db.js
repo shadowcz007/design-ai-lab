@@ -29,7 +29,7 @@ function add(data) {
     let poster = data.poster;
     delete data.poster;
     delete data.id;
-    console.log(data)
+    // console.log(data)
     data = Object.assign(data, {
         id: hash(data),
         poster: poster,
@@ -52,7 +52,7 @@ function add(data) {
 
 function getAll() {
     return db.get(key)
-        .sortBy('createDate')
+        .sortBy('create_time')
         .reverse()
         .take(10)
         .value()

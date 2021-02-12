@@ -5,7 +5,7 @@ const openAboutWindow = require('about-window').default;
 
 const _package = require("./package.json");
 // console.log(package);
-global._PACKAGE=JSON.parse(JSON.stringify(_package));
+global._PACKAGE = JSON.parse(JSON.stringify(_package));
 
 const dataPath = storage.getDataPath();
 // console.log(dataPath,path.join(dataPath, "db.json"));
@@ -24,6 +24,10 @@ const _READ_HTML = path.join(__dirname, 'src/read.html');
 // const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 
+global._DEBUG_PORT = 3000;
+
+app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
+app.commandLine.appendSwitch('remote-debugging-address', ' http://0.0.0.0 ');
 
 const config = {
     mainWindow: {
@@ -47,7 +51,7 @@ const config = {
         align: 'topRight',
         title: "预览",
         show: false,
-        alwaysOnTop:true,
+        alwaysOnTop: true,
         closable: false,
         resizable: true,
         titleBarStyle: "default",
@@ -80,7 +84,7 @@ function createWindow(key, opts, workAreaSize) {
         title: opts.title || "-",
         show: false,
         // movable:opts.movable!=undefined ? opts.movable:true,
-        alwaysOnTop:opts.alwaysOnTop||false,
+        alwaysOnTop: opts.alwaysOnTop || false,
         closable: opts.closable,
         resizable: opts.resizable,
         titleBarStyle: opts.titleBarStyle,
@@ -91,7 +95,9 @@ function createWindow(key, opts, workAreaSize) {
             //开启AI功能
             experimentalFeatures: true,
             //开启渲染进程调用remote
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            webviewTag: true,
+            devTools: true
         }
     });
 
@@ -141,8 +147,8 @@ function initWindow() {
                 config.previewWindow.height = data.size[1];
                 config.previewWindow.resizable = false;
                 // config.previewWindow.movable=true;
-                config.previewWindow.alwaysOnTop= true;
-                config.previewWindow.title='';
+                config.previewWindow.alwaysOnTop = true;
+                config.previewWindow.title = '';
             };
         } else {
             //主窗口显示在欢迎界面
@@ -241,9 +247,9 @@ function initMenu() {
                 },
                 { type: 'separator' },
                 {
-                    label:'重启',
-                    accelerator:'CmdOrCtrl+R',
-                    click:()=>{
+                    label: '重启',
+                    accelerator: 'CmdOrCtrl+R',
+                    click: () => {
                         app.relaunch();
                         app.exit();
                     }

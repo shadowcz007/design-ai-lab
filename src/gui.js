@@ -58,13 +58,25 @@ class GUI {
         Editor.init(
             document.querySelector("#editor"),
             (code) => Win.executeJavaScript(this.createExecuteJs(code))
-            .then((result) => this.onPreviewWindowError())
-            .catch((err) => this.onPreviewWindowError())
+            // .then((result) => this.onPreviewWindowError())
+            // .catch((err) => this.onPreviewWindowError())
         );
         //鼠标按键抬起
         Editor.onMouseUp = () => console.log("onMouseUp");
         //鼠标按键按下
-        Editor.onMouseDown = () => this.onPreviewWindowError();
+        //Editor.onMouseDown = () => this.onPreviewWindowError();
+
+
+
+        /**
+         * dev tool
+         */
+
+
+
+
+
+
     }
 
     //生成注入的js代码
@@ -99,7 +111,7 @@ class GUI {
          * editor面板
          */
         this.practiceBtn = document.querySelector("#practice-btn");
-        this.logdBtn = document.querySelector("#log-btn");
+        // this.logdBtn = document.querySelector("#log-btn");
         this.devBtn = document.querySelector("#devtool-btn");
 
         /**
@@ -121,8 +133,13 @@ class GUI {
         this.addClickEventListener(this.practiceBtn, () => this.practiceFn());
         //调试界面打开
         this.addClickEventListener(this.devBtn, () => {
-            Win.show(1, true);
-            (Win.get(1)).webContents.toggleDevTools();
+            if (!this.devOpen) {
+                this.openDevTool();
+                this.devOpen = true;
+            } else {
+                this.closeDevTool();
+                this.devOpen = false;
+            }
         });
         //设置路径
         this.addClickEventListener(this.setupBtn, () => this.setupExampleFilePath());
@@ -142,11 +159,13 @@ class GUI {
         });
 
         // log
-        this.addClickEventListener(this.logdBtn, () => {
-            Log.add('success');
-            this.onPreviewWindowError();
-        });
+        // this.addClickEventListener(this.logdBtn, () => {
+        //     Log.add('success');
+        //     this.onPreviewWindowError();
+        // });
     }
+
+
 
     //保存窗口状态
     // 0 主窗口 1 主窗口 预览窗口 2 预览窗口
@@ -242,6 +261,54 @@ class GUI {
                 })
             });
         });
+    }
+
+    /**
+     * devtool
+     */
+    closeDevTool() {
+        document.getElementById("devtools").style.display = "none";
+        Win.get(1).closeDevTools();
+    }
+    openDevTool() {
+        const devtoolsView = document.getElementById("devtools");
+        Win.get(1).openDevTools({
+            activate: false,
+            mode: 'undocked'
+        });
+
+        fetch('http://127.0.0.1:3000/json/list?t=' + new Date().getTime()).then(res => res.json()).then(
+            res => {
+                let target = res.filter(r => r.url === Win.get(1).getURL());
+                if (target[0]) {
+
+                    document.getElementById("devtools").style.display = "flex";
+                    if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
+                    this.resizer = new Resizer('#frame', {
+                        grabSize: 10,
+                        resize: 'vertical',
+                        handle: 'bar'
+                    });
+
+                    devtoolsView.setAttribute("src", `http://0.0.0.0:${remote.getGlobal('_DEBUG_PORT')}${target[0].devtoolsFrontendUrl}`);
+                    //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
+
+                    devtoolsView.addEventListener('dom-ready', e => {
+                        // const { webContents } = remote.webContents;
+
+                        const browser = Win.get(1).webContents;
+                        const devtools = remote.webContents.fromId(devtoolsView.getWebContentsId());
+
+                        browser.setDevToolsWebContents(devtools);
+                        browser.openDevTools();
+
+                        // console.log('====21=====', this.resizer)
+
+                    });
+
+                }
+            }
+        )
     }
 
     /*
@@ -515,24 +582,26 @@ class GUI {
     closePracticeHtml() {
         document.getElementById("knowledge-pannel").style.display = "block";
         document.getElementById("editor-pannel").classList.remove("pannel-large");
-        document.getElementById("log").style.display = "none";
+
         document.body.querySelector('#frame').style.borderWidth = '0px !important;';
         this.practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
+
+        this.closeDevTool();
     }
 
     //编程，UI状态
     openPracticeHtml() {
         document.getElementById("knowledge-pannel").style.display = "none";
         document.getElementById("editor-pannel").classList.add("pannel-large");
-        document.getElementById("log").style.display = "block";
         this.practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
-        //let resizer = null;
-        if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
-        this.resizer = new Resizer('#frame', {
-            grabSize: 10,
-            resize: 'vertical',
-            handle: 'bar'
-        });
+
+        // document.getElementById("log").style.display = "block";
+        // if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
+        // this.resizer = new Resizer('#frame', {
+        //     grabSize: 10,
+        //     resize: 'vertical',
+        //     handle: 'bar'
+        // });
     }
 
     //编程功能，按钮

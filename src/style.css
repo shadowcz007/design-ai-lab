@@ -328,17 +328,19 @@ button:hover {
     /* background: #333642; */
 }
 
-#log {
-    overflow: scroll;
+#devtools {
+    /* overflow: scroll; */
     /*height: 20%; */
-    min-height: 80px;
+    min-height: 380px;
     width: 100%;
     min-width: 500px;
     background: #1d1e22;
     display: none;
-    flex: 1;
+    /* flex: 1; */
 }
 
+
+/* 
 #log .content {
     display: flex;
     font-size: 12px;
@@ -360,7 +362,7 @@ button:hover {
     text-align: center;
     line-height: 14px;
     border-radius: 100%;
-}
+} */
 
 #blank-pannel {
     display: none;

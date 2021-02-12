@@ -86,11 +86,11 @@ class Editor {
 
 
                 this.editor.onMouseDown(() => {
-                    this.onMouseDown();
+                    if (this.onMouseDown) this.onMouseDown();
                     // this.isDrag=1;
                 });
                 this.editor.onMouseUp(() => {
-                    this.onMouseUp();
+                    if (this.onMouseUp) this.onMouseUp();
                     // this.isDrag=0;
                 });
 

@@ -6,7 +6,7 @@ const path = require('path');
 
 
 //AI功能封装
-const {Lab,cv} = require('./lab');
+const { Lab, cv } = require('./lab');
 
 
 //预加载的字体,站酷沧耳渔阳体
@@ -21,8 +21,7 @@ function preload() {
 
     // console.log(ZKYYT)
 }
-window.onerror = function(message, source, lineno, colno, error) { 
-    console.log({message, source, lineno, colno, error})
-    ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',{message, source, lineno, colno});
-}
-
+// window.onerror = function(message, source, lineno, colno, error) { 
+//     console.log({message, source, lineno, colno, error})
+//     ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',{message, source, lineno, colno});
+// }

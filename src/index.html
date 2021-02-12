@@ -51,21 +51,23 @@
                 <div id="frame">
                     <div id="editor-container">
                         <div class="btns">
+                            <button id="devtool-btn"><i class="fab fa-dev"></i></button>
                             <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
                             <button id="practice-btn"><i class="fas fa-sync"></i></button>
                         </div>
                         <div id="editor"></div>
                     </div>
                 </div>
-                
 
-                <div id="log">
+                <webview id="devtools" src="about:blank"></webview>
+                <!-- <div id="log">
                     <div class="btns">
                         <button id="log-btn"><i class="fas fa-ban"></i></button>
-                        <button id="devtool-btn"><i class="fab fa-dev"></i></button>
+                        
                     </div>
+                    
                     <div class="content"></div>
-                </div>
+                </div> -->
 
 
             </div>
@@ -93,7 +95,7 @@
             <div style="display: flex;
             padding: 0 48px;">
                 <button id="my-course-btn" class="button-select button-light">我的</button>
-                <button id="recent-btn" class="button-light" >最近</button>
+                <button id="recent-btn" class="button-light">最近</button>
             </div>
             <div id="recent-files">
 
@@ -102,12 +104,12 @@
 
 
     </main>
-    
+
     <footer>
         <p>by shadow @ Mixlab 2021</p>
     </footer>
     <script src="./renderer.js"></script>
-    
+
 </body>
 
 </html>
