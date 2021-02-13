@@ -14,6 +14,7 @@ class Runtime {
     }
     parse(code) {
             let ast;
+            // console.trace()
             try {
                 ast = esprima.parse(code);
                 // console.log(ast)
@@ -48,7 +49,7 @@ class Runtime {
 
     hash(code) {
         //去掉 EmptyStatement 
-        let ast = this.parse(code.trim()) || {};
+        let ast = this.parse(code.trim()) || null;
         if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
         return hash(ast);
     }

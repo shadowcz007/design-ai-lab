@@ -28,6 +28,8 @@
     "dependencies": {
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "@tensorflow-models/knn-classifier": "^1.2.2",
+        "@tensorflow/tfjs": "^3.0.0",
         "about-window": "^1.13.4",
         "blockly": "^4.20201217.0",
         "colorthief": "^2.3.2",
@@ -55,11 +57,13 @@
         "mac": {
             "category": "shadow.app.design.ai.lab"
         },
-        "fileAssociations": [{
-            "ext": "designlabplugin",
-            "name": "DesignLab File",
-            "role": "Editor",
-            "perMachine": true
-        }]
+        "fileAssociations": [
+            {
+                "ext": "designlabplugin",
+                "name": "DesignLab File",
+                "role": "Editor",
+                "perMachine": true
+            }
+        ]
     }
 }

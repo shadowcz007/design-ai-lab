@@ -1,5 +1,6 @@
 //lab提供封装好的功能
-
+const tf = require('@tensorflow/tfjs');
+const knnClassifier = require('@tensorflow-models/knn-classifier');
 const cv = require('opencvjs-dist/build/opencv');
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
@@ -11,20 +12,43 @@ const ffmpeg = require('./ffmpeg');
 class Base {
     constructor() {
         this.isDisplay();
+        //随机获取，累计
+        this.randomPicNum = 0;
     }
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
     add(dom) {
-        document.querySelector("#gui-main").appendChild(dom);
-        this.isDisplay();
+        if (document.querySelector("#gui-main")) {
+            document.querySelector("#gui-main").appendChild(dom);
+            this.isDisplay();
+        }
     }
 
     //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
-        let children = document.querySelector("#gui-main").children;
-        document.querySelector("#gui-main").style.display = (children.length == 0 ? "none" : "flex");
+            let children = document.querySelector("#gui-main").children;
+            document.querySelector("#gui-main").style.display = (children.length == 0 ? "none" : "flex");
+        }
+        //手动隐藏,显示p5.js
+    p5Show(isShow = true) {
+        if (document.querySelector("#p5")) document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
     }
 
+    //基础的HTMLElement
+    createBaseCanvas(width, height) {
+        let canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        return canvas
+    }
+    createBaseInput(type = 'text') {
+        let input = document.createElement('input');
+        input.setAttribute('type', type);
+        return input
+    }
+
+
+    // 封装的控件
     createIcon(key, eventListener) {
         let icons = {
             'refresh': `<i class="fas fa-sync-alt"></i>`,
@@ -135,13 +159,12 @@ class Base {
         return div
     }
 
-    //创建canvas，返回ctx
+
+    //创建canvas，返回canvas
     createCanvas(width, height, className, id, show = false) {
-        let canvas = document.createElement('canvas');
+        let canvas = this.createBaseCanvas(width, height);
         if (className) canvas.className = className;
         if (id) canvas.id = id;
-        canvas.width = width;
-        canvas.height = height;
         canvas.style.width = width + 'px';
         canvas.style.height = 'auto';
         this.add(canvas);
@@ -198,15 +221,92 @@ class Base {
         })
     }
 
+    // 
+    // canvasToURL() {
+    //     let canvas = this.createBaseCanvas(im.naturalWidth, im.naturalHeight);
+    //     let ctx = canvas.getContext('2d');
+    //     ctx.drawImage(im, 0, 0);
+    //     canvas.toBlob(blob => {
+    //         let nurl = URL.createObjectURL(blob);
+    //         this.createImage(nurl).then(nim => {
+    //             //URL.revokeObjectURL(nurl);
+    //             resolve(nim)
+    //         });
+    //     });
+    // }
+
     //随机来张图片
     randomPic(w = 200, h = 200) {
-            let url = `https://picsum.photos/${w}/${h}?random=${(new Date).getTime()}`;
+            this.randomPicNum++;
+            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
             return this.createImage(url);
         }
         //随机来一句话
     randomText() {}
 }
 
+class Knn {
+    constructor() {
+        this.knn = knnClassifier.create();
+        this.topk = 20;
+    }
+
+    count() {
+        return this.knn.getClassExampleCount();
+    }
+
+    add(tensor, className) {
+        if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
+        // console.log('+===', tensor instanceof tf.Tensor)
+        this.knn.addExample(tensor, className);
+    }
+
+    train(tensors = [], classNames = []) {
+        for (let index = 0; index < tensors.length; index++) {
+            const t = tensors[index];
+            this.add(t, classNames[index]);
+        }
+    }
+
+    async predict(tensor) {
+        if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
+        return await this.knn.predictClass(tensor, this.topk);
+    }
+
+    load(dataset = "") {
+        try {
+            var tensorObj = JSON.parse(dataset);
+            Object.keys(tensorObj).forEach((key) => {
+                tensorObj[key] = tf.tensor(tensorObj[key].tensor, tensorObj[key].shape, tensorObj[key].tensor.dtype);
+            });
+            //需要清空knn
+            this.knn.clearAllClasses();
+            this.knn.setClassifierDataset(tensorObj);
+
+            return true
+        } catch (error) {
+            return false
+        }
+    }
+    export () {
+        let dataset = this.knn.getClassifierDataset();
+        var datasetObj = {};
+        Object.keys(dataset).forEach((key) => {
+            let data = dataset[key].dataSync();
+            var shape = dataset[key].shape,
+                dtype = dataset[key].dtype;
+            datasetObj[key] = {
+                tensor: Array.from(data),
+                shape: shape,
+                dtype: dtype
+            };
+        });
+
+        let jsonModel = JSON.stringify(datasetObj)
+            //localStorage.setItem("easyteach_model",jsonModel);
+        return jsonModel;
+    }
+}
 
 
 /**
@@ -215,6 +315,7 @@ class Base {
  */
 class AI {
     constructor() {}
+        // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
         let scale = _canvas.canvas.width / _canvas.width;
         let canvas = document.createElement("canvas");
@@ -225,6 +326,11 @@ class AI {
         return canvas
     }
 
+    // knn紧邻算法
+    knnClassifier() {
+        return new Knn();
+    }
+
     //转为p5的图片类型
     p5Image(_img) {
         if (!(_img instanceof p5.Image) && (_img instanceof Image)) _img = p5.instance.createImg(_img.src, '');
@@ -232,11 +338,13 @@ class AI {
         return _img
     }
 
-    colorStr(c = [0, 0, 0]) {
-        // console.log(c)
-        return `rgb(${c.join(',')})`;
-    }
 
+    // rgb转字符串
+    colorStr(c = [0, 0, 0]) {
+            // console.log(c)
+            return `rgb(${c.join(',')})`;
+        }
+        // 计算主色
     getColor(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -261,7 +369,7 @@ class AI {
         })
 
     };
-
+    // 计算色板
     getPalette(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -286,6 +394,7 @@ class AI {
 
     }
 
+    // 人脸
     loadface(_img) {
         //转为p5的元素类型
         _img = this.p5Image(_img);
@@ -309,7 +418,7 @@ class AI {
         });
         return _img
     };
-
+    // 文本检测
     loadtext(_img) {
         //转为p5的元素类型
         _img = this.p5Image(_img);

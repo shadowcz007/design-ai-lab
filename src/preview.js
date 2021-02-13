@@ -1,13 +1,16 @@
 //用于捕捉erro的情况，回传
-const { ipcRenderer, remote } = require("electron");
-var mainWindow = (remote.getGlobal("_WINS")).mainWindow;
+// const { ipcRenderer, remote } = require("electron");
+// var mainWindow = (remote.getGlobal("_WINS")).mainWindow;
 
 const path = require('path');
 
-
-//AI功能封装
-const { Lab, cv } = require('./lab');
-
+function init() {
+    //AI功能封装
+    const { Lab, cv } = require('./lab');
+    window.Lab = Lab;
+    window.cv = cv;
+}
+window.addEventListener('load', init);
 
 //预加载的字体,站酷沧耳渔阳体
 var ZKYYT = {};
@@ -21,7 +24,3 @@ function preload() {
 
     // console.log(ZKYYT)
 }
-// window.onerror = function(message, source, lineno, colno, error) { 
-//     console.log({message, source, lineno, colno, error})
-//     ipcRenderer.sendTo(mainWindow.webContents.id, 'executeJavaScript-result',{message, source, lineno, colno});
-// }

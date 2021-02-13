@@ -62,7 +62,7 @@ class GUI {
             // .catch((err) => this.onPreviewWindowError())
         );
         //鼠标按键抬起
-        Editor.onMouseUp = () => console.log("onMouseUp");
+        // Editor.onMouseUp = () => console.log("onMouseUp");
         //鼠标按键按下
         //Editor.onMouseDown = () => this.onPreviewWindowError();
 
@@ -584,6 +584,7 @@ class GUI {
         document.getElementById("editor-pannel").classList.remove("pannel-large");
 
         document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+        document.body.querySelector('#frame').style.height = "100%";
         this.practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
 
         this.closeDevTool();

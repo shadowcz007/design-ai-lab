@@ -100,18 +100,26 @@ class Editor {
                 //     }
                 // });
 
-                this.editor.onDidChangeModelContent(() => {
-                    let id = runtime.hash(this.getCode());
-                    let now = window.performance.now();
-                    if (id !== this.codeId) {
-                        this.execute();
-                        // if(now-this.now>500){
-                        // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
-                        this.codeId = id;
-                        this.now = now;
-                        // }
+                this.editor.onDidChangeModelContent((e) => {
+                    console.log('this.editor.onDidChangeModelContent', e)
+                    if (e.changes[0]) {
+                        if (e.changes[0].text.match('↵') ||
+                            e.changes[0].text.match(';') ||
+                            e.changes[0].text.match('}') ||
+                            e.changes[0].text.match(/\)/)) {
+                            let id = runtime.hash(this.getCode());
+                            let now = window.performance.now();
+                            if (id !== this.codeId) {
+                                this.execute();
+                                // if(now-this.now>500){
+                                // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
+                                this.codeId = id;
+                                this.now = now;
+                                // }
+                            };
+                        }
+                    }
 
-                    };
                 });
                 // this.editor.getAction(['editor.action.formatDocument']).run();
 
@@ -146,7 +154,15 @@ class Editor {
                             insertText: 'cv.cvtColor(${1:src}, ${1:dst}, cv.COLOR_RGBA2GRAY, 0)',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '调整色彩模式'
-                        }, {
+                        },
+                        {
+                            label: 'Lab.base.p5Show',
+                            kind: 1,
+                            insertText: '//隐藏p5的画布\nLab.base.p5Show(false);',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: 'p5画布的显示与隐藏'
+                        },
+                        {
                             label: 'Lab.base.createInput',
                             kind: 1,
                             insertText: 'Lab.base.createInput',
@@ -167,6 +183,14 @@ class Editor {
                             insertText: 'Lab.base.createTextImage(${1:txt},${2:fontSize},${3:color})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建文本图片'
+                        },
+
+                        {
+                            label: 'Lab.ai.knnClassifier',
+                            kind: 1,
+                            insertText: 'Lab.ai.knnClassifier();',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '创建knn分类器'
                         },
                         {
                             label: 'Lab.ai.getColor',

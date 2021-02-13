@@ -10,6 +10,21 @@ class Win {
         this.workAreaSize = remote.screen.getPrimaryDisplay().workAreaSize;
         this.previewWindow = (remote.getGlobal("_WINS")).previewWindow;
         this.mainWindow = (remote.getGlobal("_WINS")).mainWindow;
+        // this.previewWindow.webContents.on('context-menu', (event, params) => {
+        //     console.log('context-menu', event, params)
+        // })
+        // 用来优化console的显示消息
+        // this.previewWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+        //     console.log('console-message', event, level, message, line, sourceId)
+        // })
+        // this.previewWindow.webContents.on('did-finish-load', () => {
+        //     this.isInjecting = false;
+
+        //     win.webContents.executeJavaScript(this.code, false)
+        //         .then(resolve)
+        //         .catch(reject);
+
+        // })
     }
 
     edit() {
@@ -89,15 +104,22 @@ class Win {
     executeJavaScript(code, w = 1) {
         let win = this.get(w);
         this.show(1, true);
+        if (this.isInjecting === true) return;
         return new Promise((resolve, reject) => {
-
+            this.isInjecting = true;
             win.webContents.reload();
-            win.webContents.once('dom-ready', () => {
-                // console.log('dom-ready',code)
+            // win.webContents.once('dom-ready', () => {
+            //     console.log('dom-ready', code)
+            //     win.webContents.executeJavaScript(code, false)
+            //         .then(resolve)
+            //         .catch(reject)
+            // });
+            win.webContents.once('did-finish-load', () => {
+                this.isInjecting = false;
                 win.webContents.executeJavaScript(code, false)
                     .then(resolve)
                     .catch(reject)
-            });
+            })
 
         });
     };

@@ -1,123 +1,151 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>预览</title>
     <script src="../lib/p5.min.js"></script>
-    <script src="../lib/addons/p5.sound.min.js"></script>
+    <!-- <script src="../lib/addons/p5.sound.min.js"></script> -->
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
-  
+
     <style>
         body {
-          padding: 0;
-          margin: 0;
-          display: flex;
-          /* height: 100vh; */
-          overflow: hidden;
-          flex-direction: column;
-          justify-content: space-around;
-          align-items: center;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            /* height: 100vh; */
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
         }
-        #p5{
-          text-align: center;
+        
+        #p5 {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            height: 40vh;
+            background-color: #eee;
+            position: fixed;
+            left: 0;
+            top: 0;
         }
-        #p5 canvas{
-          outline: 1px dashed lightgray;
+        
+        #p5 canvas {
+            outline: 1px dashed lightgray;
         }
-        #gui-main{
-          width: 100%;
-          padding: 24px;
-          justify-content: space-around;
-          align-items: center;
-          flex-wrap: wrap;
+        
+        #gui-main {
+            display: flex;
+            position: fixed;
+            top: 40vh;
+            height: 60vh;
+            overflow-y: scroll;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        #gui-main .input-image-default{
-          background-position: 0 0, 5px 5px;
-          background-size: 10px 10px;
-          background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
-          width: 120px;
-          height: 120px;
-          border-radius: 12px;
-          cursor: pointer;
-          box-shadow: 0px 0 14px 7px lightgrey;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: lightsteelblue;
-          margin: 12px;
+        
+        #gui-main .input-image-default {
+            background-position: 0 0, 5px 5px;
+            background-size: 10px 10px;
+            background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0px 0 14px 7px lightgrey;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: lightsteelblue;
+            margin: 12px;
         }
-        #gui-main .input-image{
-          background-position: center!important;
-          background-size: contain!important;
-          background-repeat: no-repeat!important;
-          width: 120px;
-          height: 120px;
-          border-radius: 12px;
-          cursor: pointer;
-          box-shadow: 0px 0 14px 7px lightgrey;
+        
+        #gui-main .input-image {
+            background-position: center!important;
+            background-size: contain!important;
+            background-repeat: no-repeat!important;
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0px 0 14px 7px lightgrey;
         }
-        #gui-main .input-file{
-          height:32px
+        
+        #gui-main .input-file {
+            height: 32px
         }
-        #gui-main .input-file p{
-          overflow: hidden;
-          height: 20px;
+        
+        #gui-main .input-file p {
+            overflow: hidden;
+            height: 20px;
         }
-
-        #gui-main .input-image-default:hover{
-          box-shadow: 0px 0 14px 14px lightgrey!important;
+        
+        #gui-main .input-image-default:hover {
+            box-shadow: 0px 0 14px 14px lightgrey!important;
         }
-        #gui-main .input-image:hover{
-          box-shadow: 0px 0 14px 14px lightgrey!important;
+        
+        #gui-main .input-image:hover {
+            box-shadow: 0px 0 14px 14px lightgrey!important;
         }
-
-        #gui-main .input-text{
-        width: 80%;
+        
+        #gui-main .input-text {
+            width: 80%;
         }
-        #gui-main .input-text input{
-          height:32px;
-          border-color: lightsteelblue;
-          border-width: thin;
-          outline: none;
-          padding: 0 8px;
-          font-size: 16px;
-          color: lightsteelblue;
+        
+        #gui-main .input-text input {
+            height: 32px;
+            border-color: lightsteelblue;
+            border-width: thin;
+            outline: none;
+            padding: 0 8px;
+            font-size: 16px;
+            color: lightsteelblue;
         }
-        #gui-main .input-text p{
-        padding-top: 16px;
-        margin: 8px 0;
-        color: lightsteelblue;
+        
+        #gui-main .input-text p {
+            padding-top: 16px;
+            margin: 8px 0;
+            color: lightsteelblue;
         }
-
-        #gui-main button{
-          outline: none;
-          cursor: pointer;
-          user-select: none;
-          margin: 12px;
-          height: 36px;
-          padding: 0px 18px;
-          font-size: 16px;
-          background: #484848;
-          font-weight: 300;
-          color: white;
-          border: none;
-          border-radius: 24px;
-          box-shadow: 0px 0 14px 7px lightgrey;
+        
+        #gui-main button {
+            outline: none;
+            cursor: pointer;
+            user-select: none;
+            margin: 12px;
+            height: 36px;
+            padding: 0px 18px;
+            font-size: 16px;
+            background: #484848;
+            font-weight: 300;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0px 0 14px 7px lightgrey;
         }
-        #gui-main button:hover{
-         box-shadow: 0px 0 14px 14px lightgrey!important;
+        
+        #gui-main button:hover {
+            box-shadow: 0px 0 14px 14px lightgrey!important;
         }
-        #gui-main .button{
-          width:40%;
-          margin-top: 32px;
+        
+        #gui-main .button {
+            width: 40%;
+            margin-top: 32px;
         }
-      </style>
+    </style>
+    
 </head>
+
 <body>
     <div id="p5"></div>
     <div id="gui-main"></div>
     <script src="./preview.js"></script>
 </body>
+
 </html>

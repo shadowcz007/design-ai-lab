@@ -20,7 +20,7 @@ class Knowledge {
         this.initDataAndDom();
         this.toggle(true);
 
-        this.marked=marked;
+        this.marked = marked;
     }
     initDataAndDom() {
 
@@ -45,6 +45,21 @@ class Knowledge {
                 this.course.setAttribute('data-md', this.course.innerText);
                 localStorage.setItem("knowledge", JSON.stringify(this.get()));
             });
+        };
+
+        // 只粘贴text
+        if (this.readme && this.course) {
+            this.readme.addEventListener('paste', e => {
+                e.preventDefault();
+                let text = e.clipboardData.getData('text');
+                e.target.insertAdjacentText('beforeend', text);
+                // console.log(e.target)
+            });
+            this.course.addEventListener('paste', e => {
+                e.preventDefault();
+                let text = e.clipboardData.getData('text');
+                e.target.insertAdjacentText('beforeend', text);
+            })
         }
     }
     set(json) {
@@ -55,8 +70,8 @@ class Knowledge {
     get() {
         let div = document.createElement('div');
         div.innerHTML = marked(this.readme.getAttribute('data-md'));
-        let title='';
-        if(div.children&&div.children[0]) title=div.children[0].innerText;
+        let title = '';
+        if (div.children && div.children[0]) title = div.children[0].innerText;
         return {
             title: title,
             course: this.course.getAttribute('data-md'),
@@ -64,14 +79,14 @@ class Knowledge {
         };
     }
 
-    toggle(readOnly=null) {
+    toggle(readOnly = null) {
         // console.log(readOnly)
         if (readOnly !== null) {
             this.readOnly = readOnly;
         } else {
             this.readOnly = !this.readOnly;
         }
-        console.log(this.readOnly)
+        // console.log(this.readOnly)
         if (!(this.course && this.readme)) return this.readOnly;
         // console.log(this.readOnly)
         if (this.readOnly) {
@@ -101,4 +116,4 @@ class Knowledge {
 
 }
 
-module.exports =new Knowledge();
+module.exports = new Knowledge();
