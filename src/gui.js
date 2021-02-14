@@ -57,7 +57,8 @@ class GUI {
 
         Editor.init(
             document.querySelector("#editor"),
-            (code) => Win.executeJavaScript(this.createExecuteJs(code))
+            (code, codeId) => Win.executeJavaScript2Preview(
+                this.createExecuteJs(code))
             // .then((result) => this.onPreviewWindowError())
             // .catch((err) => this.onPreviewWindowError())
         );
@@ -651,9 +652,8 @@ class GUI {
 
     previewWinExecuteJavaScript(code = null) {
         code = this.createExecuteJs(code || Editor.getCode());
-        Win.executeJavaScript(code).then(res => console.log(res)).catch(err => console.log(err));
+        Win.executeJavaScript2Preview(code);
     }
-
 
     createElement(className, type = 'div') {
             let div = document.createElement(type);

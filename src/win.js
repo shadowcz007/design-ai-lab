@@ -17,14 +17,10 @@ class Win {
         // this.previewWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
         //     console.log('console-message', event, level, message, line, sourceId)
         // })
-        // this.previewWindow.webContents.on('did-finish-load', () => {
-        //     this.isInjecting = false;
-
-        //     win.webContents.executeJavaScript(this.code, false)
-        //         .then(resolve)
-        //         .catch(reject);
-
-        // })
+        // 监听加载事件，然后注入代码
+        this.previewWindow.webContents.on('did-finish-load', () => {
+            this.previewWindow.webContents.executeJavaScript(this.code, false);
+        });
     }
 
     edit() {
@@ -101,27 +97,11 @@ class Win {
             }
         }
         //注入代码
-    executeJavaScript(code, w = 1) {
-        let win = this.get(w);
+    executeJavaScript2Preview(code) {
+        this.code = code;
+        let previewWindow = this.get(1);
         this.show(1, true);
-        if (this.isInjecting === true) return;
-        return new Promise((resolve, reject) => {
-            this.isInjecting = true;
-            win.webContents.reload();
-            // win.webContents.once('dom-ready', () => {
-            //     console.log('dom-ready', code)
-            //     win.webContents.executeJavaScript(code, false)
-            //         .then(resolve)
-            //         .catch(reject)
-            // });
-            win.webContents.once('did-finish-load', () => {
-                this.isInjecting = false;
-                win.webContents.executeJavaScript(code, false)
-                    .then(resolve)
-                    .catch(reject)
-            })
-
-        });
+        previewWindow.webContents.reload();
     };
 
 

@@ -25,7 +25,7 @@ class Editor {
         let id = runtime.hash(this.getCode());
         let now = window.performance.now();
         if (id !== this.codeId) {
-            this.execute();
+            this.execute(id);
             // if(now-this.now>500){
             // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
             this.codeId = id;
@@ -423,11 +423,11 @@ function handleFile(file) {
             // },500)
         }
         //往预览窗口注入代码
-    execute() {
+    execute(id) {
             // console.log(this)
             const code = this.getCode();
             localStorage.setItem("code", code);
-            this.executeJavaScript(code);
+            this.executeJavaScript(code, id);
         }
         //格式化代码
     format() {
