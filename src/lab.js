@@ -4,6 +4,7 @@ const knnClassifier = require('@tensorflow-models/knn-classifier');
 const cv = require('opencvjs-dist/build/opencv');
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
+const Color = require('color');
 
 const ffmpeg = require('./ffmpeg');
 
@@ -14,6 +15,7 @@ class Base {
         this.isDisplay();
         //随机获取，累计
         this.randomPicNum = 0;
+        this.Color = Color;
     }
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
@@ -248,11 +250,31 @@ class Base {
 class Knn {
     constructor() {
         this.knn = knnClassifier.create();
-        this.topk = 20;
+        this.topk = 3;
     }
 
+    // 统计各标签的样本数
     count() {
-        return this.knn.getClassExampleCount();
+            return this.knn.getClassExampleCount();
+        }
+        // 其他标签的样本数控制为最小的样本数
+    async minDataset() {
+        let c = this.count();
+        let min = null;
+        for (const label in c) {
+            if (min == null || (min && min >= c[label])) min = c[label];
+        };
+
+        let dataset = this.knn.getClassifierDataset();
+        var datasetObj = {};
+        for (const key in dataset) {
+            let data = dataset[key].arraySync();
+            data = tf.data.array(data).shuffle(data.length);
+            datasetObj[key] = tf.tensor(await data.take(min).toArray());
+        }
+        // console.log(datasetObj)
+        this.knn.clearAllClasses();
+        this.knn.setClassifierDataset(datasetObj);
     }
 
     add(tensor, className) {
@@ -268,9 +290,10 @@ class Knn {
         }
     }
 
-    async predict(tensor) {
+    async predict(tensor, topk = null) {
+        if (Object.keys(this.count()).length === 0) return;
         if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
-        return await this.knn.predictClass(tensor, this.topk);
+        return await this.knn.predictClass(tensor, topk || this.topk);
     }
 
     load(dataset = "") {

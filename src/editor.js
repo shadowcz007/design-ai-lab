@@ -21,6 +21,19 @@ class Editor {
         this.now = window.performance.now();
     }
 
+    runCode() {
+        let id = runtime.hash(this.getCode());
+        let now = window.performance.now();
+        if (id !== this.codeId) {
+            this.execute();
+            // if(now-this.now>500){
+            // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
+            this.codeId = id;
+            this.now = now;
+            // }
+        };
+    }
+
     initMonaco() {
 
             const amdLoader = require('monaco-editor/min/vs/loader.js');
@@ -92,7 +105,11 @@ class Editor {
                 this.editor.onMouseUp(() => {
                     if (this.onMouseUp) this.onMouseUp();
                     // this.isDrag=0;
+                    this.runCode();
                 });
+                // this.editor.onKeyUp(() => {
+                //     this.runCode();
+                // });
 
                 // this.editor.onMouseMove(()=>{
                 //     if(this.isDrag===1){
@@ -101,26 +118,20 @@ class Editor {
                 // });
 
                 this.editor.onDidChangeModelContent((e) => {
-                    console.log('this.editor.onDidChangeModelContent', e)
-                    if (e.changes[0]) {
-                        if (e.changes[0].text.match('↵') ||
-                            e.changes[0].text.match(';') ||
-                            e.changes[0].text.match('}') ||
-                            e.changes[0].text.match(/\)/)) {
-                            let id = runtime.hash(this.getCode());
-                            let now = window.performance.now();
-                            if (id !== this.codeId) {
-                                this.execute();
-                                // if(now-this.now>500){
-                                // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
-                                this.codeId = id;
-                                this.now = now;
-                                // }
-                            };
-                        }
-                    }
-
+                    // console.log('this.editor.onDidChangeModelContent', e)
+                    // if (e.changes[0]) {
+                    //     if (e.changes[0].text.match('↵') ||
+                    //         e.changes[0].text.match(';') ||
+                    //         e.changes[0].text.match('}') ||
+                    //         e.changes[0].text.match(/\)/)) {
+                    //         this.runCode();
+                    //     }
+                    // }
+                    this.runCode();
                 });
+
+
+
                 // this.editor.getAction(['editor.action.formatDocument']).run();
 
                 monaco.languages.registerCompletionItemProvider('javascript', {
