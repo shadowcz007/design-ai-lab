@@ -331,12 +331,12 @@ button:hover {
 #devtools {
     /* overflow: scroll; */
     /*height: 20%; */
-    min-height: 380px;
+    min-height: 120px;
     width: 100%;
     min-width: 500px;
     background: #1d1e22;
     display: none;
-    /* flex: 1; */
+    flex: 1;
 }
 
 

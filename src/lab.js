@@ -29,7 +29,13 @@ class Base {
     //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
             let children = document.querySelector("#gui-main").children;
-            document.querySelector("#gui-main").style.display = (children.length == 0 ? "none" : "flex");
+            if (children.length == 0) {
+                document.querySelector("#gui-main").style.display = "none";
+                document.querySelector("#p5").style.height = '100vh';
+            } else {
+                document.querySelector("#gui-main").style.display = "flex";
+                document.querySelector("#p5").style.height = '40vh';
+            }
         }
         //手动隐藏,显示p5.js
     p5Show(isShow = true) {

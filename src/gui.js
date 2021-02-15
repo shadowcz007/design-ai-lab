@@ -15,6 +15,7 @@ const db = require('./db');
 const Log = require('./log');
 const Layout = require('./layout');
 
+window.Win = Win;
 // window.Editor=Editor;
 
 const _package = remote.getGlobal('_PACKAGE');
@@ -134,12 +135,13 @@ class GUI {
         this.addClickEventListener(this.practiceBtn, () => this.practiceFn());
         //调试界面打开
         this.addClickEventListener(this.devBtn, () => {
-            if (!this.devOpen) {
+            // Win.get(1).devToolsWebContents.isDestroyed()
+            if (Win.get(1).devToolsWebContents == null || (Win.get(1).devToolsWebContents && Win.get(1).devToolsWebContents.isDestroyed())) {
                 this.openDevTool();
-                this.devOpen = true;
+                // this.devOpen = true;
             } else {
                 this.closeDevTool();
-                this.devOpen = false;
+                // this.devOpen = false;
             }
         });
         //设置路径
@@ -269,6 +271,7 @@ class GUI {
      */
     closeDevTool() {
         document.getElementById("devtools").style.display = "none";
+        document.getElementById("frame").style.height = "100%";
         Win.get(1).closeDevTools();
     }
     openDevTool() {
@@ -283,18 +286,10 @@ class GUI {
                 let target = res.filter(r => r.url === Win.get(1).getURL());
                 if (target[0]) {
 
-                    document.getElementById("devtools").style.display = "flex";
-                    if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
-                    this.resizer = new Resizer('#frame', {
-                        grabSize: 10,
-                        resize: 'vertical',
-                        handle: 'bar'
-                    });
-
                     devtoolsView.setAttribute("src", `http://0.0.0.0:${remote.getGlobal('_DEBUG_PORT')}${target[0].devtoolsFrontendUrl}`);
                     //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
 
-                    devtoolsView.addEventListener('dom-ready', e => {
+                    devtoolsView.addEventListener('did-finish-load', e => {
                         // const { webContents } = remote.webContents;
 
                         const browser = Win.get(1).webContents;
@@ -302,6 +297,14 @@ class GUI {
 
                         browser.setDevToolsWebContents(devtools);
                         browser.openDevTools();
+
+                        document.getElementById("devtools").style.display = "flex";
+                        if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
+                        this.resizer = new Resizer('#frame', {
+                            grabSize: 10,
+                            resize: 'vertical',
+                            handle: 'bar'
+                        });
 
                         // console.log('====21=====', this.resizer)
 
