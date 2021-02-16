@@ -28,6 +28,7 @@
     "dependencies": {
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "@hapi/hapi": "^20.1.0",
         "@tensorflow-models/body-pix": "^2.0.5",
         "@tensorflow-models/deeplab": "^0.2.1",
         "@tensorflow-models/knn-classifier": "^1.2.2",
