@@ -395,8 +395,9 @@ class GUI {
         if (t === true) {
             this.closePracticeHtml();
             Layout.reset();
-            Editor.execute();
-            Editor.format();
+            // Editor.execute();
+            this.previewWinExecuteJavaScript();
+
         } else {
             //编程模式
             Layout.destroy();
@@ -624,9 +625,8 @@ class GUI {
             mainWindow.focus();
             previewWindow.webContents.reload();
             previewWindow.webContents.once('dom-ready', () => {
-                Editor.execute();
-                Editor.format();
 
+                this.previewWinExecuteJavaScript();
                 Win.edit();
 
             });
@@ -654,6 +654,7 @@ class GUI {
     }
 
     previewWinExecuteJavaScript(code = null) {
+        Editor.format();
         code = this.createExecuteJs(code || Editor.getCode());
         Win.executeJavaScript2Preview(code);
     }

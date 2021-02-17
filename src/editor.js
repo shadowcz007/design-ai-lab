@@ -218,15 +218,15 @@ class Editor {
                             detail: '色板提取'
                         },
                         {
-                            label: 'Lab.ai.loadface',
+                            label: 'Lab.ai.getFace',
                             kind: 1,
-                            insertText: 'Lab.ai.loadface(${1:img})',
+                            insertText: 'Lab.ai.getFace(${1:img})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '人脸检测'
                         }, {
-                            label: 'Lab.ai.loadtext',
+                            label: 'Lab.ai.getText',
                             kind: 1,
-                            insertText: 'Lab.ai.loadtext(${1:img})',
+                            insertText: 'Lab.ai.getText(${1:img})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '文本检测'
                         }, {

@@ -55,7 +55,8 @@ const config = {
         closable: false,
         resizable: true,
         titleBarStyle: "default",
-        html: _PRE_HTML
+        html: _PRE_HTML,
+        preload: _PRELOAD_JS
     },
     // readWindow: {
     //     width: 800,
@@ -89,7 +90,7 @@ function createWindow(key, opts, workAreaSize) {
         resizable: opts.resizable,
         titleBarStyle: opts.titleBarStyle,
         webPreferences: {
-            preload: _PRELOAD_JS,
+            preload: opts.preload,
             //开启nodejs支持
             nodeIntegration: true,
             //开启AI功能
@@ -137,10 +138,10 @@ function initWindow() {
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
         //  0 主窗口 1 主窗口 预览窗口 2 预览窗口
-        if (data && data.status === 2) {
-            if (config.mainWindow) config.mainWindow.show = false;
+        if (data && (data.status === 2 || data.status === 1)) {
+            if (config.mainWindow) config.mainWindow.show = (data.status === 1);
             if (config.previewWindow) {
-                config.previewWindow.show = true;
+                config.previewWindow.show = !!data.executeJavaScript;
                 config.previewWindow.closable = true;
                 config.previewWindow.executeJavaScript = data.executeJavaScript;
                 config.previewWindow.width = data.size[0];
@@ -150,11 +151,11 @@ function initWindow() {
                 config.previewWindow.alwaysOnTop = true;
                 config.previewWindow.title = '';
             };
-        } else {
+        } else if (data && data.status === 0) {
             //主窗口显示在欢迎界面
             //初始状态在 欢迎界面
             if (config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',GUI.closeFn);`;
-        }
+        };
         for (const key in config) {
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
         }
@@ -340,6 +341,9 @@ ipcMain.on('init-window', (event, arg) => {
     initWindow()
 });
 
+// ipcMain.on('preview-ready', (event, arg) => {
+//     console.log('preview-ready')
+// });
 // app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
 // 当应用完成初始化后

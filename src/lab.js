@@ -1,10 +1,22 @@
 //lab提供封装好的功能
+const { clipboard, remote } = require('electron');
+
+//当窗口focus的时候，需要运行的函数
+let focusEvents = [];
+remote.getCurrentWindow().on('focus', e => {
+    // console.log(e)
+    Array.from(focusEvents, event => event());
+});
+
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
 const cv = require('opencvjs-dist/build/opencv');
+const md5 = require('md5');
+const hash = require('object-hash');
 const ColorThief = require('colorthief/dist/color-thief.umd');
 const colorThief = new ColorThief();
 const Color = require('color');
+
 
 const ffmpeg = require('./ffmpeg');
 
@@ -16,6 +28,14 @@ class Base {
         //随机获取，累计
         this.randomPicNum = 0;
         this.Color = Color;
+    }
+
+    // 取id
+    md5(str = "") {
+        return md5(str)
+    }
+    hash(obj = {}) {
+        return hash(obj);
     }
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
@@ -61,7 +81,8 @@ class Base {
         let icons = {
             'refresh': `<i class="fas fa-sync-alt"></i>`,
             'download': `<i class="far fa-download"></i>`,
-            'play': `<i class="far fa-play-circle"></i>`
+            'play': `<i class="far fa-play-circle"></i>`,
+            'fan': '<i class="fas fa-fan"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
@@ -81,9 +102,38 @@ class Base {
         return btn
     }
 
+    // 粘贴组件，开启后旋转，监听页面的粘贴事件
+    createPasteIcon(eventListener) {
+
+        const pasteFn = function(e) {
+            // console.log(e)
+            let img = clipboard.readImage();
+            if (!img.isEmpty() && eventListener) eventListener(clipboard.readImage().toDataURL());
+        }
+        focusEvents.push(pasteFn);
+
+        let btn = this.createIcon('fan');
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!btn.classList.contains('fan')) {
+                document.body.addEventListener("paste", pasteFn);
+                btn.classList.add('fan');
+                btn.querySelector('svg').classList.add('fa-spin');
+            } else {
+                document.body.removeEventListener("paste", pasteFn);
+                btn.classList.remove('fan');
+                btn.querySelector('svg').classList.remove('fa-spin');
+            }
+        });
+        return btn
+    }
+
     //TODO 多文件的支持 当文件过大的时候，opencv需要提示
     //,isMultiple=false
-    createInput(type, text = "", eventListener = null) {
+    // 支持缓存 cache
+    createInput(type, text = "", eventListener = null, cache = true) {
+
         let isMultiple = false;
         let fileExt = null,
             data = null;
@@ -117,8 +167,17 @@ class Base {
             input.style.display = "none";
         };
 
+
+        // 用于缓存
+        let key = this.md5(`_${type}_${text}`);
+        let defaultValue = localStorage.getItem(key);
+        // 
+        cache ? setDefaultValue(defaultValue) : null;
+
+        // 事件绑定
         div.addEventListener('click', () => input.click());
 
+        // 监听事件
         function eventFn(e) {
             let res;
             if (type == 'file') {
@@ -129,7 +188,6 @@ class Base {
                 } else {
 
                     //单个文件
-
                     let file = e.target.files[0];
                     //图片
                     if (fileExt === 'image' && file.type.match(fileExt)) {
@@ -149,16 +207,52 @@ class Base {
                 }
 
             } else if (type === 'text') {
+                // console.log(e)
                 //文本输入
                 res = input.value;
             };
             //eventListener,处理input的结果
             if (eventListener) {
+                //存储
+                cache ? localStorage.setItem(key, res) : null;
                 res = eventListener(res);
             };
             input.setAttribute('data', res);
-        }
+        };
         input.addEventListener('change', eventFn);
+
+        function setDefaultValue(value) {
+            let res = value;
+            if (type == 'file') {
+                if (isMultiple === true) {
+                    //多个文件
+                } else {
+                    //单个文件
+                    //图片
+                    if (fileExt === 'image' && value) {
+                        div.className = 'input-image';
+                        div.style.backgroundImage = `url(${encodeURI(value)})`;
+                    };
+                    //其他文件
+                    if (fileExt == "other" && value) {
+                        p.innerText = `-`;
+                    }
+                }
+
+            } else if (type === 'text' && value) {
+                //文本输入
+                input.value = value;
+            };
+            //eventListener,处理input的结果
+            if (eventListener && value) {
+                setTimeout(() => {
+                    // console.log(value)
+                    res = eventListener(value);
+                    if (value) input.setAttribute('data', res);
+                }, 1200);
+            };
+
+        };
 
         div.appendChild(p);
         div.appendChild(input);
@@ -374,6 +468,7 @@ class AI {
             return `rgb(${c.join(',')})`;
         }
         // 计算主色
+        // mainColor
     getColor(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -399,6 +494,7 @@ class AI {
 
     };
     // 计算色板
+    // colorPalette
     getPalette(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -424,31 +520,34 @@ class AI {
     }
 
     // 人脸
-    loadface(_img) {
+    getFace(_img, fastMode = false, maxDetectedFaces = 10) {
         //转为p5的元素类型
         _img = this.p5Image(_img);
-
         let _im = _img.elt;
-        var faceDetector = new FaceDetector({ fastMode: false, maxDetectedFaces: 10 });
+        var faceDetector = new FaceDetector({ fastMode: fastMode, maxDetectedFaces: maxDetectedFaces });
         _img.faces = [];
-        faceDetector.detect(_im).then(function(faces) {
-            console.log(`人脸检测`, faces)
-            faces.forEach(function(item) {
 
-                _img.faces.push({
-                    x: parseInt(item.boundingBox.x),
-                    y: parseInt(item.boundingBox.y),
-                    width: parseInt(item.boundingBox.width),
-                    height: parseInt(item.boundingBox.height)
+        return new Promise((resolve, reject) => {
+            faceDetector.detect(_im).then(function(faces) {
+                console.log(`人脸检测`, faces)
+                faces.forEach(function(item) {
+                    _img.faces.push({
+                        x: parseInt(item.boundingBox.x),
+                        y: parseInt(item.boundingBox.y),
+                        width: parseInt(item.boundingBox.width),
+                        height: parseInt(item.boundingBox.height)
+                    });
                 });
+                resolve(_img)
+            }).catch(function(err) {
+                console.log("err", err);
+                reject(err);
             });
-        }).catch(function(err) {
-            console.log("err", err)
         });
-        return _img
+
     };
     // 文本检测
-    loadtext(_img) {
+    getText(_img) {
         //转为p5的元素类型
         _img = this.p5Image(_img);
 
