@@ -19,12 +19,16 @@ class Win {
         // })
         // 监听加载事件，然后注入代码
         this.previewWindow.webContents.on('did-finish-load', () => {
-
-            // this.previewWindow.webContents.executeJavaScript(`var _test=!!window.Lab;console.log(_test);`, false)
-            //     .then(res => console.log).catch(err => console.log(err));
-
             this.previewWindow.webContents.executeJavaScript(this.code, false);
         });
+        // 
+        this.previewWindow.webContents.on('render-process-gone', (event, details) => {
+            console.log('render-process-gone', event, details);
+        });
+        this.previewWindow.webContents.on('unresponsive', (event, details) => {
+            console.log('unresponsive', event, details);
+        });
+
     }
 
     edit() {

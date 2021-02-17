@@ -2,10 +2,13 @@
 const { clipboard, remote } = require('electron');
 
 //当窗口focus的时候，需要运行的函数
-let focusEvents = [];
+let focusEvents = {};
 remote.getCurrentWindow().on('focus', e => {
     // console.log(e)
-    Array.from(focusEvents, event => event());
+    for (const key in focusEvents) {
+        focusEvents[key]();
+    };
+
 });
 
 const tf = require('@tensorflow/tfjs');
@@ -110,7 +113,6 @@ class Base {
             let img = clipboard.readImage();
             if (!img.isEmpty() && eventListener) eventListener(clipboard.readImage().toDataURL());
         }
-        focusEvents.push(pasteFn);
 
         let btn = this.createIcon('fan');
         btn.addEventListener('click', e => {
@@ -118,10 +120,12 @@ class Base {
             e.stopPropagation();
             if (!btn.classList.contains('fan')) {
                 document.body.addEventListener("paste", pasteFn);
+                focusEvents['pasteFn'] = pasteFn;
                 btn.classList.add('fan');
                 btn.querySelector('svg').classList.add('fa-spin');
             } else {
                 document.body.removeEventListener("paste", pasteFn);
+                delete focusEvents['pasteFn'];
                 btn.classList.remove('fan');
                 btn.querySelector('svg').classList.remove('fa-spin');
             }
