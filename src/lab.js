@@ -13,6 +13,7 @@ remote.getCurrentWindow().on('focus', e => {
 
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
+const mobilenet = require('@tensorflow-models/mobilenet');
 const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
 const hash = require('object-hash');
@@ -57,57 +58,57 @@ class Base {
      * @param {String} type 
      */
     write2Clipboard(data, type = 'text') {
-        type = type.toLowerCase();
-        if (type === 'text') {
-            clipboard.writeText(data);
-        } else if (type === 'html') {
-            clipboard.writeHTML(data);
-        } else if (type === 'base64') {
-            let img = nativeImage.createFromDataURL(data)
-            clipboard.writeImage(img);
-        }
-    }
-    //读取剪切板
-    /**
-     * 
-     * @param {*} type 
-     */
-    getFromClipboard(type = 'text') {
-        type = type.toLowerCase();
-        let res;
-        if (type === 'text') {
-            res = clipboard.readText();
-        } else if (type == 'html') {
-            res = clipboard.readHTML();
-        } else if (type == 'img') {
-            res = clipboard.readImage();
-            if (res.isEmpty()) {
-                res = null;
+            type = type.toLowerCase();
+            if (type === 'text') {
+                clipboard.writeText(data);
+            } else if (type === 'html') {
+                clipboard.writeHTML(data);
+            } else if (type === 'base64') {
+                let img = nativeImage.createFromDataURL(data)
+                clipboard.writeImage(img);
             }
-            // else{
-            //     res=res.toDataURL();
-            // }
-        };
-        return res
-    }
-    // 创建缓存对象
+        }
+        //读取剪切板
+        /**
+         * 
+         * @param {*} type 
+         */
+    getFromClipboard(type = 'text') {
+            type = type.toLowerCase();
+            let res;
+            if (type === 'text') {
+                res = clipboard.readText();
+            } else if (type == 'html') {
+                res = clipboard.readHTML();
+            } else if (type == 'img') {
+                res = clipboard.readImage();
+                if (res.isEmpty()) {
+                    res = null;
+                }
+                // else{
+                //     res=res.toDataURL();
+                // }
+            };
+            return res
+        }
+        // 创建缓存对象
     createClipboardStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
-        return this.clipboardStore
-    }
-    // 得到缓存的结果
+            if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
+            return this.clipboardStore
+        }
+        // 得到缓存的结果
     async getAllClipboardStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
-        return new Promise((resolve, reject) => {
-            this.clipboardStore.json().then(res => resolve(res));
-        });
-    }
-    // 清空缓存
+            if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
+            return new Promise((resolve, reject) => {
+                this.clipboardStore.json().then(res => resolve(res));
+            });
+        }
+        // 清空缓存
     clearAllClipboardStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
-        this.clipboardStore.clear();
-    }
-    //剪切板监听
+            if (!this.clipboardStore) this.clipboardStore = new IdbKvStore(`clipboardListener_${type}_${cacheKey}`);
+            this.clipboardStore.clear();
+        }
+        //剪切板监听
     clipboardListener(type = 'text', fn = null, cacheKey = "default", interval = 2000) {
         if (this.clipboardListenerStop == true) return;
         this.createClipboardStore(type, cacheKey);
@@ -115,8 +116,8 @@ class Base {
         let data = this.getFromClipboard(type);
         let id = md5(
             type == 'img' && data ?
-                data.toDataURL() :
-                (data || '')
+            data.toDataURL() :
+            (data || '')
         );
 
         if (data && this.clipboardListenerData != id) {
@@ -132,10 +133,10 @@ class Base {
             if (type == 'img') data = data.toDataURL();
             this.clipboardStore.set(id, data, (err) => {
                 if (err) throw err
-                // this.clipboardStore.get(id, (err, value) => {
-                //     if (err) throw err
-                //     console.log('key=id  value=' + value)
-                // })
+                    // this.clipboardStore.get(id, (err, value) => {
+                    //     if (err) throw err
+                    //     console.log('key=id  value=' + value)
+                    // })
             });
         };
         // 
@@ -146,26 +147,26 @@ class Base {
 
     //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
-        let children = document.querySelector("#gui-main").children;
-        if (children.length == 0) {
-            document.querySelector("#gui-main").style.display = "none";
-            document.querySelector("#p5").style.height = '100vh';
-        } else {
-            document.querySelector("#gui-main").style.display = "flex";
-            document.querySelector("#p5").style.height = '40vh';
+            let children = document.querySelector("#gui-main").children;
+            if (children.length == 0) {
+                document.querySelector("#gui-main").style.display = "none";
+                document.querySelector("#p5").style.height = '100vh';
+            } else {
+                document.querySelector("#gui-main").style.display = "flex";
+                document.querySelector("#p5").style.height = '40vh';
+            }
         }
-    }
-    //手动隐藏,显示p5.js
+        //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
+            if (document.querySelector("#p5")) {
+                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            };
+            if (document.querySelector('#gui-main')) {
+                document.querySelector('#gui-main').style.top = '0';
+                document.querySelector('#gui-main').style.height = '100vh';
+            }
         }
-    }
-    // GUI布局
+        // GUI布局
     layout(type = 'default') {
         type = type.toLowerCase();
         let g = document.querySelector('#gui-main');
@@ -196,9 +197,9 @@ class Base {
     }
 
     // 创建组
-    createGroup(){
-        let div=document.createElement('div');
-        Array.from(arguments,g=>g instanceof HTMLElement? div.appendChild(g):null);
+    createGroup() {
+        let div = document.createElement('div');
+        Array.from(arguments, g => g instanceof HTMLElement ? div.appendChild(g) : null);
         return div;
     };
 
@@ -209,7 +210,7 @@ class Base {
             'download': `<i class="far fa-download"></i>`,
             'play': `<i class="far fa-play-circle"></i>`,
             'fan': '<i class="fas fa-fan"></i>',
-            'clear':'<i class="far fa-trash-alt"></i>'
+            'clear': '<i class="far fa-trash-alt"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
@@ -232,7 +233,7 @@ class Base {
     // 粘贴组件，开启后旋转，监听页面的粘贴事件
     createPasteIcon(eventListener) {
 
-        const pasteFn = function (e) {
+        const pasteFn = function(e) {
             // console.log(e)
             let img = clipboard.readImage();
             if (!img.isEmpty() && eventListener) eventListener(clipboard.readImage().toDataURL());
@@ -417,57 +418,57 @@ class Base {
      * @param {*} width 
      */
     createTextCanvas(txt, fontSize = 24, color = "black", width = 300) {
-        let canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d');
-        let x = 2;
-        // canvas.width = 480;
-        // canvas.height = 32;
-        ctx.font = `${fontSize * x}px Arial`;
-        let font = ctx.measureText(txt);
-        canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
-        canvas.width = (font.width) + 10;
+            let canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d');
+            let x = 2;
+            // canvas.width = 480;
+            // canvas.height = 32;
+            ctx.font = `${fontSize * x}px Arial`;
+            let font = ctx.measureText(txt);
+            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+            canvas.width = (font.width) + 10;
 
-        ctx.fillStyle = color;
-        ctx.textAlign = "start";
-        ctx.textBaseline = "top";
-        ctx.font = `${fontSize * x}px Arial`;
-        ctx.fillText(txt, 5, 10);
+            ctx.fillStyle = color;
+            ctx.textAlign = "start";
+            ctx.textBaseline = "top";
+            ctx.font = `${fontSize * x}px Arial`;
+            ctx.fillText(txt, 5, 10);
 
-        // 导出图片
-        canvas.toDataURL = function () {
-            let base64, height;
-            if (canvas.width > width) {
-                let nc = document.createElement('canvas'),
-                    nctx = nc.getContext('2d');
-                nc.width = width;
-                nc.height = parseInt(canvas.height * width / canvas.width) + 1;
-                nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
-                base64 = nc.toDataURL('image/png');
-                height = nc.height;
-            } else {
-                base64 = canvas.toDataURL('image/png');
-                height = canvas.height;
-            };
-            return base64
+            // 导出图片
+            canvas.toDataURL = function() {
+                let base64, height;
+                if (canvas.width > width) {
+                    let nc = document.createElement('canvas'),
+                        nctx = nc.getContext('2d');
+                    nc.width = width;
+                    nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+                    nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+                    base64 = nc.toDataURL('image/png');
+                    height = nc.height;
+                } else {
+                    base64 = canvas.toDataURL('image/png');
+                    height = canvas.height;
+                };
+                return base64
+            }
+
+
+            this.add(canvas);
+
+            return canvas
         }
-
-
-        this.add(canvas);
-
-        return canvas
-    }
-    //创建图片，根据url返回图片dom
+        //创建图片，根据url返回图片dom
     createImage(url) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = url;
-            _img.onload = function () {
+            _img.onload = function() {
                 //this.add(_img);
                 resolve(_img);
             }
         })
     }
-    
+
     // 
     // canvasToURL() {
     //     let canvas = this.createBaseCanvas(im.naturalWidth, im.naturalHeight);
@@ -484,12 +485,12 @@ class Base {
 
     //随机来张图片
     randomPic(w = 200, h = 200) {
-        this.randomPicNum++;
-        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-        return this.createImage(url);
-    }
-    //随机来一句话
-    randomText() { }
+            this.randomPicNum++;
+            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+            return this.createImage(url);
+        }
+        //随机来一句话
+    randomText() {}
 }
 
 class Knn {
@@ -500,9 +501,9 @@ class Knn {
 
     // 统计各标签的样本数
     count() {
-        return this.knn.getClassExampleCount();
-    }
-    // 其他标签的样本数控制为最小的样本数
+            return this.knn.getClassExampleCount();
+        }
+        // 其他标签的样本数控制为最小的样本数
     async minDataset() {
         let c = this.count();
         let min = null;
@@ -556,7 +557,7 @@ class Knn {
             return false
         }
     }
-    export() {
+    export () {
         let dataset = this.knn.getClassifierDataset();
         var datasetObj = {};
         Object.keys(dataset).forEach((key) => {
@@ -571,7 +572,7 @@ class Knn {
         });
 
         let jsonModel = JSON.stringify(datasetObj)
-        //localStorage.setItem("easyteach_model",jsonModel);
+            //localStorage.setItem("easyteach_model",jsonModel);
         return jsonModel;
     }
 }
@@ -582,8 +583,8 @@ class Knn {
  * 所有输出格式参考p5的数据类型 
  */
 class AI {
-    constructor() { }
-    // 裁切p5的画布，用于下载
+    constructor() {}
+        // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
         let scale = _canvas.canvas.width / _canvas.width;
         let canvas = document.createElement("canvas");
@@ -609,11 +610,11 @@ class AI {
 
     // rgb转字符串
     colorStr(c = [0, 0, 0]) {
-        // console.log(c)
-        return `rgb(${c.join(',')})`;
-    }
-    // 计算主色
-    // mainColor
+            // console.log(c)
+            return `rgb(${c.join(',')})`;
+        }
+        // 计算主色
+        // mainColor
     getColor(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -652,7 +653,7 @@ class AI {
                     c => p5.instance.color(this.colorStr(c)));
                 resolve(_img);
             } else {
-                _im.addEventListener('load', function () {
+                _im.addEventListener('load', function() {
                     _img.colorPalette = Array.from(
                         colorThief.getPalette(_im),
                         c => p5.instance.color(this.colorStr(c)));
@@ -673,9 +674,9 @@ class AI {
         _img.faces = [];
 
         return new Promise((resolve, reject) => {
-            faceDetector.detect(_im).then(function (faces) {
+            faceDetector.detect(_im).then(function(faces) {
                 console.log(`人脸检测`, faces)
-                faces.forEach(function (item) {
+                faces.forEach(function(item) {
                     _img.faces.push({
                         x: parseInt(item.boundingBox.x),
                         y: parseInt(item.boundingBox.y),
@@ -684,7 +685,7 @@ class AI {
                     });
                 });
                 resolve(_img)
-            }).catch(function (err) {
+            }).catch(function(err) {
                 console.log("err", err);
                 reject(err);
             });
@@ -693,28 +694,34 @@ class AI {
     };
     // 文本检测
     getText(_img) {
-        //转为p5的元素类型
-        _img = this.p5Image(_img);
+            //转为p5的元素类型
+            _img = this.p5Image(_img);
 
-        let _im = _img.elt;
-        let textDetector = new TextDetector();
-        _img.textBlocks = [];
-        textDetector.detect(_im)
-            .then(detectedTextBlocks => {
-                console.log(`文本检测`, detectedTextBlocks)
-                for (const textBlock of detectedTextBlocks) {
-                    _img.textBlocks.push({
-                        x: textBlock.boundingBox.x,
-                        y: textBlock.boundingBox.y,
-                        width: textBlock.boundingBox.width,
-                        height: textBlock.boundingBox.height
-                    });
-                }
-            }).catch(() => {
-                console.error("Text Detection failed, boo.");
-            });
-        return _img
+            let _im = _img.elt;
+            let textDetector = new TextDetector();
+            _img.textBlocks = [];
+            textDetector.detect(_im)
+                .then(detectedTextBlocks => {
+                    console.log(`文本检测`, detectedTextBlocks)
+                    for (const textBlock of detectedTextBlocks) {
+                        _img.textBlocks.push({
+                            x: textBlock.boundingBox.x,
+                            y: textBlock.boundingBox.y,
+                            width: textBlock.boundingBox.width,
+                            height: textBlock.boundingBox.height
+                        });
+                    }
+                }).catch(() => {
+                    console.error("Text Detection failed, boo.");
+                });
+            return _img
+        }
+        // 预训练模型
+    mobilenet() {
+        const model = await mobilenet.load();
+        console.log(model)
     }
+
 }
 
 
