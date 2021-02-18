@@ -7,6 +7,7 @@ const { remote } = require("electron");
 
 class Win {
     constructor() {
+        this.executeJSNow=window.performance.now();
         this.workAreaSize = remote.screen.getPrimaryDisplay().workAreaSize;
         this.previewWindow = (remote.getGlobal("_WINS")).previewWindow;
         this.mainWindow = (remote.getGlobal("_WINS")).mainWindow;
@@ -21,9 +22,10 @@ class Win {
         this.previewWindow.webContents.on('did-finish-load', () => {
             this.previewWindow.webContents.executeJavaScript(this.code, false);
         });
-        // 
+        // 当preview窗口崩溃的时候
         this.previewWindow.webContents.on('render-process-gone', (event, details) => {
             console.log('render-process-gone', event, details);
+            this.previewWindow.reload();
         });
         this.previewWindow.webContents.on('unresponsive', (event, details) => {
             console.log('unresponsive', event, details);
@@ -104,12 +106,25 @@ class Win {
                 }
             }
         }
+    // 检查间隔时间
+    checkTime(n){
+        if(Math.abs(n-this.executeJSNow)<200){
+            // 间隔较短
+            console.log("间隔较短")
+        }
+    }
         //注入代码
     executeJavaScript2Preview(code) {
+        let n=window.performance.now();
+        this.executeJSNow=n;
+        setTimeout(()=>{
+            this.checkTime(n);
+        },300);
+        
         this.code = code;
         let previewWindow = this.get(1);
         this.show(1, true);
-        previewWindow.webContents.reload();
+        if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
     };
 
 

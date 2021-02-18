@@ -174,16 +174,40 @@ class Editor {
                             detail: 'p5画布的显示与隐藏'
                         },
                         {
+                            label: 'Lab.base.createCanvas',
+                            kind: 1,
+                            insertText: '//创建画布\nLab.base.createCanvas(${1:width}, ${2:height},${3: className}, ${4: id}, ${5: show})',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '创建画布'
+                            
+                        },
+                        {
+                            label: 'Lab.base.createImage',
+                            kind: 1,
+                            insertText: '//创建图片\nLab.base.createImage(${1:url})',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '创建图片'
+                            
+                        },
+                        {
                             label: 'Lab.base.createInput',
                             kind: 1,
-                            insertText: 'Lab.base.createInput',
+                            insertText: '//创建输入\nLab.base.createInput(${1:type}, ${2:text},${3:eventListener}, ${4:cache})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建输入'
+                        },
+                        
+                        {
+                            label: 'Lab.base.createIcon',
+                            kind: 1,
+                            insertText: '//创建图标\nLab.base.createIcon(${1:key},${2:eventListener})',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '创建图标'
                         },
                         {
                             label: 'Lab.base.createButton',
                             kind: 1,
-                            insertText: 'Lab.base.createButton',
+                            insertText: '//创建按钮\nLab.base.createButton',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建按钮'
                         },
@@ -251,7 +275,15 @@ class Editor {
                             insertText: 'windowWidth',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '窗口内部宽度'
-                        }, {
+                        }, 
+                        {
+                            label: 'frameRate()',
+                            kind: 0,
+                            insertText: 'frameRate(25)',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '帧速率'
+                            
+                        },{
                             label: 'noise(x, [y], [z])',
                             kind: 0,
                             insertText: 'noise(${1:x});',

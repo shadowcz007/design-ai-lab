@@ -49,17 +49,17 @@ class Knowledge {
 
         // 只粘贴text
         if (this.readme && this.course) {
-            this.readme.addEventListener('paste', e => {
-                e.preventDefault();
-                let text = e.clipboardData.getData('text');
-                e.target.insertAdjacentText('beforeend', text);
-                // console.log(e.target)
-            });
-            this.course.addEventListener('paste', e => {
-                e.preventDefault();
-                let text = e.clipboardData.getData('text');
-                e.target.insertAdjacentText('beforeend', text);
-            })
+            // this.readme.addEventListener('paste', e => {
+            //     e.preventDefault();
+            //     let text = e.clipboardData.getData('text');
+            //     e.target.insertAdjacentText('beforeend', text);
+            //     // console.log(e.target)
+            // });
+            // this.course.addEventListener('paste', e => {
+            //     e.preventDefault();
+            //     let text = e.clipboardData.getData('text');
+            //     e.target.insertAdjacentText('beforeend', text);
+            // })
         }
     }
     set(json) {

@@ -235,6 +235,8 @@ class GUI {
             let previewWindow = Win.get(1);
             //截图
             previewWindow.webContents.capturePage().then(img => {
+                // 压缩图片大小
+                img=img.resize({width:120});
                 // console.log(img.toDataURL())
                 let knowledgeJson = Knowledge.get();
                 resolve({
