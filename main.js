@@ -27,7 +27,7 @@ const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 global._DEBUG_PORT = 3000;
 
 app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
-app.commandLine.appendSwitch('remote-debugging-address', ' http://0.0.0.0 ');
+app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
 
 const config = {
     mainWindow: {
@@ -112,7 +112,7 @@ function createWindow(key, opts, workAreaSize) {
     // 打开调试工具
     if (process.env.NODE_ENV === 'development') win.webContents.openDevTools();
     // console.log(opts)
-    win.webContents.once("dom-ready", () => {
+    win.webContents.once("did-finish-load", () => {
         opts.show === true ? win.show() : null;
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
     });

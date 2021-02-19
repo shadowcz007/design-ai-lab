@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
 
+    <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
+
     <style>
          :root {
             --hover-color: #6399ff;
@@ -42,6 +45,8 @@
         
         #p5 canvas {
             outline: 1px dashed lightgray;
+            max-height: 100%;
+            width: auto!important;
         }
         
         #gui-main {
@@ -198,6 +203,11 @@
             line-height: 18px;
             /* min-width: 98px; */
             font-family: monospace;
+        }
+
+        #gui-main .group img{
+            width: 45%;
+            max-width: fit-content;
         }
     </style>
 

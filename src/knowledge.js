@@ -97,8 +97,8 @@ class Knowledge {
 
             // this.readme.setAttribute('data-md', this.readme.innerText);
             // this.course.setAttribute('data-md', this.course.innerText);
-            this.readme.innerHTML = marked(this.readme.getAttribute('data-md'));;
-            this.course.innerHTML = marked(this.course.getAttribute('data-md'));;
+            this.readme.innerHTML = marked(this.readme.getAttribute('data-md'));
+            this.course.innerHTML = marked(this.course.getAttribute('data-md'));
             //this.course.blur();
         } else {
             // this.course.style.outline='0.5px dotted green';

@@ -93,6 +93,7 @@ class GUI {
                             document.querySelector("#p5").innerHTML = "";
                             if(window.gui) {
                                 document.querySelector("#gui-main").innerHTML="";
+                                //console.log(Object.is(window.Lab,undefined)?3000:100)
                                 gui();
                             };
                             ${code.trim()};
@@ -283,12 +284,13 @@ class GUI {
             mode: 'undocked'
         });
 
-        fetch('http://127.0.0.1:3000/json/list?t=' + new Date().getTime()).then(res => res.json()).then(
+        const port=remote.getGlobal('_DEBUG_PORT');
+        fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
             res => {
                 let target = res.filter(r => r.url === Win.get(1).getURL());
                 if (target[0]) {
 
-                    devtoolsView.setAttribute("src", `http://0.0.0.0:${remote.getGlobal('_DEBUG_PORT')}${target[0].devtoolsFrontendUrl}`);
+                    devtoolsView.setAttribute("src", `http://127.0.0.1:${port}${target[0].devtoolsFrontendUrl}`);
                     //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
 
                     devtoolsView.addEventListener('did-finish-load', e => {
@@ -311,6 +313,9 @@ class GUI {
                         // console.log('====21=====', this.resizer)
 
                     });
+                    devtoolsView.addEventListener('did-fail-load',event=>{
+                        console.log(event)
+                    })
 
                 }
             }

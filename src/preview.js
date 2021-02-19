@@ -3,10 +3,9 @@
 // var mainWindow = (remote.getGlobal("_WINS")).mainWindow;
 
 const path = require('path');
-
+// const { Lab, cv } = require('./lab');
 // function init() {
 //     //AI功能封装
-//     const { Lab, cv } = require('./lab');
 //     window.Lab = Lab;
 //     window.cv = cv;
 //     // ipcRenderer.send('preview-ready', true);
