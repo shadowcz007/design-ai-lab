@@ -19,7 +19,7 @@ const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
 const hash = require('object-hash');
 const IdbKvStore = require('idb-kv-store');
-const colorThief = new(require('colorthief/dist/color-thief.umd'))();
+const colorThief = new (require('colorthief/dist/color-thief.umd'))();
 const Color = require('color');
 const _GIF = require('gif.js/dist/gif');
 
@@ -38,6 +38,7 @@ class Store {
         this.key = key;
     }
     set(id, data) {
+        id = id || (new Date()).getTime().toString();
         this.db.set(id, data, (err) => {
             if (err) throw err
         });
@@ -66,13 +67,13 @@ class Store {
 
 class GIF {
     constructor() {
-            this.gif = new _GIF({
-                workers: 2,
-                quality: 10,
-                workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
-            });
-        }
-        // canvasElement imageElement
+        this.gif = new _GIF({
+            workers: 2,
+            quality: 10,
+            workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
+        });
+    }
+    // canvasElement imageElement
     add(elt) {
         this.gif.addFrame(elt);
     }
@@ -86,7 +87,7 @@ class GIF {
 
     }
     render() {
-        this.gif.on('finished', function(blob) {
+        this.gif.on('finished', function (blob) {
             window.open(URL.createObjectURL(blob));
         });
         this.gif.render();
@@ -105,57 +106,57 @@ class Clipboard {
      * @param {String} type 
      */
     write(data, type = 'text') {
-            type = type.toLowerCase();
-            if (type === 'text') {
-                clipboard.writeText(data);
-            } else if (type === 'html') {
-                clipboard.writeHTML(data);
-            } else if (type === 'base64') {
-                let img = nativeImage.createFromDataURL(data)
-                clipboard.writeImage(img);
-            }
+        type = type.toLowerCase();
+        if (type === 'text') {
+            clipboard.writeText(data);
+        } else if (type === 'html') {
+            clipboard.writeHTML(data);
+        } else if (type === 'base64') {
+            let img = nativeImage.createFromDataURL(data)
+            clipboard.writeImage(img);
         }
-        //读取剪切板
-        /**
-         * 
-         * @param {*} type 
-         */
+    }
+    //读取剪切板
+    /**
+     * 
+     * @param {*} type 
+     */
     read(type = 'text') {
-            type = type.toLowerCase();
-            let res;
-            if (type === 'text') {
-                res = clipboard.readText();
-            } else if (type == 'html') {
-                res = clipboard.readHTML();
-            } else if (type == 'img') {
-                res = clipboard.readImage();
-                if (res.isEmpty()) {
-                    res = null;
-                }
-                // else{
-                //     res=res.toDataURL();
-                // }
-            };
-            return res
-        }
-        // 创建缓存对象
+        type = type.toLowerCase();
+        let res;
+        if (type === 'text') {
+            res = clipboard.readText();
+        } else if (type == 'html') {
+            res = clipboard.readHTML();
+        } else if (type == 'img') {
+            res = clipboard.readImage();
+            if (res.isEmpty()) {
+                res = null;
+            }
+            // else{
+            //     res=res.toDataURL();
+            // }
+        };
+        return res
+    }
+    // 创建缓存对象
     store(type = 'text', cacheKey = "default") {
-            if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
-            return this.clipboardStore
-        }
-        // 得到缓存的结果
+        if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
+        return this.clipboardStore
+    }
+    // 得到缓存的结果
     async getAllStore(type = 'text', cacheKey = "default") {
-            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-            return new Promise((resolve, reject) => {
-                this.clipboardStore.getJson().then(res => resolve(res));
-            });
-        }
-        // 清空缓存
+        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+        return new Promise((resolve, reject) => {
+            this.clipboardStore.getJson().then(res => resolve(res));
+        });
+    }
+    // 清空缓存
     clearStore(type = 'text', cacheKey = "default") {
-            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-            this.clipboardStore.clear();
-        }
-        //剪切板监听
+        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+        this.clipboardStore.clear();
+    }
+    //剪切板监听
     listener(type = 'text', fn = null, cacheKey = "default", interval = 2000) {
         if (this.clipboardListenerStop == true) return;
         this.store(type, cacheKey);
@@ -163,12 +164,12 @@ class Clipboard {
         let data = this.read(type);
         let id = md5(
             type == 'img' && data ?
-            data.toDataURL() :
-            (data || '')
+                data.toDataURL() :
+                (data || '')
         );
 
         if (data && this.clipboardListenerData != id) {
-            if (fn) fn(data);
+            if (fn) fn(type == 'img' && data ? data.toDataURL() : data);
             this.clipboardListenerData = id;
             if (type == 'img' && data) {
                 let resizeImg = data.resize({ height: 18 });
@@ -186,6 +187,127 @@ class Clipboard {
         setTimeout(() => {
             this.listener(type, fn);
         }, interval);
+    }
+}
+
+
+// match shape
+class Shape {
+    constructor() {
+        this.store = new Store('my_shape');
+    }
+
+    // 初始化
+    initProcess(img) {
+        //创建画布
+        let canvas = Lab.base.createCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height, 'myCanvas', '', false);
+        let src = cv.imread(img);
+        // 空的
+        // let dst = new cv.Mat();
+        // 黑图
+        let dst = cv.Mat.zeros(src.rows, src.cols, cv.CV_8UC3);
+        // let dst=cv.imread(img);
+        return {
+            src, dst, canvas
+        }
+    }
+
+    // 寻找轮廓
+    findContours(src) {
+        // 轮廓
+        let contours = new cv.MatVector();
+
+        // 层级 [Next, Previous, First_Child, Parent]
+        let hierarchy = new cv.Mat();
+
+        // 模式
+        let mode = cv.RETR_EXTERNAL;
+        // cv.RETR_TREE 取回所有的轮廓并且创建完整的家族层级列表
+        // cv.RETR_CCOMP 获取所有轮廓并且把他们组织到一个2层结构里
+        // cv.RETR_EXTERNAL 返回最外层的,所有孩子轮廓都不要
+        // cv.RETR_LIST 获取所有轮廓，但是不建立父子关系
+
+        let method = cv.CHAIN_APPROX_SIMPLE;
+        // CHAIN_APPROX_NONE：获取每个轮廓的每个像素，相邻的两个点的像素位置差不超过1
+        // CHAIN_APPROX_SIMPLE：压缩水平方向，垂直方向，对角线方向的元素，值保留该方向的重点坐标，如果一个矩形轮廓只需4个点来保存轮廓信息
+        // CHAIN_APPROX_TC89_L1和CHAIN_APPROX_TC89_KCOS使用Teh-Chinl链逼近算法中的一种
+        /**
+         * 如果传递cv.CHAIN_APPROX_NONE，则将存储所有边界点。但是实际上我们需要所有这些要点吗？
+         * 例如，您找到了一条直线的轮廓。您是否需要线上的所有点代表该线？
+         * 不，我们只需要该线的两个端点即可。
+         * 这就是cv.CHAIN_APPROX_SIMPLE所做的。
+         * 它删除所有冗余点并压缩轮廓，从而节省内存。
+         */
+        cv.findContours(src, contours, hierarchy, mode, method);
+
+        return { contours, hierarchy };
+    }
+    //  比较两个轮廓
+    matchShape(img1, img2) {
+        // 初始化
+        let { src: src1 } = initProcess(img1);
+        // 灰度
+        src1 = rgb2gray(src1);
+        // 轮廓
+        let { contours: c1 } = findContours(src1);
+
+        // 使用凸包来匹配计算
+        // 凸包
+        // let tmp1 = new cv.Mat();
+        // cv.convexHull(c1.get(0), tmp1, false, true);
+        // console.log(contoursSave(c1))
+
+        // 初始化
+        let { src: src2 } = initProcess(img2);
+        // 灰度
+        src2 = rgb2gray(src2);
+        // 轮廓
+        let { contours: c2 } = findContours(src2);
+        // 使用凸包来匹配计算
+        // 凸包
+        // let tmp2 = new cv.Mat();
+        // cv.convexHull(c2.get(0), tmp2, false, true);
+
+        let result = cv.matchShapes(c1.get(0), c2.get(0), 1, 0);
+
+        src1.delete();
+        src2.delete();
+        c1.delete();
+        c2.delete();
+        // tmp1.delete();
+        // tmp2.delete();
+
+        return result;
+    }
+    // 保存
+    contoursSave(contours) {
+        let res = [];
+        for (let i = 0; i < contours.size(); i++) {
+            let cnt = contours.get(i);
+            // 近似轮廓
+            let tmp = new cv.Mat();
+            cv.approxPolyDP(cnt, tmp, 12, true);
+
+            res.push({
+                rows: tmp.rows,
+                cols: tmp.cols,
+                type: tmp.type(),
+                // 长度不等
+                array: tmp.data32S
+            });
+            tmp.delete();
+        };
+        return res;
+    };
+    // 读取
+    contoursLoad(array = []) {
+        let matVec = new cv.MatVector();
+        for (let i = 0; i < array.length; i++) {
+            let a = array[i]
+            let mat = cv.matFromArray(a.rows, a.cols, a.type, a.array);
+            matVec.push_back(mat);
+        };
+        return matVec
     }
 }
 
@@ -223,28 +345,28 @@ class Base {
 
     //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
-            if (document.querySelector("#gui-main")) {
-                let children = document.querySelector("#gui-main").children;
-                if (children.length == 0) {
-                    document.querySelector("#gui-main").style.display = "none";
-                    document.querySelector("#p5").style.height = '100vh';
-                } else {
-                    document.querySelector("#gui-main").style.display = "flex";
-                    document.querySelector("#p5").style.height = '40vh';
-                }
+        if (document.querySelector("#gui-main")) {
+            let children = document.querySelector("#gui-main").children;
+            if (children.length == 0) {
+                document.querySelector("#gui-main").style.display = "none";
+                document.querySelector("#p5").style.height = '100vh';
+            } else {
+                document.querySelector("#gui-main").style.display = "flex";
+                document.querySelector("#p5").style.height = '40vh';
             }
         }
-        //手动隐藏,显示p5.js
+    }
+    //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-            if (document.querySelector("#p5")) {
-                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-            };
-            if (document.querySelector('#gui-main')) {
-                document.querySelector('#gui-main').style.top = '0';
-                document.querySelector('#gui-main').style.height = '100vh';
-            }
+        if (document.querySelector("#p5")) {
+            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+        };
+        if (document.querySelector('#gui-main')) {
+            document.querySelector('#gui-main').style.top = '0';
+            document.querySelector('#gui-main').style.height = '100vh';
         }
-        // GUI布局
+    }
+    // GUI布局
     layout(type = 'default') {
         type = type.toLowerCase();
         let g = document.querySelector('#gui-main');
@@ -304,7 +426,9 @@ class Base {
             'clear': '<i class="far fa-trash-alt"></i>',
             'plus': '<i class="fas fa-plus"></i>',
             'minus': '<i class="fas fa-minus"></i>',
-            'light': '<i class="far fa-lightbulb"></i>'
+            'light': '<i class="far fa-lightbulb"></i>',
+            'square': '<i class="fas fa-vector-square"></i>',
+            'link': '<i class="fas fa-link"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
@@ -327,7 +451,7 @@ class Base {
     // 粘贴组件，开启后旋转，监听页面的粘贴事件
     createPasteIcon(eventListener, isAdd = true) {
 
-        const pasteFn = function(e) {
+        const pasteFn = function (e) {
             // console.log(e)
             let img = clipboard.readImage();
             if (!img.isEmpty() && eventListener) eventListener(clipboard.readImage().toDataURL());
@@ -340,7 +464,7 @@ class Base {
                 document.body.addEventListener("paste", pasteFn);
                 focusEvents['pasteFn'] = pasteFn;
                 btn.classList.add('fan');
-                btn.querySelector('svg').classList.add('fa-spin');
+                (btn.querySelector('svg') || btn.querySelector('i')).classList.add('fa-spin');
             } else {
                 document.body.removeEventListener("paste", pasteFn);
                 delete focusEvents['pasteFn'];
@@ -390,6 +514,21 @@ class Base {
             input.style.display = "none";
         };
 
+        // 事件绑定
+        div.addEventListener('click', () => input.click());
+
+        // 设置placeholder
+        div.setPlaceholder = function (value) {
+
+            if (fileExt === 'image' && value) {
+                div.className = 'input-image';
+                div.style.backgroundImage = `url(${encodeURI(value)})`;
+            };
+            //其他文件
+            if (fileExt == "other" && value) {
+                p.innerText = `-`;
+            };
+        }
 
         // 用于缓存
         let key = this.md5(`_${type}_${text}`);
@@ -397,8 +536,6 @@ class Base {
         // 
         cache ? setDefaultValue(defaultValue) : null;
 
-        // 事件绑定
-        div.addEventListener('click', () => input.click());
 
         // 监听事件
         function eventFn(e) {
@@ -412,21 +549,19 @@ class Base {
 
                     //单个文件
                     let file = e.target.files[0];
+
                     //图片
                     if (fileExt === 'image' && file.type.match(fileExt)) {
                         //转成base64存data
                         res = file.path;
-                        div.className = 'input-image';
-                        // console.log(res)
-                        div.style.backgroundImage = `url(${encodeURI(res)})`;
                     };
-
                     //其他文件
                     if (fileExt == "other") {
                         res = file.path;
-                        p.innerText = file.name;
-                        // console.log(file)
                     }
+
+                    div.setPlaceholder(res);
+
                 }
 
             } else if (type === 'text') {
@@ -452,15 +587,7 @@ class Base {
                     //多个文件
                 } else {
                     //单个文件
-                    //图片
-                    if (fileExt === 'image' && value) {
-                        div.className = 'input-image';
-                        div.style.backgroundImage = `url(${encodeURI(value)})`;
-                    };
-                    //其他文件
-                    if (fileExt == "other" && value) {
-                        p.innerText = `-`;
-                    }
+                    div.setPlaceholder(value);
                 }
 
             } else if (type === 'text' && value) {
@@ -482,6 +609,7 @@ class Base {
         div.appendChild(input);
 
         if (isAdd) this.add(div);
+
 
         return div
     }
@@ -513,51 +641,51 @@ class Base {
      * @param {*} width 
      */
     createTextCanvas(txt, fontSize = 24, color = "black", width = 300, isAdd = true) {
-            let canvas = document.createElement('canvas'),
-                ctx = canvas.getContext('2d');
-            let x = 2;
-            // canvas.width = 480;
-            // canvas.height = 32;
-            ctx.font = `${fontSize * x}px Arial`;
-            let font = ctx.measureText(txt);
-            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
-            canvas.width = (font.width) + 10;
+        let canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
+        let x = 2;
+        // canvas.width = 480;
+        // canvas.height = 32;
+        ctx.font = `${fontSize * x}px Arial`;
+        let font = ctx.measureText(txt);
+        canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+        canvas.width = (font.width) + 10;
 
-            ctx.fillStyle = color;
-            ctx.textAlign = "start";
-            ctx.textBaseline = "top";
-            ctx.font = `${fontSize * x}px Arial`;
-            ctx.fillText(txt, 5, 10);
+        ctx.fillStyle = color;
+        ctx.textAlign = "start";
+        ctx.textBaseline = "top";
+        ctx.font = `${fontSize * x}px Arial`;
+        ctx.fillText(txt, 5, 10);
 
-            // 导出图片
-            canvas.toDataURL = function() {
-                let base64, height;
-                if (canvas.width > width) {
-                    let nc = document.createElement('canvas'),
-                        nctx = nc.getContext('2d');
-                    nc.width = width;
-                    nc.height = parseInt(canvas.height * width / canvas.width) + 1;
-                    nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
-                    base64 = nc.toDataURL('image/png');
-                    height = nc.height;
-                } else {
-                    base64 = canvas.toDataURL('image/png');
-                    height = canvas.height;
-                };
-                return base64
-            }
-
-
-            if (isAdd) this.add(canvas);
-
-            return canvas
+        // 导出图片
+        canvas.toDataURL = function () {
+            let base64, height;
+            if (canvas.width > width) {
+                let nc = document.createElement('canvas'),
+                    nctx = nc.getContext('2d');
+                nc.width = width;
+                nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+                nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+                base64 = nc.toDataURL('image/png');
+                height = nc.height;
+            } else {
+                base64 = canvas.toDataURL('image/png');
+                height = canvas.height;
+            };
+            return base64
         }
-        //创建图片，根据url返回图片dom
+
+
+        if (isAdd) this.add(canvas);
+
+        return canvas
+    }
+    //创建图片，根据url返回图片dom
     createImage(url, isAdd = false) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = url;
-            _img.onload = function() {
+            _img.onload = function () {
                 if (isAdd) this.add(_img);
                 resolve(_img);
             }
@@ -580,12 +708,12 @@ class Base {
 
     //随机来张图片
     randomPic(w = 200, h = 200, isAdd = false) {
-            this.randomPicNum++;
-            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-            return this.createImage(url, isAdd);
-        }
-        //随机来一句话
-    randomText() {}
+        this.randomPicNum++;
+        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+        return this.createImage(url, isAdd);
+    }
+    //随机来一句话
+    randomText() { }
 
     // toast
 
@@ -599,9 +727,9 @@ class Knn {
 
     // 统计各标签的样本数
     count() {
-            return this.knn.getClassExampleCount();
-        }
-        // 其他标签的样本数控制为最小的样本数
+        return this.knn.getClassExampleCount();
+    }
+    // 其他标签的样本数控制为最小的样本数
     async minDataset() {
         let c = this.count();
         let min = null;
@@ -628,18 +756,18 @@ class Knn {
     }
 
     train(tensors = [], classNames = []) {
-            for (let index = 0; index < tensors.length; index++) {
-                const t = tensors[index];
-                this.add(t, classNames[index]);
-            }
+        for (let index = 0; index < tensors.length; index++) {
+            const t = tensors[index];
+            this.add(t, classNames[index]);
         }
-        // 图片转tensor
-        // img2tensor(img){
-        //     if (!(img instanceof tf.Tensor)) {
-        //         img = tf.browser.fromPixels(img);
-        //     }
-        //     return img
-        // }
+    }
+    // 图片转tensor
+    // img2tensor(img){
+    //     if (!(img instanceof tf.Tensor)) {
+    //         img = tf.browser.fromPixels(img);
+    //     }
+    //     return img
+    // }
     async predict(tensor, topk = null) {
         if (Object.keys(this.count()).length === 0) return;
         if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
@@ -661,7 +789,7 @@ class Knn {
             return false
         }
     }
-    export () {
+    export() {
         let dataset = this.knn.getClassifierDataset();
         var datasetObj = {};
         Object.keys(dataset).forEach((key) => {
@@ -676,15 +804,15 @@ class Knn {
         });
 
         let jsonModel = JSON.stringify(datasetObj)
-            //localStorage.setItem("easyteach_model",jsonModel);
+        //localStorage.setItem("easyteach_model",jsonModel);
         return jsonModel;
     }
     // 缓存模型
     save(key) {
-            let store = new Store(`knn_${key}`);
-            store.set((new Date()).getTime().toString(), this.export());
-        }
-        // 从缓存加载模型 
+        let store = new Store(`knn_${key}`);
+        store.set((new Date()).getTime().toString(), this.export());
+    }
+    // 从缓存加载模型 
     async loadFromStore(key) {
         let store = new Store(`knn_${key}`);
         let ms = await store.getValues();
@@ -704,11 +832,11 @@ class Knn {
  */
 class AI {
     constructor() {
-            // 预训练模型
-            this.Mobilenet = Mobilenet;
+        // 预训练模型
+        this.Mobilenet = Mobilenet;
 
-        }
-        // 裁切p5的画布，用于下载
+    }
+    // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
         let scale = _canvas.canvas.width / _canvas.width;
         let canvas = document.createElement("canvas");
@@ -734,11 +862,11 @@ class AI {
 
     // rgb转字符串
     colorStr(c = [0, 0, 0]) {
-            // console.log(c)
-            return `rgb(${c.join(',')})`;
-        }
-        // 计算主色
-        // mainColor
+        // console.log(c)
+        return `rgb(${c.join(',')})`;
+    }
+    // 计算主色
+    // mainColor
     getColor(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -777,7 +905,7 @@ class AI {
                     c => p5.instance.color(this.colorStr(c)));
                 resolve(_img);
             } else {
-                _im.addEventListener('load', function() {
+                _im.addEventListener('load', function () {
                     _img.colorPalette = Array.from(
                         colorThief.getPalette(_im),
                         c => p5.instance.color(this.colorStr(c)));
@@ -798,9 +926,9 @@ class AI {
         _img.faces = [];
 
         return new Promise((resolve, reject) => {
-            faceDetector.detect(_im).then(function(faces) {
+            faceDetector.detect(_im).then(function (faces) {
                 console.log(`人脸检测`, faces)
-                faces.forEach(function(item) {
+                faces.forEach(function (item) {
                     _img.faces.push({
                         x: parseInt(item.boundingBox.x),
                         y: parseInt(item.boundingBox.y),
@@ -809,7 +937,7 @@ class AI {
                     });
                 });
                 resolve(_img)
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.log("err", err);
                 reject(err);
             });
@@ -860,40 +988,40 @@ class Mobilenet {
         return this.savePath;
     }
     async init() {
-            if (!this.mobilenetModel) {
-                try {
-                    this.mobilenetModel = await mobilenet.load(Object.assign(this.opts, {
-                        modelUrl: this.savePath
-                    }));
-                    console.log('Prediction from loaded model:');
-                } catch (error) {
-                    this.mobilenetModel = await mobilenet.load(this.opts);
-                    this.mobilenetModel.model.save(this.savePath).then(console.log);
-                };
-            }
+        if (!this.mobilenetModel) {
+            try {
+                this.mobilenetModel = await mobilenet.load(Object.assign(this.opts, {
+                    modelUrl: this.savePath
+                }));
+                console.log('Prediction from loaded model:');
+            } catch (error) {
+                this.mobilenetModel = await mobilenet.load(this.opts);
+                this.mobilenetModel.model.save(this.savePath).then(console.log);
+            };
+        }
 
-            // Warmup the model.
-            const result = tf.tidy(
-                () => this.mobilenetModel.infer(tf.zeros(
-                    [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), true));
-            // result.print();
-            await result.data();
-            result.dispose();
-        }
-        /**
-         * 
-         * @param {tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} img 
-         * @param {number} topk 
-         */
+        // Warmup the model.
+        const result = tf.tidy(
+            () => this.mobilenetModel.infer(tf.zeros(
+                [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), true));
+        // result.print();
+        await result.data();
+        result.dispose();
+    }
+    /**
+     * 
+     * @param {tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} img 
+     * @param {number} topk 
+     */
     classify(img = tf.zeros(
-            [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), topk = 5) {
-            return this.mobilenetModel.classify(img, topk);
-        }
-        /**
-         * 
-         * @param {*} img 
-         * @param {*} embedding 
-         */
+        [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), topk = 5) {
+        return this.mobilenetModel.classify(img, topk);
+    }
+    /**
+     * 
+     * @param {*} img 
+     * @param {*} embedding 
+     */
     infer(img = tf.zeros(
         [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), embedding = true) {
         return this.mobilenetModel.infer(

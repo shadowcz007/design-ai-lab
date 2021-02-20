@@ -1,0 +1,17 @@
+{
+  "poster": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAADQCAYAAADMK6VRAAAEEElEQVR4nO3dv24cVRiG8fc7O3acIkBEoIho6LgAaKgouAyugYrbyKVwF/T0XABFJOzCkf/uzKGIdzEQ0C6excPD85Mix458NNajmZ3Nnv1cp6enPcJqj30AOiwDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDDf07hw0sqGqHvsYdEDDer1O7z1Vtf2YZJavLW2dzdXq//KzVlWGm5sbAy/oGGcP3Jr3WWTeZMF5kwXn9RnOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MNj30A+nu/m7PZe5JKsvt0QgMvXFUlvadaS472z2Xghet3cfvFVabXZ8meoycNvHB9mlJPn2T940/p3/+Q9vxZ+nrMrjNGDbxwVZXU28fh9sF7aR++n35rYI6e7T1VH8f09Zg+jjtfqg28dJVtzKq6O6Nr9zO4TzMNBN/cvdefR+br8Qx1PPNJPE7JNBl3IYbp9dl8q0099exp6uQ4ffIMXoLh8ttXD16kJ6lW6ecXefLdNzn6+ovkzWWyMvBjG/rV9YMX6UnSKv3qOn2aks1j8INX1kMNNdOv1alWSWu//deal+dFOMyrScZdDF8uhDMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwM556spdtsuus9/d6fXRl46SpJ+tuNdsMqtVrdfequSoTte5PWY/rZeWq1Sl+7bRajqiW3Y1affJTxy88yHh/dvQltNwZeuGqV3K7TXr5I+/TlXnETAy/e/Ut0bi72/n4DL1zde1fDP9ml6vNgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4Ya0mcYttMp2rT13Hehwhn6+/y6BP9pO2Tm/2G4Ic8rOMgyrrz6fZ6WW5PI67ePnybj7NFQdVv189su819Ob22SPbZ06rKG/uZxnpc0w0lYOI12Q+W6ykviguzzDoc4yz95l8HkwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeGGfUbT6r/nYHuytAyewXDD/VmI28GXd9Hv/33jXf++69f+ap1Drr20df7tYxxOTk4iLi/RcN5kwfk8GM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDw/0KkP1QBx7sRwQAAAAASUVORK5CYII=",
+  "knowledge": {
+    "readme": "用鼠标控制布局",
+    "course": ""
+  },
+  "code": "var isChangeY = 1,\n  y1 = 0, y2 = 0, color1 = [244, 122, 158], color2 = [237, 34, 93];\n\nfunction setup() {\n  createCanvas(windowWidth, windowWidth);\n  noStroke();\n  rectMode(CENTER);\n}\n\nfunction draw() {\n  var c1 = color1, c2 = color1;\n  if (isChangeY == 0) {\n    y1 = height / 2;\n    y2 = height / 2;\n    c1 = [0,0,0,0];\n    c2 = [0,0,0,0];\n    stroke(...color2);\n  } else if (isChangeY == 1) {\n    y1 = mouseY;\n    c1 = color2;\n    c2 = color1;\n    \n  } else if (isChangeY == 2) {\n    y2 = mouseY;\n    c1 = color1;\n    c2 = color2;\n  }\n\n  background(230);\n  fill(...c1);\n  rect(mouseX, y1, mouseY / 2 + 10, mouseY / 2 + 10);\n  fill(...c2);\n  let inverseX = width - mouseX;\n  let inverseY = height - mouseY;\n  rect(inverseX, y2, inverseY / 2 + 10, inverseY / 2 + 10);\n}\n\nfunction mouseClicked() {\n  isChangeY++;\n  if (isChangeY > 2) isChangeY = 0;\n}",
+  "code_length": 18,
+  "size": [
+    365,
+    660
+  ],
+  "extname": "designlabplugin",
+  "version": "0.1.0",
+  "package_id": "06241f709c5ea14f71e2c1f43d1915ca08613e3a",
+  "create_time": 1613830309651
+}

@@ -467,7 +467,7 @@ button:hover {
     font-family: monospace;
     /* display: block; */
     height: 44px;
-    /* width: 100%; */
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

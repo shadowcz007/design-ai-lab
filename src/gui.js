@@ -91,13 +91,15 @@ class GUI {
                                 document.body.appendChild(div);
                             };
                             document.querySelector("#p5").innerHTML = "";
+                            new p5(null, 'p5');
+                            ${code.trim()};
                             if(window.gui) {
                                 document.querySelector("#gui-main").innerHTML="";
                                 //console.log(Object.is(window.Lab,undefined)?3000:100)
                                 gui();
-                            };
-                            ${code.trim()};
-                            new p5(null, 'p5');
+                            }else{
+                                Lab.base.isDisplay();
+                            }
                             console.log('createExecuteJs-success')
                             `
     }
@@ -237,7 +239,7 @@ class GUI {
             //截图
             previewWindow.webContents.capturePage().then(img => {
                 // 压缩图片大小
-                img=img.resize({width:120});
+                img = img.resize({ width: 120 });
                 // console.log(img.toDataURL())
                 let knowledgeJson = Knowledge.get();
                 resolve({
@@ -284,7 +286,7 @@ class GUI {
             mode: 'undocked'
         });
 
-        const port=remote.getGlobal('_DEBUG_PORT');
+        const port = remote.getGlobal('_DEBUG_PORT');
         fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
             res => {
                 let target = res.filter(r => r.url === Win.get(1).getURL());
@@ -313,7 +315,7 @@ class GUI {
                         // console.log('====21=====', this.resizer)
 
                     });
-                    devtoolsView.addEventListener('did-fail-load',event=>{
+                    devtoolsView.addEventListener('did-fail-load', event => {
                         console.log(event)
                     })
 
@@ -682,7 +684,8 @@ class GUI {
         let version = this.createElement("version");
         let close = this.createElement('close');
 
-        img.style.backgroundImage = `url(${data.poster})`;
+
+        img.style.backgroundImage = `url(${URL.createObjectURL(this.base64ToBlob(data.poster))})`;
         //img.innerHTML = '<div><i class="fas fa-eye"></i></div>';
         readme.innerHTML = Knowledge.marked(data.knowledge.readme);
         readme.innerText = readme.innerText;
@@ -701,7 +704,7 @@ class GUI {
 
         isCanClose === true ? this.addClickEventListener(close, e => {
             e.stopPropagation();
-            // console.log(data.id)
+            // console.log(e)
             div.remove();
             db.removeById(data.id);
         }) : close.style.color = 'white';
@@ -736,6 +739,19 @@ class GUI {
         });
     };
 
+    base64ToBlob(urlData, type) {
+        let arr = urlData.split(',');
+        let mime = arr[0].match(/:(.*?);/)[1] || type;
+        let bytes = window.atob(arr[1]);
+        let ab = new ArrayBuffer(bytes.length);
+        let ia = new Uint8Array(ab);
+        for (let i = 0; i < bytes.length; i++) {
+            ia[i] = bytes.charCodeAt(i);
+        }
+        return new Blob([ab], {
+            type: mime
+        });
+    }
 }
 
 module.exports = new GUI();

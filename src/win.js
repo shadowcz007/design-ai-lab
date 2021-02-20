@@ -107,24 +107,29 @@ class Win {
             }
         }
     // 检查间隔时间
-    checkTime(n){
-        if(Math.abs(n-this.executeJSNow)<200){
+    checkTime(){
+        let n=window.performance.now();
+        if(Math.abs(n-this.executeJSNow)<1000){
             // 间隔较短
             console.log("间隔较短")
+            setTimeout(()=>{
+                this.checkTime(n);
+            },1000);
+        }else{
+            console.log("间隔时间可以")
+            let previewWindow = this.get(1);
+            this.show(1, true);
+            if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
         }
     }
         //注入代码
     executeJavaScript2Preview(code) {
-        let n=window.performance.now();
-        this.executeJSNow=n;
-        setTimeout(()=>{
-            this.checkTime(n);
-        },300);
-        
         this.code = code;
-        let previewWindow = this.get(1);
-        this.show(1, true);
-        if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
+        this.executeJSNow=window.performance.now();
+        this.checkTime();
+        // let previewWindow = this.get(1);
+        // this.show(1, true);
+        // if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
     };
 
 
