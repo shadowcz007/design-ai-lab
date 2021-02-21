@@ -456,7 +456,7 @@ function createShortVideoInput() {
     });
 
     let type = null;
-    if (filePaths[0]) {
+    if (filePaths && filePaths[0]) {
         var count = Array.from(['mov', 'avi', 'mp4'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
         if (count.length > 0) type = "video";
         count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
@@ -465,7 +465,7 @@ function createShortVideoInput() {
         if (count.length > 0) type = "img";
     }
 
-    return filePaths[0] ? {
+    return filePaths && filePaths[0] ? {
         type: type,
         url: filePaths[0]
     } : null;
