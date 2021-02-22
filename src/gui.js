@@ -141,9 +141,11 @@ class GUI {
             // Win.get(1).devToolsWebContents.isDestroyed()
             if (Win.get(1).devToolsWebContents == null || (Win.get(1).devToolsWebContents && Win.get(1).devToolsWebContents.isDestroyed())) {
                 this.openDevTool();
+                this.devBtn.classList.add('button-active');
                 // this.devOpen = true;
             } else {
                 this.closeDevTool();
+                this.devBtn.classList.remove('button-active');
                 // this.devOpen = false;
             }
         });

@@ -1,5 +1,5 @@
 // preload.js
-const { Lab, cv,Store } = require('./lab');
+const { Lab, cv, Store, Canvas } = require('./lab');
 // const _setImmediate = setImmediate;
 // const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
@@ -8,7 +8,8 @@ process.once('loaded', () => {
     //AI功能封装
     global.Lab = Lab;
     global.cv = cv;
-    global.Store=Store;
+    global.Store = Store;
+    global.Canvas = Canvas;
 })
 
 

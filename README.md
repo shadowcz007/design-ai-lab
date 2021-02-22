@@ -57,8 +57,6 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
 ## 感谢以下开源项目
 
-[idb-kv-store](https://www.npmjs.com/package/idb-kv-store)
-
 [@ffmpeg-installer/ffmpeg]()
 
 [@tensorflow/tfjs 3.0.0]()
@@ -68,6 +66,10 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 [@tensorflow-models/body-pix]()
 
 [opencvjs-dist 4.4.0]()
+
+[fabric]()
+
+[idb-kv-store](https://www.npmjs.com/package/idb-kv-store)
 
 ...详见package.json
 

@@ -42,6 +42,7 @@
         "escodegen": "^2.0.0",
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
+        "fabric": "^4.3.1",
         "fluent-ffmpeg": "^2.1.2",
         "gif.js": "^0.2.0",
         "idb-kv-store": "^4.5.0",

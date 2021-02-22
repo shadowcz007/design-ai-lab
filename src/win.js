@@ -20,7 +20,9 @@ class Win {
         // })
         // 监听加载事件，然后注入代码
         this.previewWindow.webContents.on('did-finish-load', () => {
-            this.previewWindow.webContents.executeJavaScript(this.code, false);
+            this.previewWindow.webContents.executeJavaScript(this.code, false).then(()=>{
+                this.previewWindow.setTitle("更新成功");
+            })
         });
         // 当preview窗口崩溃的时候
         this.previewWindow.webContents.on('render-process-gone', (event, details) => {
@@ -108,16 +110,18 @@ class Win {
         }
     // 检查间隔时间
     checkTime(){
+        let previewWindow = this.get(1);
         let n=window.performance.now();
         if(Math.abs(n-this.executeJSNow)<1000){
             // 间隔较短
             console.log("间隔较短")
+            previewWindow.setTitle("输入ing");
             setTimeout(()=>{
                 this.checkTime(n);
             },1000);
         }else{
             console.log("间隔时间可以")
-            let previewWindow = this.get(1);
+            previewWindow.setTitle("更新ing");
             this.show(1, true);
             if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
         }

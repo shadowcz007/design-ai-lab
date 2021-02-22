@@ -1,7 +1,7 @@
 const fs = require("fs"),
     path = require('path');
 
-const Jimp = require('jimp');
+// const Jimp = require('jimp');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -400,27 +400,23 @@ function frames2video(filePath) {
 //         url,text,type,textImage:{width,height,base64}
 //     }
 // ]
-function createShortVideoFromLocal(files = []) {
-    // console.log(this)
-    // let filePaths = dialog.showOpenDialogSync({
-    //     title: "打开……",
-    //     properties: ['openFile', 'multiSelections'],
-    //     filters: [
-    //         { name: '合并多个视频+1个音频', extensions: ['mov', 'avi', 'mp4','mp3', 'jpg', 'png', 'gif'] }
-    //     ]
-    // });
-    if (files && files.length > 0) {
+/**
+ * 
+ * @param {*} width 视频宽度
+ * @param {*} height 视频高度
+ * @param {*} frames 每一个素材
+ * @param {*} backgroundAudio 背景音乐
+ */
+function createShortVideoFromLocal(width, height, frames = [], backgroundAudio) {
 
-        let extnames = Array.from(files, f => f.type);
-        let audio = files[extnames.indexOf('audio')].url;
-        files[extnames.indexOf('audio')] = null;
-        // console.log(filePaths)
-        let videos = files.filter(f => f);
-        // console.log(extnames.indexOf('.mp3'))
+    if (frames && frames.length > 0) {
+
+        let audio = backgroudAudio.url;
+
         return new Promise((resolve, reject) => {
             mergeVideos(
-                Array.from(videos, v => v.url),
-                Array.from(videos, v => v.textImage)
+                Array.from(frames, v => v.url),
+                Array.from(frames, v => v.textImage)
             ).then(outputVideo => {
                 addMusicToVideo(outputVideo, audio).then(output => {
                     fs.unlinkSync(outputVideo);
@@ -444,32 +440,32 @@ function getFileType(formatName) {
     // }
 }
 
-//完成视频及音频合成
-function createShortVideoInput() {
-    // console.log(this)
-    let filePaths = dialog.showOpenDialogSync({
-        title: "打开……",
-        properties: ['openFile'],
-        filters: [
-            { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
-        ]
-    });
+// //完成视频及音频合成
+// function createShortVideoInput() {
+//     // console.log(this)
+//     let filePaths = dialog.showOpenDialogSync({
+//         title: "打开……",
+//         properties: ['openFile'],
+//         filters: [
+//             { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
+//         ]
+//     });
 
-    let type = null;
-    if (filePaths && filePaths[0]) {
-        var count = Array.from(['mov', 'avi', 'mp4'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-        if (count.length > 0) type = "video";
-        count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-        if (count.length > 0) type = "audio";
-        count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-        if (count.length > 0) type = "img";
-    }
+//     let type = null;
+//     if (filePaths && filePaths[0]) {
+//         var count = Array.from(['mov', 'avi', 'mp4'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+//         if (count.length > 0) type = "video";
+//         count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+//         if (count.length > 0) type = "audio";
+//         count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+//         if (count.length > 0) type = "img";
+//     }
 
-    return filePaths && filePaths[0] ? {
-        type: type,
-        url: filePaths[0]
-    } : null;
-}
+//     return filePaths && filePaths[0] ? {
+//         type: type,
+//         url: filePaths[0]
+//     } : null;
+// }
 
 //需要把_imgs保存为文本文件，再使用
 function createShortVideo(_imgs) {
@@ -568,7 +564,7 @@ function sortFiles(filePath) {
 
 
 module.exports = {
-    createShortVideoInput,
+    // createShortVideoInput,
     createShortVideoFromLocal,
     mergeVideosUI,
     mergeOneVideoAndMusicUI,

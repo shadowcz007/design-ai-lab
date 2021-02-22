@@ -10,7 +10,6 @@
     <!-- <script src="../lib/addons/p5.sound.min.js"></script> -->
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
-
     <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
 
@@ -127,10 +126,14 @@
         }
         
         #gui-main .input-text input {
-            height: 32px;
             border-color: lightsteelblue;
             border-width: thin;
+            border-top: none;
+            border-left: none;
+            margin-bottom: 12px;
+            border-right: none;
             outline: none;
+            height: 32px;
             width: 100%;
             padding: 0 8px;
             font-size: 16px;
@@ -206,6 +209,10 @@
             font-family: monospace;
         }
 
+        #gui-main .text_canvas{
+            max-width: 100%;
+        }
+
         #gui-main .group img{
             width: 45%;
             max-width: fit-content;
@@ -219,6 +226,16 @@
             outline: none;
             max-width: 100%;
         }
+        #gui-main .preview-canvas{
+        width: 50%!important;
+        height: auto!important;
+        max-width: 360px!important;
+        position: inherit!important;
+        /* left: 0px; */
+        outline: 1px solid gray;
+        
+        }
+
     </style>
 
 </head>

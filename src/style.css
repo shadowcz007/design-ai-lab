@@ -139,6 +139,11 @@ button:hover {
     color: white;
 }
 
+.button-active{
+    background-color: #14161b;
+    color: #676767;
+}
+
 .button-light {
     color: #232323;
     background-color: #e2e2e2;
