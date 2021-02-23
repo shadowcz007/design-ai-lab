@@ -21,7 +21,7 @@ const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
 const hash = require('object-hash');
 const IdbKvStore = require('idb-kv-store');
-const colorThief = new (require('colorthief/dist/color-thief.umd'))();
+const colorThief = new(require('colorthief/dist/color-thief.umd'))();
 const Color = require('color');
 const _GIF = require('gif.js/dist/gif');
 
@@ -69,13 +69,13 @@ class Store {
 
 class GIF {
     constructor() {
-        this.gif = new _GIF({
-            workers: 2,
-            quality: 10,
-            workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
-        });
-    }
-    // canvasElement imageElement
+            this.gif = new _GIF({
+                workers: 2,
+                quality: 10,
+                workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
+            });
+        }
+        // canvasElement imageElement
     add(elt) {
         this.gif.addFrame(elt);
     }
@@ -89,7 +89,7 @@ class GIF {
 
     }
     render() {
-        this.gif.on('finished', function (blob) {
+        this.gif.on('finished', function(blob) {
             window.open(URL.createObjectURL(blob));
         });
         this.gif.render();
@@ -108,57 +108,57 @@ class Clipboard {
      * @param {String} type 
      */
     write(data, type = 'text') {
-        type = type.toLowerCase();
-        if (type === 'text') {
-            clipboard.writeText(data);
-        } else if (type === 'html') {
-            clipboard.writeHTML(data);
-        } else if (type === 'base64') {
-            let img = nativeImage.createFromDataURL(data)
-            clipboard.writeImage(img);
-        }
-    }
-    //读取剪切板
-    /**
-     * 
-     * @param {*} type 
-     */
-    read(type = 'text') {
-        type = type.toLowerCase();
-        let res;
-        if (type === 'text') {
-            res = clipboard.readText();
-        } else if (type == 'html') {
-            res = clipboard.readHTML();
-        } else if (type == 'img') {
-            res = clipboard.readImage();
-            if (res.isEmpty()) {
-                res = null;
+            type = type.toLowerCase();
+            if (type === 'text') {
+                clipboard.writeText(data);
+            } else if (type === 'html') {
+                clipboard.writeHTML(data);
+            } else if (type === 'base64') {
+                let img = nativeImage.createFromDataURL(data)
+                clipboard.writeImage(img);
             }
-            // else{
-            //     res=res.toDataURL();
-            // }
-        };
-        return res
-    }
-    // 创建缓存对象
+        }
+        //读取剪切板
+        /**
+         * 
+         * @param {*} type 
+         */
+    read(type = 'text') {
+            type = type.toLowerCase();
+            let res;
+            if (type === 'text') {
+                res = clipboard.readText();
+            } else if (type == 'html') {
+                res = clipboard.readHTML();
+            } else if (type == 'img') {
+                res = clipboard.readImage();
+                if (res.isEmpty()) {
+                    res = null;
+                }
+                // else{
+                //     res=res.toDataURL();
+                // }
+            };
+            return res
+        }
+        // 创建缓存对象
     store(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
-        return this.clipboardStore
-    }
-    // 得到缓存的结果
+            if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
+            return this.clipboardStore
+        }
+        // 得到缓存的结果
     async getAllStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-        return new Promise((resolve, reject) => {
-            this.clipboardStore.getJson().then(res => resolve(res));
-        });
-    }
-    // 清空缓存
+            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+            return new Promise((resolve, reject) => {
+                this.clipboardStore.getJson().then(res => resolve(res));
+            });
+        }
+        // 清空缓存
     clearStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-        this.clipboardStore.clear();
-    }
-    //剪切板监听
+            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+            this.clipboardStore.clear();
+        }
+        //剪切板监听
     listener(type = 'text', fn = null, cacheKey = "default", interval = 2000) {
         if (this.clipboardListenerStop == true) return;
         this.store(type, cacheKey);
@@ -166,8 +166,8 @@ class Clipboard {
         let data = this.read(type);
         let id = md5(
             type == 'img' && data ?
-                data.toDataURL() :
-                (data || '')
+            data.toDataURL() :
+            (data || '')
         );
 
         if (data && this.clipboardListenerData != id) {
@@ -218,72 +218,72 @@ class Shape {
 
     // 寻找轮廓
     findContours(src) {
-        // 轮廓
-        let contours = new cv.MatVector();
+            // 轮廓
+            let contours = new cv.MatVector();
 
-        // 层级 [Next, Previous, First_Child, Parent]
-        let hierarchy = new cv.Mat();
+            // 层级 [Next, Previous, First_Child, Parent]
+            let hierarchy = new cv.Mat();
 
-        // 模式
-        let mode = cv.RETR_EXTERNAL;
-        // cv.RETR_TREE 取回所有的轮廓并且创建完整的家族层级列表
-        // cv.RETR_CCOMP 获取所有轮廓并且把他们组织到一个2层结构里
-        // cv.RETR_EXTERNAL 返回最外层的,所有孩子轮廓都不要
-        // cv.RETR_LIST 获取所有轮廓，但是不建立父子关系
+            // 模式
+            let mode = cv.RETR_EXTERNAL;
+            // cv.RETR_TREE 取回所有的轮廓并且创建完整的家族层级列表
+            // cv.RETR_CCOMP 获取所有轮廓并且把他们组织到一个2层结构里
+            // cv.RETR_EXTERNAL 返回最外层的,所有孩子轮廓都不要
+            // cv.RETR_LIST 获取所有轮廓，但是不建立父子关系
 
-        let method = cv.CHAIN_APPROX_SIMPLE;
-        // CHAIN_APPROX_NONE：获取每个轮廓的每个像素，相邻的两个点的像素位置差不超过1
-        // CHAIN_APPROX_SIMPLE：压缩水平方向，垂直方向，对角线方向的元素，值保留该方向的重点坐标，如果一个矩形轮廓只需4个点来保存轮廓信息
-        // CHAIN_APPROX_TC89_L1和CHAIN_APPROX_TC89_KCOS使用Teh-Chinl链逼近算法中的一种
-        /**
-         * 如果传递cv.CHAIN_APPROX_NONE，则将存储所有边界点。但是实际上我们需要所有这些要点吗？
-         * 例如，您找到了一条直线的轮廓。您是否需要线上的所有点代表该线？
-         * 不，我们只需要该线的两个端点即可。
-         * 这就是cv.CHAIN_APPROX_SIMPLE所做的。
-         * 它删除所有冗余点并压缩轮廓，从而节省内存。
-         */
-        cv.findContours(src, contours, hierarchy, mode, method);
+            let method = cv.CHAIN_APPROX_SIMPLE;
+            // CHAIN_APPROX_NONE：获取每个轮廓的每个像素，相邻的两个点的像素位置差不超过1
+            // CHAIN_APPROX_SIMPLE：压缩水平方向，垂直方向，对角线方向的元素，值保留该方向的重点坐标，如果一个矩形轮廓只需4个点来保存轮廓信息
+            // CHAIN_APPROX_TC89_L1和CHAIN_APPROX_TC89_KCOS使用Teh-Chinl链逼近算法中的一种
+            /**
+             * 如果传递cv.CHAIN_APPROX_NONE，则将存储所有边界点。但是实际上我们需要所有这些要点吗？
+             * 例如，您找到了一条直线的轮廓。您是否需要线上的所有点代表该线？
+             * 不，我们只需要该线的两个端点即可。
+             * 这就是cv.CHAIN_APPROX_SIMPLE所做的。
+             * 它删除所有冗余点并压缩轮廓，从而节省内存。
+             */
+            cv.findContours(src, contours, hierarchy, mode, method);
 
-        return { contours, hierarchy };
-    }
-    //  比较两个轮廓
+            return { contours, hierarchy };
+        }
+        //  比较两个轮廓
     matchShape(img1, img2) {
-        // 初始化
-        let { src: src1 } = initProcess(img1);
-        // 灰度
-        src1 = rgb2gray(src1);
-        // 轮廓
-        let { contours: c1 } = findContours(src1);
+            // 初始化
+            let { src: src1 } = initProcess(img1);
+            // 灰度
+            src1 = rgb2gray(src1);
+            // 轮廓
+            let { contours: c1 } = findContours(src1);
 
-        // 使用凸包来匹配计算
-        // 凸包
-        // let tmp1 = new cv.Mat();
-        // cv.convexHull(c1.get(0), tmp1, false, true);
-        // console.log(contoursSave(c1))
+            // 使用凸包来匹配计算
+            // 凸包
+            // let tmp1 = new cv.Mat();
+            // cv.convexHull(c1.get(0), tmp1, false, true);
+            // console.log(contoursSave(c1))
 
-        // 初始化
-        let { src: src2 } = initProcess(img2);
-        // 灰度
-        src2 = rgb2gray(src2);
-        // 轮廓
-        let { contours: c2 } = findContours(src2);
-        // 使用凸包来匹配计算
-        // 凸包
-        // let tmp2 = new cv.Mat();
-        // cv.convexHull(c2.get(0), tmp2, false, true);
+            // 初始化
+            let { src: src2 } = initProcess(img2);
+            // 灰度
+            src2 = rgb2gray(src2);
+            // 轮廓
+            let { contours: c2 } = findContours(src2);
+            // 使用凸包来匹配计算
+            // 凸包
+            // let tmp2 = new cv.Mat();
+            // cv.convexHull(c2.get(0), tmp2, false, true);
 
-        let result = cv.matchShapes(c1.get(0), c2.get(0), 1, 0);
+            let result = cv.matchShapes(c1.get(0), c2.get(0), 1, 0);
 
-        src1.delete();
-        src2.delete();
-        c1.delete();
-        c2.delete();
-        // tmp1.delete();
-        // tmp2.delete();
+            src1.delete();
+            src2.delete();
+            c1.delete();
+            c2.delete();
+            // tmp1.delete();
+            // tmp2.delete();
 
-        return result;
-    }
-    // 保存
+            return result;
+        }
+        // 保存
     contoursSave(contours) {
         let res = [];
         for (let i = 0; i < contours.size(); i++) {
@@ -317,34 +317,45 @@ class Shape {
 
 
 class Canvas {
-    constructor(width, height, isStatic = false, zoom = true) {
-        const { fabric } = require('fabric');
-        global.fabric = fabric;
+    constructor(width, height, isStatic = false, isZoom = false) {
+        if (!global.fabric) {
+            const { fabric } = require('fabric');
+            global.fabric = fabric;
+        }
+
+        this.width = width;
+        this.height = height;
+        this.x = width / 2;
+        this.y = height / 2;
+        this.zoom = 0.8;
+        this.isStatic = isStatic;
+        this.isZoom = isZoom;
+
         this.canvas = new fabric.Canvas(document.createElement('canvas'), {
             width: width,
             height: height,
             backgroundColor: isStatic ? 'transparent' : '#eee',
         });
 
-        if (zoom == true) this.canvas.on('mouse:wheel', (opt) => {
-            let delta = opt.e.deltaY,
-                zoom = this.canvas.getZoom();
-            zoom *= 0.999 ** delta;
-            if (zoom > 20) zoom = 20;
-            if (zoom < 0.01) zoom = 0.01;
-            this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+        if (isZoom == true) this.canvas.on('mouse:wheel', (opt) => {
+            let delta = opt.e.deltaY;
+            this.zoom = this.canvas.getZoom();
+            this.zoom *= 0.999 ** delta;
+            if (this.zoom > 20) this.zoom = 20;
+            if (this.zoom < 0.01) this.zoom = 0.01;
+            this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, this.zoom);
             opt.e.preventDefault();
             opt.e.stopPropagation();
         });
 
         if (isStatic === false) {
-            this.initStyle(width / 2, height / 2, 0.8);
+            this.initStyle(width / 2, height / 2, this.zoom);
             this.canvas.on('text:changed', (opt) => {
                 if (this.onTextChange) this.onTextChange(opt);
             });
 
             this.canvas.on('object:modified', opt => {
-                if (this.onModified) this.onModified(opt,this.exportJSON());
+                if (this.onModified) this.onModified(opt, this.exportJSON());
             })
 
             // this.canvas.on('after:render', opt => {
@@ -357,34 +368,99 @@ class Canvas {
 
     }
     initStyle(x, y, zoom) {
-        this.canvas.selectionColor = 'rgba(0,255,0,0.3)';
-        this.canvas.selectionBorderColor = 'red';
-        this.canvas.selectionLineWidth = 5;
+
+
+        this.canvas.selectionColor = 'rgba(255,0,0,0.1)';
+        this.canvas.selectionBorderColor = 'rgba(255,0,0,0.7)';
+        this.canvas.selectionLineWidth = 1;
+        this.canvas.hoverCursor = 'pointer';
         this.canvas.zoomToPoint({ x: x, y: y }, zoom);
+
+        fabric.Object.prototype.hasControls = false;
+        fabric.Object.prototype.controls.mtr.visible = false;
+        fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+            x: 0.5,
+            y: -0.5,
+            offsetY: -16,
+            offsetX: 16,
+            cursorStyle: 'pointer',
+            mouseUpHandler: deleteObject,
+            render: renderIcon,
+            cornerSize: 24
+        });
+        fabric.Textbox.prototype.controls.deleteControl = fabric.Object.prototype.controls.deleteControl;
+
+
+        var deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
+
+        var img = document.createElement('img');
+        img.src = deleteIcon;
+
+        function deleteObject(eventData, transform) {
+            let target = transform.target;
+            let canvas = target.canvas;
+            canvas.remove(target);
+            canvas.requestRenderAll();
+        }
+
+        function renderIcon(ctx, left, top, styleOverride, fabricObject) {
+            let size = this.cornerSize;
+            ctx.save();
+            ctx.translate(left, top);
+            ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+            ctx.drawImage(img, -size / 2, -size / 2, size, size);
+            ctx.restore();
+        }
+
     }
     addRect(style, selectable = true) {
+        style = Object.assign(style || {}, {
+            lockMovementX: true,
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+        });
         let rect = new fabric.Rect(style);
         this.canvas.add(rect);
+        rect.hoverCursor = 'default';
         rect.selectable = selectable;
         return rect
     }
-    addText(text, style, selectable = true) {
+    addText(text, style, selectable = true, hasControls = true) {
         style = Object.assign(style || {}, {
             splitByGrapheme: true,
-            lockScalingY: true
+            // lockScalingX:true,
+            // lockScalingY: true,
         });
         let t = new fabric.Textbox(text, style);
         this.canvas.add(t);
         t.selectable = selectable;
+        t.hasControls = hasControls;
+        // t.charSpacing = 4;
+        // t.centeredScaling=true;
+        // console.log(t.controls)
+        // t.hasRotatingPoint=false;
         return t
     }
     addImg(imageElement, style, selectable = true) {
+        style = Object.assign(style || {}, {
+            lockMovementX: true,
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+        });
         let imgInstance = new fabric.Image(imageElement, style);
         this.canvas.add(imgInstance);
         imgInstance.selectable = selectable;
         return imgInstance
     }
     addVideo(videoEl, style, selectable = true) {
+        style = Object.assign(style || {}, {
+            lockMovementX: true,
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+        });
         // console.log(videoEl)
         let video = new fabric.Image(videoEl, style);
         this.canvas.add(video);
@@ -411,11 +487,16 @@ class Canvas {
         return this.canvas.toJSON();
     }
 
-    toDataURL(multiplier=2) {
-        return this.canvas.toDataURL({
-            format: 'png',
+    toDataURL(multiplier = 2, format = 'png') {
+        this.canvas.zoomToPoint({ x: this.x, y: this.y }, 1);
+        this.canvas.renderAll();
+        let res = this.canvas.toDataURL({
+            format: format,
             multiplier: multiplier
-        })
+        });
+        this.canvas.zoomToPoint({ x: this.x, y: this.y }, this.zoom);
+        this.canvas.renderAll();
+        return res
     }
 
 }
@@ -454,28 +535,28 @@ class Base {
 
     //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
-        if (document.querySelector("#gui-main")) {
-            let children = document.querySelector("#gui-main").children;
-            if (children.length == 0) {
-                document.querySelector("#gui-main").style.display = "none";
-                document.querySelector("#p5").style.height = '100vh';
-            } else {
-                document.querySelector("#gui-main").style.display = "flex";
-                document.querySelector("#p5").style.height = '40vh';
+            if (document.querySelector("#gui-main")) {
+                let children = document.querySelector("#gui-main").children;
+                if (children.length == 0) {
+                    document.querySelector("#gui-main").style.display = "none";
+                    document.querySelector("#p5").style.height = '100vh';
+                } else {
+                    document.querySelector("#gui-main").style.display = "flex";
+                    document.querySelector("#p5").style.height = '40vh';
+                }
             }
         }
-    }
-    //手动隐藏,显示p5.js
+        //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
+            if (document.querySelector("#p5")) {
+                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            };
+            if (document.querySelector('#gui-main')) {
+                document.querySelector('#gui-main').style.top = '0';
+                document.querySelector('#gui-main').style.height = '100vh';
+            }
         }
-    }
-    // GUI布局
+        // GUI布局
     layout(type = 'default') {
         if (typeof type === 'string') type = type.toLowerCase();
         let g = document.querySelector('#gui-main');
@@ -560,7 +641,7 @@ class Base {
     // 粘贴组件，开启后旋转，监听页面的粘贴事件
     createPasteIcon(eventListener, isAdd = true) {
 
-        const pasteFn = function (e) {
+        const pasteFn = function(e) {
             // console.log(e)
             let img = clipboard.readImage();
             if (!img.isEmpty() && eventListener) eventListener(clipboard.readImage().toDataURL());
@@ -627,7 +708,7 @@ class Base {
         div.addEventListener('click', () => input.click());
 
         // 设置placeholder
-        div.setPlaceholder = function (value) {
+        div.setPlaceholder = function(value) {
 
             if (fileExt === 'image' && value) {
                 div.className = 'input-image';
@@ -749,59 +830,59 @@ class Base {
      * @param {*} isAdd 
      */
     createTextCanvas(txt, style, isAdd = true) {
-        let canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d');
-        canvas.className = 'text_canvas';
+            let canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d');
+            canvas.className = 'text_canvas';
 
-        let { fontSize, color, fontFamily } = style;
-        fontSize = fontSize || 12;
-        color = color || 'black';
-        fontFamily = fontFamily || 'monospace';
+            let { fontSize, color, fontFamily } = style;
+            fontSize = fontSize || 12;
+            color = color || 'black';
+            fontFamily = fontFamily || 'monospace';
 
-        // 导出图片
-        canvas.toDataURL = function (width = 300) {
-            let base64, height;
-            if (canvas.width > width) {
-                let nc = document.createElement('canvas'),
-                    nctx = nc.getContext('2d');
-                nc.width = width;
-                nc.height = parseInt(canvas.height * width / canvas.width) + 1;
-                nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
-                base64 = nc.toDataURL('image/png');
-                height = nc.height;
-            } else {
-                base64 = canvas.toDataURL('image/png');
-                height = canvas.height;
+            // 导出图片
+            canvas.toDataURL = function(width = 300) {
+                let base64, height;
+                if (canvas.width > width) {
+                    let nc = document.createElement('canvas'),
+                        nctx = nc.getContext('2d');
+                    nc.width = width;
+                    nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+                    nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+                    base64 = nc.toDataURL('image/png');
+                    height = nc.height;
+                } else {
+                    base64 = canvas.toDataURL('image/png');
+                    height = canvas.height;
+                };
+                return base64
+            }
+            canvas.update = function(textNew) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let x = 2;
+                ctx.font = `${fontSize * x}px ${fontFamily}`;
+                let font = ctx.measureText(textNew);
+                canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+                canvas.width = (font.width) + 10;
+
+                ctx.fillStyle = color;
+                ctx.textAlign = "start";
+                ctx.textBaseline = "top";
+                ctx.font = `${fontSize * x}px ${fontFamily}`;
+                ctx.fillText(textNew, 5, 10);
             };
-            return base64
+
+            canvas.update(txt);
+
+            if (isAdd) this.add(canvas);
+
+            return canvas
         }
-        canvas.update = function (textNew) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let x = 2;
-            ctx.font = `${fontSize * x}px ${fontFamily}`;
-            let font = ctx.measureText(textNew);
-            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
-            canvas.width = (font.width) + 10;
-
-            ctx.fillStyle = color;
-            ctx.textAlign = "start";
-            ctx.textBaseline = "top";
-            ctx.font = `${fontSize * x}px ${fontFamily}`;
-            ctx.fillText(textNew, 5, 10);
-        };
-
-        canvas.update(txt);
-
-        if (isAdd) this.add(canvas);
-
-        return canvas
-    }
-    //创建图片，根据url返回图片dom
+        //创建图片，根据url返回图片dom
     createImage(url, isAdd = false) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = url;
-            _img.onload = function () {
+            _img.onload = function() {
                 if (isAdd) this.add(_img);
                 resolve(_img);
             }
@@ -838,51 +919,51 @@ class Base {
 
     //原生的视频、音频、图片本地打开
     createShortVideoInput() {
-        // console.log(this)
-        let filePaths = dialog.showOpenDialogSync({
-            title: "打开……",
-            properties: ['openFile'],
-            filters: [
-                { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
-            ]
-        });
+            // console.log(this)
+            let filePaths = dialog.showOpenDialogSync({
+                title: "打开……",
+                properties: ['openFile'],
+                filters: [
+                    { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
+                ]
+            });
 
-        let type = null;
-        if (filePaths && filePaths[0]) {
-            var count = Array.from(['mov', 'avi', 'mp4'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-            if (count.length > 0) type = "video";
-            count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-            if (count.length > 0) type = "audio";
-            count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
-            if (count.length > 0) type = "img";
+            let type = null;
+            if (filePaths && filePaths[0]) {
+                var count = Array.from(['mov', 'avi', 'mp4'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+                if (count.length > 0) type = "video";
+                count = Array.from(['mp3'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+                if (count.length > 0) type = "audio";
+                count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => filePaths[0].match(t) ? 1 : null).filter(f => f);
+                if (count.length > 0) type = "img";
+            }
+            return filePaths && filePaths[0] ? {
+                type: type,
+                url: filePaths[0]
+            } : null;
         }
-        return filePaths && filePaths[0] ? {
-            type: type,
-            url: filePaths[0]
-        } : null;
-    }
-    // 
-    // canvasToURL() {
-    //     let canvas = this.createBaseCanvas(im.naturalWidth, im.naturalHeight);
-    //     let ctx = canvas.getContext('2d');
-    //     ctx.drawImage(im, 0, 0);
-    //     canvas.toBlob(blob => {
-    //         let nurl = URL.createObjectURL(blob);
-    //         this.createImage(nurl).then(nim => {
-    //             //URL.revokeObjectURL(nurl);
-    //             resolve(nim)
-    //         });
-    //     });
-    // }
+        // 
+        // canvasToURL() {
+        //     let canvas = this.createBaseCanvas(im.naturalWidth, im.naturalHeight);
+        //     let ctx = canvas.getContext('2d');
+        //     ctx.drawImage(im, 0, 0);
+        //     canvas.toBlob(blob => {
+        //         let nurl = URL.createObjectURL(blob);
+        //         this.createImage(nurl).then(nim => {
+        //             //URL.revokeObjectURL(nurl);
+        //             resolve(nim)
+        //         });
+        //     });
+        // }
 
     //随机来张图片
     randomPic(w = 200, h = 200, isAdd = false) {
-        this.randomPicNum++;
-        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-        return this.createImage(url, isAdd);
-    }
-    //随机来一句话
-    randomText() { }
+            this.randomPicNum++;
+            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+            return this.createImage(url, isAdd);
+        }
+        //随机来一句话
+    randomText() {}
 
     // toast
 
@@ -896,9 +977,9 @@ class Knn {
 
     // 统计各标签的样本数
     count() {
-        return this.knn.getClassExampleCount();
-    }
-    // 其他标签的样本数控制为最小的样本数
+            return this.knn.getClassExampleCount();
+        }
+        // 其他标签的样本数控制为最小的样本数
     async minDataset() {
         let c = this.count();
         let min = null;
@@ -925,18 +1006,18 @@ class Knn {
     }
 
     train(tensors = [], classNames = []) {
-        for (let index = 0; index < tensors.length; index++) {
-            const t = tensors[index];
-            this.add(t, classNames[index]);
+            for (let index = 0; index < tensors.length; index++) {
+                const t = tensors[index];
+                this.add(t, classNames[index]);
+            }
         }
-    }
-    // 图片转tensor
-    // img2tensor(img){
-    //     if (!(img instanceof tf.Tensor)) {
-    //         img = tf.browser.fromPixels(img);
-    //     }
-    //     return img
-    // }
+        // 图片转tensor
+        // img2tensor(img){
+        //     if (!(img instanceof tf.Tensor)) {
+        //         img = tf.browser.fromPixels(img);
+        //     }
+        //     return img
+        // }
     async predict(tensor, topk = null) {
         if (Object.keys(this.count()).length === 0) return;
         if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
@@ -958,7 +1039,7 @@ class Knn {
             return false
         }
     }
-    export() {
+    export () {
         let dataset = this.knn.getClassifierDataset();
         var datasetObj = {};
         Object.keys(dataset).forEach((key) => {
@@ -973,15 +1054,15 @@ class Knn {
         });
 
         let jsonModel = JSON.stringify(datasetObj)
-        //localStorage.setItem("easyteach_model",jsonModel);
+            //localStorage.setItem("easyteach_model",jsonModel);
         return jsonModel;
     }
     // 缓存模型
     save(key) {
-        let store = new Store(`knn_${key}`);
-        store.set((new Date()).getTime().toString(), this.export());
-    }
-    // 从缓存加载模型 
+            let store = new Store(`knn_${key}`);
+            store.set((new Date()).getTime().toString(), this.export());
+        }
+        // 从缓存加载模型 
     async loadFromStore(key) {
         let store = new Store(`knn_${key}`);
         let ms = await store.getValues();
@@ -1001,11 +1082,11 @@ class Knn {
  */
 class AI {
     constructor() {
-        // 预训练模型
-        this.Mobilenet = Mobilenet;
+            // 预训练模型
+            this.Mobilenet = Mobilenet;
 
-    }
-    // 裁切p5的画布，用于下载
+        }
+        // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
         let scale = _canvas.canvas.width / _canvas.width;
         let canvas = document.createElement("canvas");
@@ -1031,11 +1112,11 @@ class AI {
 
     // rgb转字符串
     colorStr(c = [0, 0, 0]) {
-        // console.log(c)
-        return `rgb(${c.join(',')})`;
-    }
-    // 计算主色
-    // mainColor
+            // console.log(c)
+            return `rgb(${c.join(',')})`;
+        }
+        // 计算主色
+        // mainColor
     getColor(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
@@ -1074,7 +1155,7 @@ class AI {
                     c => p5.instance.color(this.colorStr(c)));
                 resolve(_img);
             } else {
-                _im.addEventListener('load', function () {
+                _im.addEventListener('load', function() {
                     _img.colorPalette = Array.from(
                         colorThief.getPalette(_im),
                         c => p5.instance.color(this.colorStr(c)));
@@ -1095,9 +1176,9 @@ class AI {
         _img.faces = [];
 
         return new Promise((resolve, reject) => {
-            faceDetector.detect(_im).then(function (faces) {
+            faceDetector.detect(_im).then(function(faces) {
                 console.log(`人脸检测`, faces)
-                faces.forEach(function (item) {
+                faces.forEach(function(item) {
                     _img.faces.push({
                         x: parseInt(item.boundingBox.x),
                         y: parseInt(item.boundingBox.y),
@@ -1106,7 +1187,7 @@ class AI {
                     });
                 });
                 resolve(_img)
-            }).catch(function (err) {
+            }).catch(function(err) {
                 console.log("err", err);
                 reject(err);
             });
@@ -1157,40 +1238,40 @@ class Mobilenet {
         return this.savePath;
     }
     async init() {
-        if (!this.mobilenetModel) {
-            try {
-                this.mobilenetModel = await mobilenet.load(Object.assign(this.opts, {
-                    modelUrl: this.savePath
-                }));
-                console.log('Prediction from loaded model:');
-            } catch (error) {
-                this.mobilenetModel = await mobilenet.load(this.opts);
-                this.mobilenetModel.model.save(this.savePath).then(console.log);
-            };
-        }
+            if (!this.mobilenetModel) {
+                try {
+                    this.mobilenetModel = await mobilenet.load(Object.assign(this.opts, {
+                        modelUrl: this.savePath
+                    }));
+                    console.log('Prediction from loaded model:');
+                } catch (error) {
+                    this.mobilenetModel = await mobilenet.load(this.opts);
+                    this.mobilenetModel.model.save(this.savePath).then(console.log);
+                };
+            }
 
-        // Warmup the model.
-        const result = tf.tidy(
-            () => this.mobilenetModel.infer(tf.zeros(
-                [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), true));
-        // result.print();
-        await result.data();
-        result.dispose();
-    }
-    /**
-     * 
-     * @param {tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} img 
-     * @param {number} topk 
-     */
+            // Warmup the model.
+            const result = tf.tidy(
+                () => this.mobilenetModel.infer(tf.zeros(
+                    [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), true));
+            // result.print();
+            await result.data();
+            result.dispose();
+        }
+        /**
+         * 
+         * @param {tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} img 
+         * @param {number} topk 
+         */
     classify(img = tf.zeros(
-        [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), topk = 5) {
-        return this.mobilenetModel.classify(img, topk);
-    }
-    /**
-     * 
-     * @param {*} img 
-     * @param {*} embedding 
-     */
+            [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), topk = 5) {
+            return this.mobilenetModel.classify(img, topk);
+        }
+        /**
+         * 
+         * @param {*} img 
+         * @param {*} embedding 
+         */
     infer(img = tf.zeros(
         [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), embedding = true) {
         return this.mobilenetModel.infer(

@@ -29,6 +29,14 @@ global._DEBUG_PORT = 3000;
 app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
 app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
 
+// app.commandLine.appendSwitch(
+// 	"js-flags",
+// 	// WebAssembly flags
+// 	"--experimental-wasm-threads --experimental-wasm-bulk-memory"
+// );
+// app.allowRendererProcessReuse = true; // https://github.com/electron/electron/issues/18397
+
+
 const config = {
     mainWindow: {
         width: 800,

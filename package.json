@@ -34,6 +34,7 @@
         "@tensorflow-models/knn-classifier": "^1.2.2",
         "@tensorflow-models/mobilenet": "^2.0.4",
         "@tensorflow/tfjs": "^3.0.0",
+        "@tensorflow/tfjs-converter": "^2.8.6",
         "about-window": "^1.13.4",
         "blockly": "^4.20201217.0",
         "color": "^3.1.3",
