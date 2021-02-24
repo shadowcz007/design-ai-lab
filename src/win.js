@@ -112,13 +112,13 @@ class Win {
     checkTime(){
         let previewWindow = this.get(1);
         let n=window.performance.now();
-        if(Math.abs(n-this.executeJSNow)<1000){
+        if(Math.abs(n-this.executeJSNow)<1500){
             // 间隔较短
             console.log("间隔较短")
             previewWindow.setTitle("输入ing");
             setTimeout(()=>{
                 this.checkTime(n);
-            },1000);
+            },1500);
         }else{
             console.log("间隔时间可以")
             previewWindow.setTitle("更新ing");
