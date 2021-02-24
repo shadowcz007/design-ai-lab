@@ -15,7 +15,7 @@ const db = require('./db');
 const Log = require('./log');
 const Layout = require('./layout');
 
-window.Win = Win;
+// window.Win = Win;
 // window.Editor=Editor;
 
 const _package = remote.getGlobal('_PACKAGE');
@@ -281,13 +281,13 @@ class GUI {
         document.getElementById("frame").style.height = "100%";
         Win.get(1).closeDevTools();
     }
-    openDevTool() {
+    openDevTool(inner = true) {
         const devtoolsView = document.getElementById("devtools");
         Win.get(1).openDevTools({
-            activate: false,
+            activate: inner,
             mode: 'undocked'
         });
-
+        if (inner == true) return;
         const port = remote.getGlobal('_DEBUG_PORT');
         fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
             res => {
