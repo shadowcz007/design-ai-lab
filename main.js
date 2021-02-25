@@ -48,7 +48,8 @@ const config = {
         show: true,
         closable: true,
         resizable: true,
-        titleBarStyle: "default",
+        // titleBarStyle: "default",
+        titleBarStyle: "hidden", 
         html: _INDEX_HTML
     },
     previewWindow: {

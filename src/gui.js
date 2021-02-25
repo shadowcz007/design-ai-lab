@@ -1,11 +1,8 @@
 const { remote } = require("electron");
-
 const storage = require('electron-json-storage');
-
 const fs = require("fs"),
     path = require("path");
 const timeago = require('timeago.js');
-
 const Resizer = require('resizer-cl');
 
 const Knowledge = require("./knowledge");
@@ -19,7 +16,6 @@ const Layout = require('./layout');
 // window.Editor=Editor;
 
 const _package = remote.getGlobal('_PACKAGE');
-
 
 /**
  * GUI界面
@@ -74,11 +70,10 @@ class GUI {
          * dev tool
          */
 
-
-
-
-
-
+        //主界面提示
+        this.info=document.querySelector('#info');
+         
+        
     }
 
     //生成注入的js代码
@@ -184,7 +179,7 @@ class GUI {
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function(error) {
+        storage.set('app', obj, function (error) {
             if (error) throw error;
         });
     }
@@ -425,13 +420,13 @@ class GUI {
     }
 
     previewStatus() {
-            //预览状态
-            // console.log("预览状态")
-            this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-            Layout.init();
-        }
-        //编辑状态切换
+        //预览状态
+        // console.log("预览状态")
+        this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+        Layout.init();
+    }
+    //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -460,11 +455,12 @@ class GUI {
     backup() {
         this.getSaveFileContent().then(res => {
             db.add(res);
-            remote.dialog.showMessageBox({
-                type: 'info',
-                message: '已备份',
-                buttons: ['好的']
-            });
+            this.info.innerText='已备份';
+            // remote.dialog.showMessageBox({
+            //     type: 'info',
+            //     message: '已备份',
+            //     buttons: ['好的']
+            // });
         });
     }
 
@@ -503,7 +499,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -545,7 +541,7 @@ class GUI {
 
         //读取版本信息等
         let keywords = document.createElement('p');
-        keywords.innerHTML = `关键词:${Array.from(_package.keywords,k=>'<span>'+k+'</span>').join('')}`
+        keywords.innerHTML = `关键词:${Array.from(_package.keywords, k => '<span>' + k + '</span>').join('')}`
         let version = document.createElement('p');
         version.innerText = `版本 ${_package.version}`;
 
@@ -671,11 +667,11 @@ class GUI {
     }
 
     createElement(className, type = 'div') {
-            let div = document.createElement(type);
-            div.className = className;
-            return div
-        }
-        //创建卡片
+        let div = document.createElement(type);
+        div.className = className;
+        return div
+    }
+    //创建卡片
     createCard(data, isCanClose = false) {
         let div = this.createElement("card");
         let card = this.createElement("card-body");
@@ -692,7 +688,7 @@ class GUI {
         readme.innerHTML = Knowledge.marked(data.knowledge.readme);
         readme.innerText = readme.innerText;
         t.innerHTML = data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : "";
-        version.innerHTML = `代码量 ${data.code_length}<br>版本 ${data.version} ${((db.id(_package)===data.package_id)?'<i class="far fa-check-circle"></i>':'<i class="fas fa-ban"></i>')}`;
+        version.innerHTML = `代码量 ${data.code_length}<br>版本 ${data.version} ${((db.id(_package) === data.package_id) ? '<i class="far fa-check-circle"></i>' : '<i class="fas fa-ban"></i>')}`;
         close.innerHTML = '<i class="fas fa-times"></i>';
 
 

@@ -132,11 +132,13 @@ button {
     /* border-radius: 14px; */
     outline: none;
     background-color: #444857;
+    
 }
 
 button:hover {
     background-color: #5a6074;
     color: white;
+    cursor: pointer;
 }
 
 .button-active{

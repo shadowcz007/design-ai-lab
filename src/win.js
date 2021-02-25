@@ -114,16 +114,18 @@ class Win {
         let n=window.performance.now();
         if(Math.abs(n-this.executeJSNow)<1500){
             // 间隔较短
-            console.log("间隔较短")
+            // console.log("间隔较短")
             previewWindow.setTitle("输入ing");
             setTimeout(()=>{
                 this.checkTime(n);
             },1500);
         }else{
-            console.log("间隔时间可以")
+            // console.log("间隔时间可以")
             previewWindow.setTitle("更新ing");
             this.show(1, true);
-            if(!previewWindow.webContents.isLoading()) previewWindow.webContents.reload();
+            if(!previewWindow.webContents.isLoading()) {
+                previewWindow.webContents.reload()
+            };
         }
     }
         //注入代码
