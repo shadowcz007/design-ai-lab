@@ -17,7 +17,9 @@
 
 - 海报合成工具
 
+- 视频合成工具
 
+- 图像处理实验
 
 
 **Clone and run for a quick way to see Electron in action.**
@@ -47,27 +49,18 @@ npm install
 npm start
 ```
 
-## AI功能
-
-在main.js中开启AI功能：
-
-```javascript
-app.commandLine.appendSwitch('enable-experimental-web-platform-features');
-```
 
 ## 感谢以下开源项目
-
-[@ffmpeg-installer/ffmpeg]()
 
 [@tensorflow/tfjs 3.0.0]()
 
 [@fortawesome/fontawesome-free]()
 
-[@tensorflow-models/body-pix]()
-
 [opencvjs-dist 4.4.0]()
 
 [fabric]()
+
+[@ffmpeg-installer/ffmpeg]()
 
 [idb-kv-store](https://www.npmjs.com/package/idb-kv-store)
 
