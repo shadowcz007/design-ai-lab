@@ -7,8 +7,11 @@ const fs = require("fs"),
 
 // const Jimp = require('jimp');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 const ffmpeg = require('fluent-ffmpeg');
+
 ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 const { remote } = require("electron");
 const dialog = remote.dialog;

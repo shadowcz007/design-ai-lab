@@ -41,10 +41,14 @@ class Store {
         this.key = key;
     }
     set(id, data) {
-        id = id || (new Date()).getTime().toString();
-        this.db.set(id, data, (err) => {
-            if (err) throw err
+        return new Promise((resolve, reject) => {
+            id = id || (new Date()).getTime().toString();
+            this.db.set(id, data, (err) => {
+                if (err) reject(err);
+                resolve(true);
+            });
         });
+
     }
     getJson() {
         return new Promise((resolve, reject) => {
@@ -172,7 +176,7 @@ class Clipboard {
         );
 
         if (data && this.clipboardListenerData != id) {
-            if (fn) fn(type == 'img' && data ? data.toDataURL() : data);
+            if (fn) fn((type == 'img' && data ? data.toDataURL() : data), id);
             this.clipboardListenerData = id;
             if (type == 'img' && data) {
                 let resizeImg = data.resize({ height: 18 });
@@ -200,10 +204,42 @@ class Shape {
         this.store = new Store('my_shape');
     }
 
+    // 
+    findContoursForImgsBatch(imgs = []) {
+        let res = [];
+        for (const im of imgs) {
+            let cs = this.findContoursForImg(im);
+            res.push(cs);
+        };
+        return res
+    };
+
+
+    // 
+    findContoursForImg(im) {
+        let {
+            src,
+            dst
+        } = this.initProcess(im);
+        // 灰度
+        cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
+        let { contours, hierarchy } = this.findContours(dst);
+        let cs = this.contoursSave(contours);
+        dst.delete();
+        src.delete();
+        contours.delete();
+        hierarchy.delete();
+        return cs
+    }
+
     // 初始化
     initProcess(img) {
         //创建画布
-        let canvas = Lab.base.createCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height, 'myCanvas', '', false);
+
+        let canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+
         let src = cv.imread(img);
         // 空的
         // let dst = new cv.Mat();
@@ -248,40 +284,10 @@ class Shape {
             return { contours, hierarchy };
         }
         //  比较两个轮廓
-    matchShape(img1, img2) {
-            // 初始化
-            let { src: src1 } = initProcess(img1);
-            // 灰度
-            src1 = rgb2gray(src1);
-            // 轮廓
-            let { contours: c1 } = findContours(src1);
-
-            // 使用凸包来匹配计算
-            // 凸包
-            // let tmp1 = new cv.Mat();
-            // cv.convexHull(c1.get(0), tmp1, false, true);
-            // console.log(contoursSave(c1))
-
-            // 初始化
-            let { src: src2 } = initProcess(img2);
-            // 灰度
-            src2 = rgb2gray(src2);
-            // 轮廓
-            let { contours: c2 } = findContours(src2);
-            // 使用凸包来匹配计算
-            // 凸包
-            // let tmp2 = new cv.Mat();
-            // cv.convexHull(c2.get(0), tmp2, false, true);
-
-            let result = cv.matchShapes(c1.get(0), c2.get(0), 1, 0);
-
-            src1.delete();
-            src2.delete();
-            c1.delete();
-            c2.delete();
-            // tmp1.delete();
-            // tmp2.delete();
-
+    matchShape(contours1, contours2) {
+            let result = cv.matchShapes(contours1.get(0), contours2.get(0), 1, 0);
+            // contours1.delete();
+            // contours2.delete();
             return result;
         }
         // 保存
@@ -473,7 +479,10 @@ class Canvas {
         this.render();
         return video
     }
-    resizeImage(imageElement, left, top, width, height, type = 0) {
+
+    addAndResizeImage(imageElement, style, type = 0, selectable = true) {
+        style = {...style };
+        let { left, top, width, height } = style;
         // type 类型
         // 宽度缩放对齐
         // 0 垂直居中
@@ -500,8 +509,38 @@ class Canvas {
         }
 
         if (type === 0) {
-            th > height ? 0 : 0
-        }
+            top += (th - height) / 2;
+        } else if (type === 2) {
+            top = top + th - height;
+        } else if (type === 3) {
+            // left
+            left += (tw - width) / 2;
+        } else if (type === 5) {
+            // left
+            left = left + tw - width;
+        };
+
+        style = Object.assign(style, {
+            left,
+            top,
+            nw,
+            nh
+        });
+
+        let img = new fabric.Image(imageElement, {
+            left,
+            top,
+            width: nw,
+            height: nh
+        });
+
+        img.scaleToHeight(height);
+        img.scaleToWidth(width);
+        this.canvas.add(img);
+        this.render(false);
+
+        return
+
     }
     render(animate = true) {
         this.canvas.renderAll();
@@ -676,7 +715,10 @@ class Base {
         }
     }
 
-    //当没有子元素的时候，隐藏，有则开启
+    clear() {
+            document.querySelector("#gui-main").innerHTML = "";
+        }
+        //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
             if (document.querySelector("#gui-main")) {
                 let children = document.querySelector("#gui-main").children;
@@ -775,6 +817,7 @@ class Base {
             'light': '<i class="far fa-lightbulb"></i>',
             'square': '<i class="fas fa-vector-square"></i>',
             'link': '<i class="fas fa-link"></i>',
+            'comment': '<i class="far fa-comment-dots"></i>',
             'music': '<i class="fas fa-music"></i>',
             'save': '<i class="fas fa-save"></i>'
         };
@@ -1269,6 +1312,8 @@ class AI {
             // 预训练模型
             this.Mobilenet = Mobilenet;
 
+            // 轮廓
+            this.shape = new Shape();
         }
         // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
@@ -1424,13 +1469,15 @@ class Mobilenet {
     async init() {
             if (!this.mobilenetModel) {
                 try {
-                    this.mobilenetModel = await mobilenet.load(Object.assign(this.opts, {
-                        modelUrl: this.savePath
-                    }));
+                    this.mobilenetModel = await mobilenet.load(
+                        Object.assign({...this.opts }, {
+                            modelUrl: this.savePath
+                        }));
                     console.log('Prediction from loaded model:');
                 } catch (error) {
                     this.mobilenetModel = await mobilenet.load(this.opts);
                     this.mobilenetModel.model.save(this.savePath).then(console.log);
+                    console.log(error);
                 };
             }
 
@@ -1458,7 +1505,7 @@ class Mobilenet {
          */
     infer(img = tf.zeros(
         [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), embedding = true) {
-        return this.mobilenetModel.infer(
+        if (this.mobilenetModel) return this.mobilenetModel.infer(
             img,
             embedding
         )

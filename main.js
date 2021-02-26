@@ -49,7 +49,7 @@ const config = {
         closable: true,
         resizable: true,
         // titleBarStyle: "default",
-        titleBarStyle: "hidden", 
+        titleBarStyle: "hidden",
         html: _INDEX_HTML
     },
     previewWindow: {
@@ -322,8 +322,12 @@ function initMenu() {
             label: '窗口',
             role: 'window',
             submenu: [{
+                label: '调试',
+                // accelerator: 'CmdOrCtrl+M',
+                click: () => global._WINS.mainWindow.webContents.send('open-devtools')
+            }, {
                 label: '最小化',
-                accelerator: 'CmdOrCtrl+M',
+                // accelerator: 'CmdOrCtrl+M',
                 role: 'minimize'
             }]
         },
