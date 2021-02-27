@@ -24,7 +24,11 @@ const dialog = remote.dialog;
 
 
 class FF {
-    constructor() {}
+    constructor(newDirname) {
+        // newDirname 新的导出路径 ，当设置的时候，将把文件导出到这个路径
+        this.newDirname = newDirname || null;
+
+    }
 
     // 创建导出的文件路径
     /**
@@ -32,6 +36,7 @@ class FF {
      * @param {*} inputPath 
      * @param {*} type 
      * @param {*} hardExtname 
+     * 
      * createOutputPath('/xxxx/test/one.png','test','.mp4')
         {
             basename: "one.png"
@@ -42,7 +47,7 @@ class FF {
      */
     createOutputPath(inputPath, type = 'resize', hardExtname = '.mp4') {
         if (inputPath) {
-            let dirname = path.dirname(inputPath),
+            let dirname = this.newDirname || path.dirname(inputPath),
                 basename = path.basename(inputPath),
                 extname = path.extname(inputPath);
             return {
@@ -376,7 +381,7 @@ class FF {
     frames2video(filePath, size, aspect) {
         return new Promise((resolve, reject) => {
 
-            let { output, dirname, basename } = this.createOutputPath(filePath, 'output', '.mp4');
+            let { output } = this.createOutputPath(filePath, 'output', '.mp4');
 
             let input = this.framesRename(filePath);
 

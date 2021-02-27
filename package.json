@@ -61,6 +61,7 @@
         "p5": "^1.2.0",
         "p5.createloop": "^0.2.8",
         "pdfjs-dist": "^2.6.347",
+        "recordrtc": "^5.6.1",
         "resizer-cl": "^2.4.0",
         "sweetalert2": "^10.15.4",
         "timeago.js": "^4.0.2"

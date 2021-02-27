@@ -2,6 +2,7 @@
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 
+
 const _APPICON = remote.getGlobal('_APPICON');
 //当窗口focus的时候，需要运行的函数
 let focusEvents = {};
@@ -24,10 +25,20 @@ const IdbKvStore = require('idb-kv-store');
 const colorThief = new(require('colorthief/dist/color-thief.umd'))();
 const Color = require('color');
 const _GIF = require('gif.js/dist/gif');
+const RecordRTC = require('recordrtc/RecordRTC');
 
 const ffmpeg = require('./ffmpeg');
-const { fstat } = require('fs');
-
+ffmpeg.recordCanvas = async function(canvas, time = 3000) {
+    let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(), {
+        type: 'video'
+    });
+    recorder.startRecording();
+    const sleep = m => new Promise(r => setTimeout(r, m));
+    await sleep(time);
+    await recorder.stopRecording();
+    let url = await recorder.getDataURL();
+    return url;
+}
 
 /**
  * 存储到idb
@@ -1131,6 +1142,17 @@ class Base {
                 resolve(v);
             }
         });
+    }
+
+    getFilePath(type = 0) {
+        let properties = ['openFile', 'openDirectory'];
+        if (type == 1) properties = ['openFile'];
+        if (type == 2) properties = ['openDirectory'];
+        let filePaths = dialog.showOpenDialogSync({
+            title: "设置……",
+            properties: properties
+        });
+        return filePaths
     }
 
     //原生的视频、音频、图片本地打开
