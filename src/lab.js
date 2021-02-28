@@ -29,8 +29,12 @@ const RecordRTC = require('recordrtc/RecordRTC');
 
 const ffmpeg = require('./ffmpeg');
 ffmpeg.recordCanvas = async function(canvas, time = 3000) {
-    let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(), {
-        type: 'video'
+    let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(12), {
+        type: 'gif',
+        frameRate: 12,
+        quality: 8,
+        width: canvas.width,
+        height: canvas.height,
     });
     recorder.startRecording();
     const sleep = m => new Promise(r => setTimeout(r, m));

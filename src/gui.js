@@ -183,6 +183,11 @@ class GUI {
             if (error) throw error;
         });
     }
+    loadWindowStatus() {
+        storage.get('app', function(error, data) {
+            console.log('storage', data)
+        })
+    }
 
     //默认读取examples的地址
     setupExampleFilePath() {
@@ -524,8 +529,8 @@ class GUI {
                     }]);
 
                 });
+                this.saveWindowsStatus(1);
             };
-
         });
 
     }
@@ -632,6 +637,7 @@ class GUI {
 
     //打开编程功能
     openPractice(mShow = true, pShow = true) {
+        this.loadWindowStatus();
         Win.showWinControl(mShow, pShow);
         let previewWindow = Win.get(1),
             mainWindow = Win.get(0);
