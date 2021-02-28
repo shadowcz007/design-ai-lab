@@ -112,7 +112,7 @@ class GUI {
          */
         this.practiceBtn = document.querySelector("#practice-btn");
         // this.logdBtn = document.querySelector("#log-btn");
-        this.devBtn = document.querySelector("#devtool-btn");
+        // this.devBtn = document.querySelector("#devtool-btn");
 
         /**
          * 欢迎页面
@@ -132,18 +132,18 @@ class GUI {
         //实时编辑代码
         this.addClickEventListener(this.practiceBtn, () => this.practiceFn());
         //调试界面打开
-        this.addClickEventListener(this.devBtn, () => {
-            // Win.get(1).devToolsWebContents.isDestroyed()
-            if (Win.get(1).devToolsWebContents == null || (Win.get(1).devToolsWebContents && Win.get(1).devToolsWebContents.isDestroyed())) {
-                this.openDevTool();
-                this.devBtn.classList.add('button-active');
-                // this.devOpen = true;
-            } else {
-                this.closeDevTool();
-                this.devBtn.classList.remove('button-active');
-                // this.devOpen = false;
-            }
-        });
+        // this.addClickEventListener(this.devBtn, () => {
+        //     // Win.get(1).devToolsWebContents.isDestroyed()
+        //     if (Win.get(1).devToolsWebContents == null || (Win.get(1).devToolsWebContents && Win.get(1).devToolsWebContents.isDestroyed())) {
+        //         this.openDevTool();
+        //         this.devBtn.classList.add('button-active');
+        //         // this.devOpen = true;
+        //     } else {
+        //         this.closeDevTool();
+        //         this.devBtn.classList.remove('button-active');
+        //         // this.devOpen = false;
+        //     }
+        // });
         //设置路径
         this.addClickEventListener(this.setupBtn, () => this.setupExampleFilePath());
         //我的

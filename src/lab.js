@@ -28,10 +28,10 @@ const _GIF = require('gif.js/dist/gif');
 const RecordRTC = require('recordrtc/RecordRTC');
 
 const ffmpeg = require('./ffmpeg');
-ffmpeg.recordCanvas = async function(canvas, time = 3000) {
-    let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(12), {
+ffmpeg.recordCanvas = async function(canvas, time = 3000, frameRate = 24) {
+    let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(frameRate), {
         type: 'gif',
-        frameRate: 12,
+        frameRate: frameRate,
         quality: 8,
         width: canvas.width,
         height: canvas.height,
