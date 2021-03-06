@@ -271,18 +271,19 @@ class Editor {
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '文本检测'
                         }, {
-                            label: 'Lab.video.createShortVideoInput()',
+                            label: 'Lab.base.createShortVideoInput()',
                             kind: 1,
-                            insertText: 'Lab.video.createShortVideoInput()',
+                            insertText: 'Lab.base.createShortVideoInput()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                            detail: '从本地打开视频'
-                        }, {
-                            label: 'Lab.video.createShortVideoFromLocal()',
-                            kind: 1,
-                            insertText: 'Lab.video.createShortVideoFromLocal()',
-                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                            detail: '短视频合成从本地'
-                        }
+                            detail: '从本地读取视频素材路径'
+                        }, 
+                        // {
+                        //     label: 'Lab.video.createShortVideoFromLocal()',
+                        //     kind: 1,
+                        //     insertText: 'Lab.video.createShortVideoFromLocal()',
+                        //     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        //     detail: '短视频合成从本地'
+                        // }
                     ];
 
                     //p5内部常用
