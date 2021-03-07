@@ -49,6 +49,11 @@ npm install
 npm start
 ```
 
+## TODO
+- 图像搜索引擎
+- 多模态
+
+
 
 ## 感谢以下开源项目
 
