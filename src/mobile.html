@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        
+        .main {
+            height: 100%;
+            background: #ffffff;
+        }
+        
+        .main .controls {
+            text-align: center;
+            padding: 0.5em 0;
+            width: 300px;
+        }
+        
+        .main video {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 99;
+            height: 100vh;
+            background: black;
+            display: none;
+        }
+        
+        .main canvas {
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .main img {
+            width: 0;
+            height: 0;
+        }
+        
+        .main button {
+            width: 56px;
+            height: 56px;
+            text-align: center;
+            padding: 0;
+            font-size: 10px;
+            background: black;
+            color: white;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            user-select: none;
+        }
+        
+        .main #select {
+            margin: 24px;
+            height: 32px;
+            user-select: none;
+            outline: none;
+        }
+        
+        .main #detect {
+            width: 50%;
+            height: 50%;
+            display: none;
+            z-index: 99999;
+            position: fixed;
+            top: 0;
+            left: 0;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            grid-gap: 10px;
+            padding: 50% 25%;
+        }
+        
+        .main #detect div {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .main #detect div div {
+            background-color: #c5ffec69;
+            width: 12px;
+            height: 12px;
+        }
+        
+        .animation {
+            animation-name: opacity;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+        }
+        
+        @keyframes opacity {
+            from {
+                background-color: #cddc39;
+            }
+            to {
+                background-color: #03a9f4;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <main class="main">
+        <div id="detect">
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+            <div>
+                <div></div>
+            </div>
+
+        </div>
+        <div class="controls">
+            <button id="button">Camera</button>
+            <select id="select"></select>
+            <!-- <button id="shot">Screen Shot</button> -->
+        </div>
+
+        <video id="video" autoplay playsinline></video>
+        <!-- <canvas id="canvas" width="180" height="320"></canvas> -->
+        <img id="img" src="" />
+    </main>
+
+    <script>
+        const video = document.querySelector(".main #video");
+        const button = document.querySelector(".main #button");
+        const select = document.querySelector(".main #select");
+        const canvas = document.querySelector(".main #canvas");
+        const img = document.querySelector(".main #img");
+        const detect = document.querySelector(".main #detect");
+
+        let currentStream;
+
+        button.addEventListener("click", (event) => {
+            if (typeof currentStream !== "undefined") {
+                stopMediaTracks(currentStream);
+            }
+            const videoConstraints = {};
+
+            videoConstraints.width = window.innerHeight;
+            videoConstraints.height = window.innerWidth;
+            video.style.display = 'flex';
+            detect.style.display = 'grid';
+            //console.log(select.value)
+            if (!select.value) {
+                videoConstraints.facingMode = "environment";
+            } else {
+                videoConstraints.deviceId = {
+                    exact: select.value
+                };
+            }
+            const constraints = {
+                video: videoConstraints,
+                audio: false,
+            };
+            navigator.mediaDevices
+                .getUserMedia(constraints)
+                .then((stream) => {
+                    currentStream = stream;
+                    video.srcObject = stream;
+                    return navigator.mediaDevices.enumerateDevices();
+                })
+                .then(gotDevices)
+                .catch((error) => {
+                    console.error(error);
+                });
+        });
+
+        //shot.addEventListener("click", screenShot);
+
+        function startDetect() {
+            let ds = document.querySelectorAll('.main #detect div div');
+            Array.from(ds, d => d.classList.add('animation'));
+        }
+
+        function stopDetect() {
+            let ds = document.querySelectorAll('.main #detect div div');
+            Array.from(ds, d => d.classList.remove('animation'));
+        }
+
+        function stopMediaTracks(stream) {
+            stream.getTracks().forEach((track) => {
+                track.stop();
+            });
+        }
+
+        function gotDevices(mediaDevices) {
+            select.innerHTML = "";
+            select.appendChild(document.createElement("option"));
+            let count = 1;
+            mediaDevices.forEach((mediaDevice) => {
+                if (mediaDevice.kind === "videoinput") {
+                    const option = document.createElement("option");
+                    option.value = mediaDevice.deviceId;
+                    const label = mediaDevice.label || `Camera ${count++}`;
+                    const textNode = document.createTextNode(label);
+                    option.appendChild(textNode);
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function screenShot() {
+            canvas.getContext("2d").drawImage(video, 0, 0, 180, 320);
+
+            img.src = canvas.toDataURL("image/png");
+        }
+
+        navigator.mediaDevices.enumerateDevices().then(gotDevices);
+    </script>
+</body>
+
+</html>

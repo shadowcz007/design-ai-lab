@@ -11,6 +11,7 @@ const Win = require("./win");
 const db = require('./db');
 const Log = require('./log');
 const Layout = require('./layout');
+const Https=require('./https');
 
 // window.Win = Win;
 // window.Editor=Editor;
@@ -113,6 +114,7 @@ class GUI {
         this.practiceBtn = document.querySelector("#practice-btn");
         // this.logdBtn = document.querySelector("#log-btn");
         // this.devBtn = document.querySelector("#devtool-btn");
+        document.querySelector('#server-url').innerText=Https.url;
 
         /**
          * 欢迎页面

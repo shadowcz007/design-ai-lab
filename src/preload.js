@@ -1,5 +1,5 @@
 // preload.js
-const { Lab, cv, Store, Canvas } = require('./lab');
+const { Lab, cv, Store, Canvas, Deeplab } = require('./lab');
 // const _setImmediate = setImmediate;
 // const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
@@ -10,6 +10,7 @@ process.once('loaded', () => {
     global.cv = cv;
     global.Store = Store;
     global.Canvas = Canvas;
+    global.Deeplab = Deeplab;
 })
 
 
