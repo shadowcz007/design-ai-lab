@@ -423,6 +423,19 @@ class FF {
         });
     }
 
+    video2gif(filePath) {
+        let { output } = this.createOutputPath(filePath, 'output', '.gif');
+        return new Promise((resolve, reject) => {
+            ffmpeg(filePath)
+                .outputOption("-vf", "scale=320:-1:flags=lanczos,fps=15")
+                .save(output)
+                .on('end', function() {
+                    // console.log('Finished processing');
+                    resolve(output);
+                })
+        });
+    }
+
     // 
     framesRename(fileDir) {
             let files = this.sortFiles(fileDir);
