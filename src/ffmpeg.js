@@ -13,8 +13,8 @@ const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
-const { remote } = require("electron");
-const dialog = remote.dialog;
+// const { remote } = require("electron");
+// const dialog = remote.dialog;
 // const fontPath=path.join(__dirname,'../lib/zkyyt/W02.ttf');
 // // console.log(fontPath)
 // Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(font => {
@@ -25,8 +25,9 @@ const dialog = remote.dialog;
 
 class FF {
     constructor(newDirname) {
+        let args = [...arguments];
         // newDirname 新的导出路径 ，当设置的时候，将把文件导出到这个路径
-        this.newDirname = newDirname || null;
+        this.newDirname = newDirname || args[0] || null;
 
     }
 
@@ -93,7 +94,7 @@ class FF {
     getFileType(formatName = null) {
         if (formatName === null) return;
         if (formatName.match("image") || formatName.match('png')) return 'img';
-        if (Array.from(['mov', 'avi', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
+        if (Array.from(['mov', 'avi', 'mp4','gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
     }
 
@@ -284,12 +285,13 @@ class FF {
 
             try {
                 fs.mkdirSync(outputDir);
-            } catch (error) {}
+            } catch (error) { }
 
-            ffmpeg(input)
-                .videoFilters(`fade=in:0:${fadeIn}`)
-                .videoFilters(`fade=in:0:${fadeOut}`)
-                .videoFilters(`scale=${size}`)
+            let inp = ffmpeg(input);
+            fadeIn > 0 ? inp.videoFilters(`fade=in:0:${fadeIn}`) : null;
+            fadeOut > 0 ? inp.videoFilters(`fade=in:0:${fadeOut}`) : null
+
+            inp.videoFilters(`scale=${size}`)
                 .outputFps(fps)
                 .output(outputfile)
                 .on('progress', (progress) => {
@@ -618,33 +620,33 @@ class FF {
     }
 
     //有bug
-    testMerge() {
-        let filePaths = dialog.showOpenDialogSync({
-            title: "打开……",
-            properties: ['openFile', 'multiSelections'],
-            filters: [
-                { name: 'Videos', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpg', 'png', 'gif'] }
-            ]
-        });
-        if (filePaths) {
+    // testMerge() {
+    //     let filePaths = dialog.showOpenDialogSync({
+    //         title: "打开……",
+    //         properties: ['openFile', 'multiSelections'],
+    //         filters: [
+    //             { name: 'Videos', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpg', 'png', 'gif'] }
+    //         ]
+    //     });
+    //     if (filePaths) {
 
-            let { output, dirname } = this.createOutputPath(filePaths[0], 'test');
+    //         let { output, dirname } = this.createOutputPath(filePaths[0], 'test');
 
-            ffmpeg(filePaths[0])
-                .input(filePaths[1])
-                .videoCodec('libx264')
-                .format('mp4')
-                .outputFormat('mp4')
-                .on('end', function() {
-                    console.log('files have been merged succesfully');
-                })
-                .on('error', function(err) {
-                    console.log(err);
-                })
-                .mergeToFile(output, dirname);
-        }
+    //         ffmpeg(filePaths[0])
+    //             .input(filePaths[1])
+    //             .videoCodec('libx264')
+    //             .format('mp4')
+    //             .outputFormat('mp4')
+    //             .on('end', function() {
+    //                 console.log('files have been merged succesfully');
+    //             })
+    //             .on('error', function(err) {
+    //                 console.log(err);
+    //             })
+    //             .mergeToFile(output, dirname);
+    //     }
 
-    }
+    // }
 
 }
 

@@ -1,5 +1,6 @@
 // preload.js
 const { Lab, cv, Store, Canvas, Deeplab } = require('./lab');
+const {CameraWeb}=require('./camera');
 // const _setImmediate = setImmediate;
 // const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
@@ -11,6 +12,7 @@ process.once('loaded', () => {
     global.Store = Store;
     global.Canvas = Canvas;
     global.Deeplab = Deeplab;
+    global.CameraWeb=CameraWeb;
 })
 
 

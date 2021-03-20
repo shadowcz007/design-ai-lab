@@ -30,6 +30,7 @@
         "@ffprobe-installer/ffprobe": "^1.1.0",
         "@fortawesome/fontawesome-free": "^5.15.2",
         "@hapi/hapi": "^20.1.0",
+        "@paddlejs-models/humanseg": "0.0.5",
         "@small-tech/https": "^2.1.2",
         "@tensorflow-models/body-pix": "^2.0.5",
         "@tensorflow-models/deeplab": "^0.2.1",
@@ -65,6 +66,8 @@
         "pdfjs-dist": "^2.6.347",
         "recordrtc": "^5.6.1",
         "resizer-cl": "^2.4.0",
+        "socket.io": "^4.0.0",
+        "socket.io-client": "^4.0.0",
         "sweetalert2": "^10.15.4",
         "timeago.js": "^4.0.2"
     },

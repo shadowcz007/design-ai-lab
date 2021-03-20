@@ -12,13 +12,13 @@
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
     <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
-
+    <!-- <script src="../node_modules/socket.io/client-dist/socket.io.js"></script> -->
     <style>
-         :root {
+        :root {
             --hover-color: #6399ff;
             --box-shadow: 0px 0 14px 7px lightgrey;
         }
-        
+
         body {
             padding: 0;
             margin: 0;
@@ -29,7 +29,7 @@
             justify-content: space-around;
             align-items: center;
         }
-        
+
         #p5 {
             display: flex;
             width: 100%;
@@ -41,13 +41,13 @@
             left: 0;
             top: 0;
         }
-        
+
         #p5 canvas {
             outline: 1px dashed lightgray;
             max-height: 100%;
-            width: auto!important;
+            width: auto !important;
         }
-        
+
         #gui-main {
             display: flex;
             position: fixed;
@@ -59,7 +59,7 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        
+
         #gui-main .input-image-default {
             background-position: 0 0, 5px 5px;
             background-size: 10px 10px;
@@ -75,22 +75,22 @@
             color: lightsteelblue;
             margin: 12px;
         }
-        
+
         #gui-main .input-image {
-            background-position: center!important;
-            background-size: contain!important;
-            background-repeat: no-repeat!important;
+            background-position: center !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
             width: 120px;
             height: 120px;
             border-radius: 12px;
             cursor: pointer;
             box-shadow: var(--box-shadow);
         }
-        
+
         #gui-main .input-file {
             height: 32px
         }
-        
+
         #gui-main .input-file p {
             overflow: hidden;
             height: 20px;
@@ -102,19 +102,19 @@
             font-family: inherit;
             word-break: break-word;
         }
-        
+
         #gui-main .input-image-default:hover {
-            box-shadow: var(--box-shadow)!important;
+            box-shadow: var(--box-shadow) !important;
         }
-        
+
         #gui-main .input-image:hover {
-            box-shadow: var(--box-shadow)!important;
+            box-shadow: var(--box-shadow) !important;
         }
-        
+
         #gui-main .input-text {
             width: 80%;
         }
-        
+
         #gui-main .input-text p {
             overflow: hidden;
             height: 20px;
@@ -124,12 +124,12 @@
             line-height: inherit;
             min-width: inherit;
             font-family: inherit;
-             padding-top: 16px;
+            padding-top: 16px;
             margin: 8px 0;
             color: lightsteelblue;
             word-break: break-word;
         }
-        
+
         #gui-main .input-text input {
             border-color: lightsteelblue;
             border-width: thin;
@@ -144,7 +144,7 @@
             font-size: 16px;
             color: #265b8c;
         }
-        
+
         #gui-main button {
             outline: none;
             cursor: pointer;
@@ -158,18 +158,18 @@
             color: white;
             border: none;
             border-radius: 24px;
-            width:max-content;
+            width: max-content;
         }
-        
+
         #gui-main button:hover {
-            box-shadow: var(--box-shadow)!important;
+            box-shadow: var(--box-shadow) !important;
         }
-        
+
         #gui-main .button {
             width: 40%;
             margin-top: 32px;
         }
-        
+
         #gui-main select {
             padding: 6px 8px;
             cursor: pointer;
@@ -180,12 +180,12 @@
             border-radius: 24px;
             font-weight: 300;
         }
-        
+
         #gui-main select:hover {
             border-color: var(--hover-color);
             box-shadow: var(--box-shadow);
         }
-        
+
         #gui-main input[type="color"] {
             height: 32px;
             border: 1px solid transparent;
@@ -193,13 +193,13 @@
             width: 32px;
             outline: none;
         }
-        
+
         #gui-main input[type="color"]:hover {
             border: 1px solid gray;
             border-color: var(--hover-color);
             box-shadow: var(--box-shadow);
         }
-        
+
         #gui-main p {
             font-size: 10px;
             padding: 12px;
@@ -210,35 +210,36 @@
             word-break: break-word;
         }
 
-        #gui-main .text_canvas{
+        #gui-main .text_canvas {
             max-width: 100%;
         }
 
-        #gui-main .group img{
+        #gui-main .group img {
             width: 45%;
             max-width: fit-content;
         }
-        #gui-main .video{
+
+        #gui-main .video {
             height: 240px;
             outline: none;
             max-width: 100%;
+            width: auto;
         }
-        #gui-main .audio{
+
+        #gui-main .audio {
             outline: none;
             max-width: 100%;
         }
-        #gui-main .preview-canvas{
-        width: 50%!important;
-        height: auto!important;
-        max-width: 360px!important;
-        position: inherit!important;
-        /* left: 0px; */
-        outline: 1px solid gray;
+
+        #gui-main .preview-canvas {
+            width: 50% !important;
+            height: auto !important;
+            max-width: 360px !important;
+            position: inherit !important;
+            /* left: 0px; */
+            outline: 1px solid gray;
         }
-
-
     </style>
-
 </head>
 
 <body>
