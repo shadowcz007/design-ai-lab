@@ -388,6 +388,17 @@ class Canvas {
             })
         };
 
+        // 扩充的方法 
+        // 获取缩放后的 坐标及宽高
+        fabric.Rect.prototype.getScaledBound = function() {
+            return {
+                left: this.left,
+                top: this.top,
+                width: this.getScaledWidth(),
+                height: this.getScaledHeight()
+            }
+        }
+
     }
     initStyle(x, y, zoom) {
 
@@ -448,6 +459,7 @@ class Canvas {
         rect.hasControls = hasControls;
         rect.selectable = selectable;
         rect.controls.deleteControl.visible = isCanDelete;
+
         return rect
     }
     addText(text, style, selectable = true, hasControls = true) {
@@ -842,7 +854,8 @@ class Base {
             'comment': '<i class="far fa-comment-dots"></i>',
             'music': '<i class="fas fa-music"></i>',
             'save': '<i class="fas fa-save"></i>',
-            'copy': '<i class="fas fa-copy"></i>'
+            'copy': '<i class="fas fa-copy"></i>',
+            'setup': '<i class="fas fa-cog"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;

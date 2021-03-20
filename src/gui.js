@@ -1,4 +1,4 @@
-const { remote } = require("electron");
+const { remote, clipboard } = require("electron");
 const storage = require('electron-json-storage');
 const fs = require("fs"),
     path = require("path");
@@ -11,7 +11,7 @@ const Win = require("./win");
 const db = require('./db');
 const Log = require('./log');
 const Layout = require('./layout');
-const Https=require('./https');
+const Https = require('./https');
 
 // window.Win = Win;
 // window.Editor=Editor;
@@ -114,7 +114,22 @@ class GUI {
         this.practiceBtn = document.querySelector("#practice-btn");
         // this.logdBtn = document.querySelector("#log-btn");
         // this.devBtn = document.querySelector("#devtool-btn");
-        document.querySelector('#server-url').innerText=Https.url;
+        this.qrcodeDiv = document.getElementById("qrcode");
+        this.qrcode = new QRCode(this.qrcodeDiv, {
+            text: Https.url,
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        this.addClickEventListener(document.querySelector('#server-url'), () => {
+            // clipboard.writeText(Https.url);
+            this.qrcodeDiv.setAttribute('data-url', Https.url);
+            this.qrcodeDiv.style.display = this.qrcodeDiv.style.display === 'block' ? 'none' : 'block';
+            setTimeout(() => this.qrcodeDiv.style.display = 'none', 10000);
+        });
 
         /**
          * 欢迎页面

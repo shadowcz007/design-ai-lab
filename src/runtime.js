@@ -15,11 +15,12 @@ class Runtime {
     parse(code) {
             let ast;
             // console.trace()
+            // obj={...obj} 不支持
             try {
                 ast = esprima.parse(code);
                 // console.log(ast)
             } catch (error) {
-                console.log(error)
+                console.log(error, code)
             }
 
             return ast
@@ -49,8 +50,9 @@ class Runtime {
 
     hash(code) {
         //去掉 EmptyStatement 
-        let ast = this.parse(code.trim()) || null;
+        let ast = this.parse(code.trim()) || "";
         if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
+        // console.log(hash(ast))
         return hash(ast);
     }
 

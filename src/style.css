@@ -132,7 +132,6 @@ button {
     /* border-radius: 14px; */
     outline: none;
     background-color: #444857;
-    
 }
 
 button:hover {
@@ -141,7 +140,7 @@ button:hover {
     cursor: pointer;
 }
 
-.button-active{
+.button-active {
     background-color: #14161b;
     color: #676767;
 }
@@ -174,6 +173,21 @@ button:hover {
     color: white;
     font-weight: 500;
     padding: 2px 8px;
+}
+
+#qrcode {
+    position: fixed;
+    z-index: 9999;
+    top: 12px;
+    right: 0;
+    display: none;
+    text-align: center;
+}
+
+#qrcode:after {
+    content: attr(data-url);
+    color: white;
+    font-size: 12px;
 }
 
 

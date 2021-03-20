@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
+    <script src="../lib/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -51,8 +52,9 @@
                 <div id="frame">
                     <div id="editor-container">
                         <div class="btns">
-                             <p id="server-url"><i class="fas fa-link"></i></p>
-                           <!--  <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
+                            <button id="server-url"><i class="fas fa-mobile-alt"></i></button>
+                            <div id="qrcode"></div>
+                            <!--  <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
                             <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
                             <button id="practice-btn"><i class="fas fa-sync"></i></button>
                         </div>
