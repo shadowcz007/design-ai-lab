@@ -483,7 +483,7 @@ class Canvas {
         // t.hasRotatingPoint=false;
         return t
     }
-    addImg(imageElement, style, selectable = true) {
+    addImg(imageElement, style, selectable = true, hasControls = false) {
         style = Object.assign({
                 lockMovementX: true,
                 lockRotation: true,
@@ -496,20 +496,22 @@ class Canvas {
         let imgInstance = new fabric.Image(imageElement, style);
         this.canvas.add(imgInstance);
         imgInstance.selectable = selectable;
+        imgInstance.hasControls = hasControls;
         return imgInstance
     }
-    addVideo(videoEl, style, selectable = true) {
-        style = Object.assign(style || {}, {
+    addVideo(videoEl, style, selectable = true, hasControls = false) {
+        style = Object.assign({
             lockMovementX: true,
             lockRotation: true,
             lockScalingX: true,
             lockScalingY: true,
-        });
+        }, style || {});
         delete style.type;
         // console.log(videoEl)
         let video = new fabric.Image(videoEl, style);
         this.canvas.add(video);
         video.selectable = selectable;
+        video.hasControls = hasControls;
         // console.log(video.getElement())
         video.getElement().play();
         video.getElement().setAttribute('loop', 'loop');
@@ -648,89 +650,89 @@ class Canvas {
 
     // 从gif转为sprite图
     // TODO 宽度不对
-    async buildSprite(gifUrl) {
-        let canvas_sprite = new fabric.Canvas();
-        let frames = await this.promisedGif(gifUrl);
+    // async buildSprite(gifUrl, c) {
+    //     let canvas_sprite = c || new fabric.Canvas();
+    //     let frames = await this.promisedGif(gifUrl);
 
-        return new Promise((resolve, reject) => {
-            frames.forEach((frame, i) => {
-                // console.log(frame)
-                let canvas_frame = this.imageData2canvas(
-                    new ImageData(frame.patch, frame.dims.width,
-                        frame.dims.height)
-                );
+    //     return new Promise((resolve, reject) => {
+    //         frames.forEach((frame, i) => {
+    //             // console.log(frame)
+    //             let canvas_frame = this.imageData2canvas(
+    //                 new ImageData(frame.patch, frame.dims.width,
+    //                     frame.dims.height)
+    //             );
 
-                if (frames.length > 1) {
-                    let img = new fabric.Image.fromURL(canvas_frame.toDataURL(), img => {
-                        // console.log(img)
-                        img.set('selectable', false);
-                        img.left = img.getScaledWidth() * i;
-                        // width = img.getWidth() * i + 1;
+    //             if (frames.length > 1) {
+    //                 let img = new fabric.Image.fromURL(canvas_frame.toDataURL(), img => {
+    //                     // console.log(img)
+    //                     img.set('selectable', false);
+    //                     img.left = img.getScaledWidth() * i;
+    //                     // width = img.getWidth() * i + 1;
 
-                        canvas_sprite.setHeight(img.getScaledHeight());
-                        canvas_sprite.setWidth(img.getScaledWidth() * (i + 1));
-                        canvas_sprite.add(img);
-                        canvas_sprite.renderAll();
-                        // 需要调试
+    //                     canvas_sprite.setHeight(img.getScaledHeight());
+    //                     canvas_sprite.setWidth(img.getScaledWidth() * (i + 1));
+    //                     canvas_sprite.add(img);
+    //                     canvas_sprite.renderAll();
+    //                     // 需要调试
 
-                        if (i == frames.length - 1) {
-                            let im = canvas_sprite.toDataURL('png');
-                            resolve({
-                                    img: im,
-                                    width: canvas_frame.width,
-                                    height: canvas_frame.height
-                                })
-                                // this.buildView(im, canvas_frame.width, canvas_frame.height)
-                        }
-                    });
-                } else {
-                    alert("Invalid GIF");
-                }
-            });
-        });
+    //                     if (i == frames.length - 1) {
+    //                         let im = canvas_sprite.toDataURL('png');
+    //                         resolve({
+    //                                 img: im,
+    //                                 width: canvas_frame.width,
+    //                                 height: canvas_frame.height
+    //                             })
+    //                             // this.buildView(im, canvas_frame.width, canvas_frame.height)
+    //                     }
+    //                 });
+    //             } else {
+    //                 alert("Invalid GIF");
+    //             }
+    //         });
+    //     });
 
-    }
+    // }
 
-    buildView(img, width, height) {
-        var canvas = new fabric.Canvas('merge');
-        canvas.setBackgroundColor('lightgreen');
-        canvas.setWidth(5000)
-        canvas.setHeight(5000)
+    // buildView(img, width, height) {
+    //     var canvas = new fabric.Canvas('merge');
+    //     canvas.setBackgroundColor('lightgreen');
+    //     canvas.setWidth(5000)
+    //     canvas.setHeight(5000)
 
-        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-        fabric.Object.prototype.transparentCorners = false;
+    //     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+    //     fabric.Object.prototype.transparentCorners = false;
 
-        var ratio = window.devicePixelRatio;
-        var imgData = {
-            spriteWidth: width * ratio,
-            spriteHeight: height * ratio,
-            spriteIndex: 0,
-            frameTime: 150,
-        }
+    //     var ratio = window.devicePixelRatio;
+    //     var imgData = {
+    //         spriteWidth: width * ratio,
+    //         spriteHeight: height * ratio,
+    //         spriteIndex: 0,
+    //         frameTime: 150,
+    //     }
 
-        fabric.Sprite.fromURL(img, createSprite(), imgData);
+    //     fabric.Sprite.fromURL(img, createSprite(), imgData);
 
-        function createSprite() {
-            return function(sprite) {
-                sprite.set({
-                    left: 500,
-                    top: 250,
-                });
-                canvas.add(sprite);
-                setTimeout(function() {
-                    sprite.set('dirty', true);
-                    sprite.play();
-                }, fabric.util.getRandomInt(1, 10) * 100);
-            };
-        }
+    //     function createSprite() {
+    //         return function(sprite) {
+    //             sprite.set({
+    //                 left: 500,
+    //                 top: 250,
+    //             });
+    //             canvas.add(sprite);
+    //             setTimeout(function() {
+    //                 sprite.set('dirty', true);
+    //                 sprite.play();
+    //             }, fabric.util.getRandomInt(1, 10) * 100);
+    //         };
+    //     }
 
-        (function render() {
-            canvas.renderAll();
-            fabric.util.requestAnimFrame(render);
-        })();
+    //     (function render() {
+    //         canvas.renderAll();
+    //         fabric.util.requestAnimFrame(render);
+    //     })();
 
 
-    }
+    // }
 
 }
 
