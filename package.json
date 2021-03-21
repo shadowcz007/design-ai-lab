@@ -49,6 +49,7 @@
         "fabric": "^4.3.1",
         "fluent-ffmpeg": "^2.1.2",
         "gif.js": "^0.2.0",
+        "gifuct-js": "^2.1.1",
         "idb-kv-store": "^4.5.0",
         "internal-ip": "^6.2.0",
         "jimp": "^0.16.1",

@@ -29,7 +29,11 @@ const Color = require('color');
 const _GIF = require('gif.js/dist/gif');
 const RecordRTC = require('recordrtc/RecordRTC');
 
+const { parseGIF, decompressFrames } = require('gifuct-js');
+console.log(parseGIF, decompressFrames)
+
 const ffmpeg = require('./ffmpeg');
+const { resolve } = require('path');
 ffmpeg.recordCanvas = async function(canvas, time = 3000, frameRate = 24) {
     let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(frameRate), {
         type: 'gif',
@@ -623,6 +627,111 @@ class Canvas {
         })
     }
 
+    // 动图
+    promisedGif(gifURL) {
+            return new Promise((resolve, reject) => {
+                fetch(gifURL)
+                    .then(resp => resp.arrayBuffer())
+                    .then(buff => parseGIF(buff))
+                    .then(gif => decompressFrames(gif, true))
+                    .then(resolve);
+            });
+        }
+        // 
+    imageData2canvas(imageData) {
+        let canvas = document.createElement('canvas');
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        canvas.getContext('2d').putImageData(imageData, 0, 0);
+        return canvas
+    }
+
+    // 从gif转为sprite图
+    // TODO 宽度不对
+    async buildSprite(gifUrl) {
+        let canvas_sprite = new fabric.Canvas();
+        let frames = await this.promisedGif(gifUrl);
+
+        return new Promise((resolve, reject) => {
+            frames.forEach((frame, i) => {
+                // console.log(frame)
+                let canvas_frame = this.imageData2canvas(
+                    new ImageData(frame.patch, frame.dims.width,
+                        frame.dims.height)
+                );
+
+                if (frames.length > 1) {
+                    let img = new fabric.Image.fromURL(canvas_frame.toDataURL(), img => {
+                        // console.log(img)
+                        img.set('selectable', false);
+                        img.left = img.getScaledWidth() * i;
+                        // width = img.getWidth() * i + 1;
+
+                        canvas_sprite.setHeight(img.getScaledHeight());
+                        canvas_sprite.setWidth(img.getScaledWidth() * (i + 1));
+                        canvas_sprite.add(img);
+                        canvas_sprite.renderAll();
+                        // 需要调试
+
+                        if (i == frames.length - 1) {
+                            let im = canvas_sprite.toDataURL('png');
+                            resolve({
+                                    img: im,
+                                    width: canvas_frame.width,
+                                    height: canvas_frame.height
+                                })
+                                // this.buildView(im, canvas_frame.width, canvas_frame.height)
+                        }
+                    });
+                } else {
+                    alert("Invalid GIF");
+                }
+            });
+        });
+
+    }
+
+    buildView(img, width, height) {
+        var canvas = new fabric.Canvas('merge');
+        canvas.setBackgroundColor('lightgreen');
+        canvas.setWidth(5000)
+        canvas.setHeight(5000)
+
+        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+        fabric.Object.prototype.transparentCorners = false;
+
+        var ratio = window.devicePixelRatio;
+        var imgData = {
+            spriteWidth: width * ratio,
+            spriteHeight: height * ratio,
+            spriteIndex: 0,
+            frameTime: 150,
+        }
+
+        fabric.Sprite.fromURL(img, createSprite(), imgData);
+
+        function createSprite() {
+            return function(sprite) {
+                sprite.set({
+                    left: 500,
+                    top: 250,
+                });
+                canvas.add(sprite);
+                setTimeout(function() {
+                    sprite.set('dirty', true);
+                    sprite.play();
+                }, fabric.util.getRandomInt(1, 10) * 100);
+            };
+        }
+
+        (function render() {
+            canvas.renderAll();
+            fabric.util.requestAnimFrame(render);
+        })();
+
+
+    }
+
 }
 
 class Layout {
@@ -1188,6 +1297,10 @@ class Base {
     }
 
     //原生的视频、音频、图片本地打开
+    // video
+    // audio
+    // img
+    // gif
     createShortVideoInput() {
             // console.log(this)
             let filePaths = dialog.showOpenDialogSync({
@@ -1211,6 +1324,8 @@ class Base {
                     if (count.length > 0) type = "audio";
                     count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => url.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "img";
+                    count = Array.from(['gif'], t => url.match(t) ? 1 : null).filter(f => f);
+                    if (count.length > 0) type = "gif";
                     if (type) res.push({
                         type,
                         url

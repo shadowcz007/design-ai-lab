@@ -72,3 +72,12 @@ npm start
 ...详见package.json
 
 ### 欢迎访问微信公众号 Mixlab无界社区
+
+
+
+##### 
+- 如何在fabricjs上显示gif ？
+方法1：gif经过ffmpeg转为mp4，通过video标签进行显示
+方法2：gifuct-js把gif解析为imagedata，通过
+
+- 如何把视频抠图后，显示在fabricjs上？

@@ -94,8 +94,9 @@ class FF {
     getFileType(formatName = null) {
         if (formatName === null) return;
         if (formatName.match("image") || formatName.match('png')) return 'img';
-        if (Array.from(['mov', 'avi', 'mp4','gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
+        if (Array.from(['mov', 'avi', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
+        if (Array.from(['gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "gif";
     }
 
     // get the video duration
@@ -103,14 +104,15 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg.ffprobe(filePath, (_err, metadata) => {
                 if (_err === null) {
-                    // console.log('===', metadata)
+                    console.log('===', metadata)
                     resolve({
                         // 秒
                         duration: metadata.format.duration,
                         // img、video、audio
                         type: this.getFileType(metadata.format.format_name),
                         width: metadata.streams[0].width,
-                        height: metadata.streams[0].height
+                        height: metadata.streams[0].height,
+                        frame_rate: metadata.streams[0].avg_frame_rate
                     });
                 } else {
                     reject(_err);
@@ -285,7 +287,7 @@ class FF {
 
             try {
                 fs.mkdirSync(outputDir);
-            } catch (error) { }
+            } catch (error) {}
 
             let inp = ffmpeg(input);
             fadeIn > 0 ? inp.videoFilters(`fade=in:0:${fadeIn}`) : null;
@@ -437,6 +439,26 @@ class FF {
                 })
         });
     }
+    gif2video(filePath) {
+        let { output } = this.createOutputPath(filePath, 'output', '.mp4');
+        // this.getMediaDurationAndType(filePath).then((data) => {
+        //     console.log(data)
+        // });
+        return new Promise((resolve, reject) => {
+            ffmpeg(filePath)
+                .videoCodec('libx264')
+                .save(output)
+                .on('end', function() {
+                    setTimeout(() => {
+                        resolve(output);
+                    }, 500);
+                    // console.log('Finished processing');
+
+                })
+        });
+    }
+
+
 
     // 
     framesRename(fileDir) {
