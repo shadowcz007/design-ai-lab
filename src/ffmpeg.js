@@ -197,7 +197,7 @@ class FF {
         let { output } = this.createOutputPath(inputPath, 'resize', '.' + format);
 
         let r = ffmpeg(inputPath)
-            .videoCodec('libx264')
+            .videoCodec('mpeg4')
             //.videoFilters(`scale=${size}`)
             .format(format)
             .size(size)
@@ -363,7 +363,7 @@ class FF {
     videoAddAudio(video, audio, outputfile) {
         return new Promise((resolve, reject) => {
             ffmpeg()
-                .videoCodec('libx264')
+                .videoCodec('mpeg4')
                 // .audioCodec('libfaac')
                 .format('mp4')
                 .outputFormat('mp4')
@@ -390,7 +390,7 @@ class FF {
             let input = this.framesRename(filePath);
 
             ffmpeg(input)
-                .videoCodec('libx264')
+                .videoCodec('mpeg4')
                 .size(size)
                 .aspect(aspect)
                 .output(output)
@@ -410,7 +410,9 @@ class FF {
     files2video(files, output, size, aspect, progressFn) {
         return new Promise((resolve, reject) => {
             ffmpeg(files)
-                .videoCodec('libx264')
+                .videoCodec('mpeg4')
+                // .audioCodec('libfaac')
+                // .format('mp4')
                 .size(size)
                 .aspect(aspect)
                 .output(output)
@@ -446,7 +448,7 @@ class FF {
         // });
         return new Promise((resolve, reject) => {
             ffmpeg(filePath)
-                .videoCodec('libx264')
+                .videoCodec('mpeg4')
                 .save(output)
                 .on('end', function() {
                     setTimeout(() => {
@@ -494,7 +496,7 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg(videoFilePath)
                 .input(waterMarkFilePath)
-                .videoCodec('libx264')
+                .videoCodec('mpeg4')
                 .format('mp4')
                 .inputOptions('-filter_complex', `overlay=${x}:${y}`)
                 .on('error', function(err) {
@@ -656,7 +658,7 @@ class FF {
 
     //         ffmpeg(filePaths[0])
     //             .input(filePaths[1])
-    //             .videoCodec('libx264')
+    //             .videoCodec('mpeg4')
     //             .format('mp4')
     //             .outputFormat('mp4')
     //             .on('end', function() {
