@@ -1,7 +1,7 @@
 const https = require('@small-tech/https')
 const fs = require('fs');
 const path = require('path');
-
+const { ExpressPeerServer } = require('peer');
 const humanseg = require('@paddlejs-models/humanseg');
 humanseg.load();
 window.humanseg = humanseg;
@@ -23,6 +23,10 @@ const server = https.createServer((req, res) => {
         res.end(html);
     } else if (req.url === '/socket.io.js') {
         const js = fs.readFileSync(path.join(__dirname, '../node_modules/socket.io/client-dist/socket.io.min.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    } else if (req.url === '/peer.js') {
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/peerjs/dist/peerjs.min.js'), 'utf8');
         res.writeHead(200, { 'Content-type': 'application/javascript' });
         res.end(js);
     }
@@ -74,6 +78,25 @@ io.on('connection', (socket) => {
 });
 
 
+const { PeerServer } = require('peer');
+// const peerServer = ExpressPeerServer(server, {
+//     debug: true,
+//     path: '/myapp',
+//     // port: 9000
+// });
+console.log(server)
+const peerServer = PeerServer({
+    port: 9000,
+    debug: true,
+    proxied: true,
+    path: '/myapp',
+    ssl: {
+        key: server.key,
+        cert: server.cert
+    }
+});
+peerServer.on('connection', console.log);
+peerServer.on('disconnect', console.log);
 module.exports = {
     url
 }

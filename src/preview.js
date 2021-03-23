@@ -24,3 +24,23 @@ function preload() {
 
     // console.log(ZKYYT)
 }
+
+const peer = new Peer("pc", {
+    host: "wss://192.168.1.3",
+    port: 9000,
+    path: "/myapp",
+});
+const conn = peer.connect('mobile');
+conn.on('open', () => {
+    console.log("open")
+    conn.send('hi!');
+});
+peer.on('connection', (conn) => {
+    conn.on('data', (data) => {
+        // Will print 'hi!'
+        console.log(data);
+    });
+    conn.on('open', () => {
+        conn.send('hello!');
+    });
+});
