@@ -8,16 +8,16 @@ const Resizer = require('resizer-cl');
 const Knowledge = require("./knowledge");
 const Editor = require("./editor");
 const Win = require("./win");
-const db = require('./db');
+const fileDb = require('./fileDb');
 const Log = require('./log');
 const Layout = require('./layout');
-const Https = require('./https');
+
 
 // window.Win = Win;
 // window.Editor=Editor;
 
 const _package = remote.getGlobal('_PACKAGE');
-
+const _mobileUrl=remote.getGlobal('_MURL');
 /**
  * GUI界面
  * - DOM的封装
@@ -116,7 +116,7 @@ class GUI {
         // this.devBtn = document.querySelector("#devtool-btn");
         this.qrcodeDiv = document.getElementById("qrcode");
         this.qrcode = new QRCode(this.qrcodeDiv, {
-            text: Https.url,
+            text: _mobileUrl,
             width: 128,
             height: 128,
             colorDark: "#000000",
@@ -125,8 +125,8 @@ class GUI {
         });
 
         this.addClickEventListener(document.querySelector('#server-url'), () => {
-            // clipboard.writeText(Https.url);
-            this.qrcodeDiv.setAttribute('data-url', Https.url);
+            // clipboard.writeText(_mobileUrl);
+            this.qrcodeDiv.setAttribute('data-url', _mobileUrl);
             this.qrcodeDiv.style.display = this.qrcodeDiv.style.display === 'block' ? 'none' : 'block';
             setTimeout(() => this.qrcodeDiv.style.display = 'none', 10000);
         });
@@ -282,7 +282,7 @@ class GUI {
                     //版本
                     version: _package.version,
                     //依赖id、用来标记版本、依赖包等
-                    package_id: db.id(_package),
+                    package_id: fileDb.id(_package),
                     //创建时间
                     create_time: (new Date()).getTime()
                 })
@@ -408,7 +408,7 @@ class GUI {
         this.previewWinExecuteJavaScript(res.code);
 
         //存至数据库
-        // db.add(res);
+        // fileDb.fileAdd(res);
 
         document.querySelector(".grid").style.display = "block";
         document.getElementById("blank-pannel").style.display = "none";
@@ -483,7 +483,7 @@ class GUI {
 
     backup() {
         this.getSaveFileContent().then(res => {
-            db.add(res);
+            fileDb.fileAdd(res);
             this.info.innerText = '已备份';
             // remote.dialog.showMessageBox({
             //     type: 'info',
@@ -616,7 +616,7 @@ class GUI {
 
     //最近打开的卡片
     recentFiles() {
-        this.createCards(db.getAll(), true);
+        this.createCards(fileDb.fileGetAll(), true);
     }
 
     //编程，UI状态关闭
@@ -718,7 +718,7 @@ class GUI {
         readme.innerHTML = Knowledge.marked(data.knowledge.readme);
         readme.innerText = readme.innerText;
         t.innerHTML = data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : "";
-        version.innerHTML = `代码量 ${data.code_length}<br>版本 ${data.version} ${((db.id(_package) === data.package_id) ? '<i class="far fa-check-circle"></i>' : '<i class="fas fa-ban"></i>')}`;
+        version.innerHTML = `代码量 ${data.code_length}<br>版本 ${data.version} ${((fileDb.id(_package) === data.package_id) ? '<i class="far fa-check-circle"></i>' : '<i class="fas fa-ban"></i>')}`;
         close.innerHTML = '<i class="fas fa-times"></i>';
 
 
@@ -734,7 +734,7 @@ class GUI {
             e.stopPropagation();
             // console.log(e)
             div.remove();
-            db.removeById(data.id);
+            fileDb.fileRemoveById(data.id);
         }) : close.style.color = 'white';
 
         this.addClickEventListener(img, e => {

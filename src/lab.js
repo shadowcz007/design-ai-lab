@@ -2,7 +2,7 @@
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 
-
+const _aiUrl=remote.getGlobal('_AIURL');
 const _APPICON = remote.getGlobal('_APPICON');
 //当窗口focus的时候，需要运行的函数
 let focusEvents = {};
@@ -160,7 +160,7 @@ class Clipboard {
                 res = clipboard.readImage();
                 if (res.isEmpty()) {
                     res = null;
-                }
+                };
                 // else{
                 //     res=res.toDataURL();
                 // }
@@ -1320,13 +1320,14 @@ class Base {
                 for (const url of filePaths) {
                     // console.log(url)
                     let type = null;
-                    var count = Array.from(['mov', 'avi', 'mp4'], t => url.match(t) ? 1 : null).filter(f => f);
+                    let urlNew=url.toLowerCase();
+                    var count = Array.from(['mov', 'avi', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "video";
-                    count = Array.from(['mp3'], t => url.match(t) ? 1 : null).filter(f => f);
+                    count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "audio";
-                    count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => url.match(t) ? 1 : null).filter(f => f);
+                    count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "img";
-                    count = Array.from(['gif'], t => url.match(t) ? 1 : null).filter(f => f);
+                    count = Array.from(['gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "gif";
                     if (type) res.push({
                         type,
@@ -1681,9 +1682,9 @@ class Mobilenet {
         this.IMAGE_SIZE = 224;
         this.savePathHead = 'indexeddb://Mobilenet_';
         this.opts = opts || {
-            version: 1,
+            version: 2,
             alpha: 1.0,
-            // modelUrl
+            modelUrl:`${_aiUrl}/mobilenet_v2/model.json`
         };
         this.initSavePath(this.opts);
     }

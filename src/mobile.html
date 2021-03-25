@@ -155,27 +155,7 @@
     </main>
 
     <script>
-      const peer = new Peer("mobile", {
-        host: "192.168.1.3",
-        port: 9000,
-        path: "/myapp",
-      });
-
-      const conn = peer.connect("pc");
-      conn.on("open", () => {
-        console.log("open");
-        conn.send("hi!");
-      });
-      peer.on("connection", (conn) => {
-        conn.on("data", (data) => {
-          // Will print 'hi!'
-          console.log(data);
-        });
-        conn.on("open", () => {
-          conn.send("hello!");
-        });
-      });
-
+      
       const video = document.querySelector(".main #video");
       const button = document.querySelector(".main #button");
       const select = document.querySelector(".main #select");
@@ -183,17 +163,71 @@
       const img = document.querySelector(".main #img");
       const detect = document.querySelector(".main #detect");
 
+      let peer,conn,call;
+
       let currentStream, capture;
 
       let socket = io();
-      socket.emit("chat message", {
+      /* socket.emit("chat message", {
         type: "text",
         data: "hhh",
-      });
+      }); */
       socket.on("chat message", function (msg) {
         //console.log(msg)
         if (msg.type === "image") {
           // drawResult(msg.data)
+        };
+        if(msg.type==='host'){
+        //console.log(msg)
+          peer = new Peer("mobile", {
+            host: msg.data,
+            port: 9000,
+            path: "/myapp",
+          });
+          //peer.call(id, stream, [options]); 向另一个用户端发起视频连接
+          conn = peer.connect("pc");
+          conn.on("open", () => {
+            console.log("connect open");
+            conn.send({t:1});
+          });
+          conn.on("error",error=>{
+            console.log(error);
+            conn = peer.connect("pc");
+          });
+
+          peer.on( 'open', id=> {
+
+            console.log('peer open',id);
+
+          });
+
+          // disconnected from PeerJS server
+          peer.on( 'close',id =>{
+
+            console.log('peer close',id);
+
+          } );
+          
+          peer.on("connection", (conn) => {
+            conn.on("data", (data) => {
+              // Will print 'hi!'
+              console.log(data);
+            });
+            conn.on("open", () => {
+              conn.send("hello!");
+            });
+          });
+
+          peer.on('disconnected', () => {
+            console.info('peer.on.disconnected');
+            console.info('peer.reconnect():begin...');
+            peer.reconnect();
+            console.info('peer.reconnect():finish...');
+          });
+          
+
+         
+
         }
       });
 
@@ -234,6 +268,18 @@
               capture = new DataGenerator(12, (t) => {
                 // console.log(t)
                 sendVideoCapture();
+              });
+              
+              call = peer.call('pc', currentStream);
+              call.on('close', () => {
+                  console.log('close')
+                });
+                call.on('error', error => {
+                  console.log('error',error)
+                });
+               // remoteStream
+              call.on('stream', (remoteStream) => {
+                  console.log('stream',remoteStream)
               });
               // capture.stop();
             };

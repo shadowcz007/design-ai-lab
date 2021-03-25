@@ -1,15 +1,20 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog,net } = require('electron');
 const path = require('path');
+const url = require('url');
 const storage = require('electron-json-storage');
 const openAboutWindow = require('about-window').default;
+const serverModel=require('./src/serverModel');
+const Https = require('./src/https');
 
 const _package = require("./package.json");
 // console.log(package);
 global._PACKAGE = JSON.parse(JSON.stringify(_package));
-
-const dataPath = storage.getDataPath();
+global._AIURL=serverModel.url;
+global._MHOST=Https.host;
+global._MURL=Https.url;
+// 本地数据存储的地址
+global._DBPATH = storage.getDataPath();
 // console.log(dataPath,path.join(dataPath, "db.json"));
-global._DBPATH = path.join(dataPath, "db.json");
 
 //平台
 const _IS_MAC = process.platform === 'darwin';
@@ -24,10 +29,24 @@ const _READ_HTML = path.join(__dirname, 'src/read.html');
 // const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 
+
+// console.log(url.format({
+//     pathname: _PRE_HTML,
+//     protocol: 'file',
+//     slashes:true
+// }))
+
+
 global._DEBUG_PORT = 3000;
 
 app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
 app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
+
+// 忽略证书错误
+app.commandLine.appendSwitch('ignore-certificate-errors');
+// https://stackoverflow.com/questions/57476284/cant-connect-to-web-socket-from-electron-when-using-self-signed-cert
+
+
 
 // app.commandLine.appendSwitch(
 // 	"js-flags",
@@ -115,7 +134,11 @@ function createWindow(key, opts, workAreaSize) {
     if (opts.html.match("https://")) {
         win.loadURL(opts.html);
     } else {
-        win.loadFile(opts.html);
+        win.loadURL(url.format({
+            pathname: opts.html,
+            protocol: 'file',
+            slashes:true
+        }));
     }
 
     // 打开调试工具
@@ -364,16 +387,25 @@ app.whenReady().then(() => {
     initAppIcon()
     initMenu();
     initWindow();
-    app.on('activate', function() {
+    app.on('activate', ()=> {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) initWindow()
+    });
+    app.on('browser-window-focus',(event,win)=>{
+        // console.log(event,win)
+        // TODO 待细化,当wifi环境变化的时候
+        Https.updateHost();
+        serverModel.updateHost();
+        global._MHOST=Https.host;
+        global._MURL=Https.url;
+        global._AIURL=serverModel.url;
     });
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', ()=> {
     if (process.platform !== 'darwin') app.quit()
 });
