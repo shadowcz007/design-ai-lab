@@ -2,7 +2,7 @@
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 
-const _aiUrl=remote.getGlobal('_AIURL');
+
 const _APPICON = remote.getGlobal('_APPICON');
 //当窗口focus的时候，需要运行的函数
 let focusEvents = {};
@@ -33,7 +33,7 @@ const { parseGIF, decompressFrames } = require('gifuct-js');
 console.log(parseGIF, decompressFrames)
 
 const ffmpeg = require('./ffmpeg');
-const { resolve } = require('path');
+
 ffmpeg.recordCanvas = async function(canvas, time = 3000, frameRate = 24) {
     let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(frameRate), {
         type: 'gif',
@@ -1249,7 +1249,7 @@ class Base {
      * @param {*} url string
      * url instanceof MediaStream
      */
-    createVideo(url, isAdd = true) {
+    createVideo(url, isAdd = true, autoPlay = true) {
         let v = document.createElement('video');
         if (url instanceof MediaStream) {
             v.srcObject = url;
@@ -1264,6 +1264,7 @@ class Base {
                 v.height = v.videoHeight;
                 v.width = v.videoWidth;
                 v.oncanplay = null;
+                if (autoPlay) v.play();
                 resolve(v);
             }
             v.onerror = () => {
@@ -1309,7 +1310,7 @@ class Base {
                 title: "打开……",
                 properties: ['openFile', 'multiSelections'],
                 filters: [
-                    { name: '视频、音频', extensions: ['mov', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
+                    { name: '视频、音频', extensions: ['mov', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
                 ]
             });
 
@@ -1320,8 +1321,8 @@ class Base {
                 for (const url of filePaths) {
                     // console.log(url)
                     let type = null;
-                    let urlNew=url.toLowerCase();
-                    var count = Array.from(['mov', 'avi', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                    let urlNew = url.toLowerCase();
+                    var count = Array.from(['mov', 'm4v', 'avi', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "video";
                     count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                     if (count.length > 0) type = "audio";
@@ -1684,7 +1685,7 @@ class Mobilenet {
         this.opts = opts || {
             version: 2,
             alpha: 1.0,
-            modelUrl:`${_aiUrl}/mobilenet_v2/model.json`
+            modelUrl: `http://0.0.0.0/mobilenet_v2/model.json`
         };
         this.initSavePath(this.opts);
     }

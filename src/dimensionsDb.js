@@ -8,7 +8,7 @@ const dataPath = remote.getGlobal('_DBPATH');
 
 
 // 多维数据库
-class DimensionsData {
+class DimensionsDb {
     constructor(name = 'dimensions-db', n = 5) {
         //create new spatial-db with 5 dimensions
         this.db = new SpatialDb(path.join(dataPath, name), n);
@@ -16,4 +16,4 @@ class DimensionsData {
 
 }
 
-module.exports = DimensionsData;
+module.exports = DimensionsDb;

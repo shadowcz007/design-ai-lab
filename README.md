@@ -81,3 +81,10 @@ npm start
 x 方法2：gifuct-js把gif解析为imagedata，通过
 
 - 如何把视频抠图后，显示在fabricjs上？
+
+
+- 移动端safari
+WebSocket network error: The operation couldn’t be completed. (OSStatus error -9807.)
+websock在iphone上建立连接失败，在mac和pc和安卓都是好的
+解决：ip替换成域名，或者不用https 或者用认证过的
+- peerjs server部署到mixlab.top官网上

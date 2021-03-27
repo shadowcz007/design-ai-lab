@@ -429,11 +429,11 @@ class FF {
         });
     }
 
-    video2gif(filePath) {
+    video2gif(filePath, width = 320, fps = 15) {
         let { output } = this.createOutputPath(filePath, 'output', '.gif');
         return new Promise((resolve, reject) => {
             ffmpeg(filePath)
-                .outputOption("-vf", "scale=320:-1:flags=lanczos,fps=15")
+                .outputOption("-vf", `scale=${width}:-1:flags=lanczos,fps=${fps}`)
                 .save(output)
                 .on('end', function() {
                     // console.log('Finished processing');

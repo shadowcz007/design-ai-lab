@@ -1,17 +1,16 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog,net } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, dialog, net } = require('electron');
 const path = require('path');
 const url = require('url');
 const storage = require('electron-json-storage');
 const openAboutWindow = require('about-window').default;
-const serverModel=require('./src/serverModel');
+
+// web服务,包括模型
 const Https = require('./src/https');
 
 const _package = require("./package.json");
 // console.log(package);
 global._PACKAGE = JSON.parse(JSON.stringify(_package));
-global._AIURL=serverModel.url;
-global._MHOST=Https.host;
-global._MURL=Https.url;
+
 // 本地数据存储的地址
 global._DBPATH = storage.getDataPath();
 // console.log(dataPath,path.join(dataPath, "db.json"));
@@ -137,7 +136,7 @@ function createWindow(key, opts, workAreaSize) {
         win.loadURL(url.format({
             pathname: opts.html,
             protocol: 'file',
-            slashes:true
+            slashes: true
         }));
     }
 
@@ -387,25 +386,25 @@ app.whenReady().then(() => {
     initAppIcon()
     initMenu();
     initWindow();
-    app.on('activate', ()=> {
+    app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) initWindow()
     });
-    app.on('browser-window-focus',(event,win)=>{
+    app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
         // TODO 待细化,当wifi环境变化的时候
-        Https.updateHost();
-        serverModel.updateHost();
-        global._MHOST=Https.host;
-        global._MURL=Https.url;
-        global._AIURL=serverModel.url;
+        // Https.updateHost();
+        // serverModel.updateHost();
+        // global._MHOST=Https.host;
+        // global._MURL=Https.url;
+        // global._AIURL=serverModel.url;
     });
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', ()=> {
+app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 });

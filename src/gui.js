@@ -17,7 +17,7 @@ const Layout = require('./layout');
 // window.Editor=Editor;
 
 const _package = remote.getGlobal('_PACKAGE');
-const _mobileUrl=remote.getGlobal('_MURL');
+
 /**
  * GUI界面
  * - DOM的封装
@@ -114,22 +114,7 @@ class GUI {
         this.practiceBtn = document.querySelector("#practice-btn");
         // this.logdBtn = document.querySelector("#log-btn");
         // this.devBtn = document.querySelector("#devtool-btn");
-        this.qrcodeDiv = document.getElementById("qrcode");
-        this.qrcode = new QRCode(this.qrcodeDiv, {
-            text: _mobileUrl,
-            width: 128,
-            height: 128,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
 
-        this.addClickEventListener(document.querySelector('#server-url'), () => {
-            // clipboard.writeText(_mobileUrl);
-            this.qrcodeDiv.setAttribute('data-url', _mobileUrl);
-            this.qrcodeDiv.style.display = this.qrcodeDiv.style.display === 'block' ? 'none' : 'block';
-            setTimeout(() => this.qrcodeDiv.style.display = 'none', 10000);
-        });
 
         /**
          * 欢迎页面

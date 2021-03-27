@@ -22,3 +22,9 @@ ipcRenderer.on("open-devtools", () => GUI.openPreviewDev());
 
 //显示代码错误
 ipcRenderer.on("executeJavaScript-result", () => GUI.onPreviewWindowError());
+
+
+
+// ipcRenderer.on("update-mobileUrl", (event, args) => {
+//     window.mobileUrl = Https.url + '?id=' + args;
+// });

@@ -1,16 +1,28 @@
 const https = require('@small-tech/https')
 const fs = require('fs');
 const path = require('path');
+
 // const { ExpressPeerServer } = require('peer');
 // const humanseg = require('@paddlejs-models/humanseg');
 // humanseg.load();
 // window.humanseg = humanseg;
 // console.log(path.join(__dirname, './mobile.html'))
 
+
 // const { remote } = require("electron");
 
 const internalIp = require('internal-ip');
-let host = internalIp.v4.sync(), url = `https://${host}`;
+let host = internalIp.v4.sync(),
+    url = `https://${host}`;
+
+// 远程的peerjs服务
+const defaultHost = {
+    host: 'mixlab.top',
+    path: "/myapp"
+}
+
+let peerServer;
+
 // 更新ip地址
 function updateHost() {
     host = internalIp.v4.sync(), url = `https://${host}`;
@@ -22,36 +34,36 @@ const server = https.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', '*');
 
-    if (req.url === '/') {
+    console.log(req.url);
+    // console.log(req.url.replace(/\?.*/ig, ''));
+    let reqUrlBase = req.url.replace(/\?.*/ig, '');
+    if (reqUrlBase === '/') {
         const html = fs.readFileSync(path.join(__dirname, './mobile.html'), 'utf8');
         res.writeHead(200, { 'Content-type': 'text/html' });
-        // res.write('<h1>Node.js</h1>');
+        // res.write(`<h1>~</h1>`);
         res.end(html);
-    } else if (req.url === '/host') {
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end({
-            host: global._MHOST
-        });
-
-    } else if (req.url === '/socket.io.js') {
+    } else if (reqUrlBase === '/socket.io.js') {
         const js = fs.readFileSync(path.join(__dirname, '../node_modules/socket.io/client-dist/socket.io.min.js'), 'utf8');
         res.writeHead(200, { 'Content-type': 'application/javascript' });
         res.end(js);
-    } else if (req.url === '/peer.js') {
+
+    } else if (reqUrlBase === '/peer.js') {
         const js = fs.readFileSync(path.join(__dirname, '../node_modules/peerjs/dist/peerjs.min.js'), 'utf8');
         res.writeHead(200, { 'Content-type': 'application/javascript' });
         res.end(js);
-    } else if (req.url === '/mobilenet_v2/model.json') {
+
+    } else if (reqUrlBase === '/mobilenet_v2/model.json') {
+        // 模型
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/model.json')));
-    } else if (req.url === '/mobilenet_v2/weights.bin') {
+    } else if (reqUrlBase === '/mobilenet_v2/weights.bin') {
+        // 模型
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/weights.bin')));
-    }
+    };
+
 });
-
-
 
 
 server.listen(443, () => {
@@ -62,12 +74,6 @@ const io = require('socket.io')(server);
 
 io.on('connection', (socket) => {
     console.log('a user connected', socket.id);
-
-    io.emit('chat message', {
-        type: 'host',
-        data: global._MHOST
-    });
-
     socket.on('chat message', (msg) => {
         if (msg.type === 'image') {
             //   console.log(msg.size)
@@ -92,35 +98,52 @@ io.on('connection', (socket) => {
         } else {
             io.emit('chat message', msg);
         }
-
     });
 
 });
 
+function localServer() {
+    const { PeerServer } = require('peer');
+    // const peerServer = ExpressPeerServer(server, {
+    //     debug: true,
+    //     path: '/myapp',
+    //     // port: 9000
+    // });
+    // console.log(server)
 
-const { PeerServer } = require('peer');
-// const peerServer = ExpressPeerServer(server, {
-//     debug: true,
-//     path: '/myapp',
-//     // port: 9000
-// });
-// console.log(server)
-const peerServer = PeerServer({
-    port: 9000,
-    // debug: true,
-    // proxied: true,
-    path: '/myapp',
-    ssl: {
-        key: server.key,
-        cert: server.cert
-    }
-});
-peerServer.on('connection', c => {
-    console.log('connection', c.id)
-});
-peerServer.on('disconnect', c => {
-    console.log('disconnect', c.id)
-});
+    // const makeCert=require('make-cert');
+    // const {key, cert} = makeCert('localhost');
+    // console.log(key)
+    // console.log(cert)
+
+    const customGenerationFunction = () => {
+        // console.log(data)
+        return (Math.random().toString(36) + '0000000000000000000').substr(2, 16)
+    };
+    peerServer = PeerServer({
+        port: 9000,
+        debug: true,
+        // proxied: true,
+        path: '/myapp',
+        ssl: {
+            key: server.key,
+            cert: server.cert
+        },
+        generateClientId: customGenerationFunction
+    });
+    peerServer.on('connection', c => {
+        console.log('connection', c.id)
+    });
+    peerServer.on('disconnect', c => {
+        console.log('disconnect', c.id)
+    });
+}
+
+
 module.exports = {
-    url, host,updateHost
+    url,
+    host,
+    updateHost,
+    localServer,
+    defaultHost
 }
