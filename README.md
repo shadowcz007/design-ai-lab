@@ -1,4 +1,6 @@
-![LOGO](https://shadowcz007.github.io/design-ai-lab/assets/icons/ios/AppIcon.appiconset/icon-20-ipad.png)
+![LOGO](https://shadowcz007.github.io/design-ai-lab/assets/icons/ios/AppIcon.appiconset/icon-76@2x.png)
+
+
 ![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/demo.jpg)
 
 # design-ai-lab
