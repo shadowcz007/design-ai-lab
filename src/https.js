@@ -3,9 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // const { ExpressPeerServer } = require('peer');
-// const humanseg = require('@paddlejs-models/humanseg');
-// humanseg.load();
-// window.humanseg = humanseg;
+
 // console.log(path.join(__dirname, './mobile.html'))
 
 

@@ -345,7 +345,7 @@ class Shape {
 
 
 class Canvas {
-    constructor(width, height, isStatic = false, isZoom = false) {
+    constructor(width = 300, height = 300, isStatic = false, isZoom = false) {
         if (!global.fabric) {
             const { fabric } = require('fabric');
             global.fabric = fabric;

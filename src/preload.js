@@ -1,6 +1,7 @@
 // preload.js
 const { Lab, cv, Store, Canvas, Deeplab } = require('./lab');
-// const {CameraWeb}=require('./camera');
+const { humanseg } = require('./humanseg');
+const DataGenerator = require('./dataGenerator');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 
@@ -19,6 +20,8 @@ process.once('loaded', () => {
     // global.CameraWeb=CameraWeb;
     global.PeerPC = PeerPC;
     global.DimensionsDb = DimensionsDb;
+    global.humanseg = humanseg;
+    global.DataGenerator = DataGenerator;
 })
 
 // ipcRenderer.send('preview-ready', true);

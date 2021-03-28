@@ -196,7 +196,7 @@ function initWindow() {
 
 
 function initAppIcon() {
-    global._APPICON = new Tray(path.join(__dirname, "assets/appIcon.png"));
+    global._APPICON = new Tray(path.join(__dirname, "assets/icons/ios/AppIcon.appiconset/icon-20@2x.png"));
     const contextMenu = Menu.buildFromTemplate([{
         label: '编辑',
         type: 'normal',

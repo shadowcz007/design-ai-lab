@@ -1,5 +1,5 @@
 const Peer = require('peerjs').default;
-const { ipcRenderer, remote } = require("electron");
+
 const internalIp = require('internal-ip');
 
 class PeerPC {
@@ -23,6 +23,12 @@ class PeerPC {
         peer.on('close', id => {
             console.log('peer close', id);
         });
+        peer.on('disconnected', () => {
+            console.log('peer disconnected');
+            setTimeout(() => {
+                peer.reconnect();
+            }, 1000);
+        });
         peer.on('connection', (conn) => {
             console.log('connection', conn);
             conn.on('data', (data) => {
@@ -45,6 +51,10 @@ class PeerPC {
         let host = internalIp.v4.sync();
         return `https://${host}?id=${this.id}`;
     }
+    reconnect() {
+        this.peer.reconnect();
+    };
+
 }
 
 
