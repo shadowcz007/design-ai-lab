@@ -9,18 +9,18 @@
         body {
             overflow: hidden;
         }
-        
+
         .main {
             height: 100%;
             background: #ffffff;
         }
-        
+
         .main .controls {
             text-align: center;
             padding: 0.5em 0;
             width: 300px;
         }
-        
+
         .main video {
             width: 100%;
             position: fixed;
@@ -31,19 +31,19 @@
             background: black;
             display: none;
         }
-        
+
         .main canvas {
             margin: 0 auto;
             display: block;
             /* position: fixed; */
             top: 0;
         }
-        
+
         .main img {
             width: 0;
             height: 0;
         }
-        
+
         .main button {
             width: 56px;
             height: 56px;
@@ -57,14 +57,14 @@
             border-radius: 12px;
             user-select: none;
         }
-        
+
         .main #select {
             margin: 24px;
             height: 32px;
             user-select: none;
             outline: none;
         }
-        
+
         .main #detect {
             width: 50%;
             height: 50%;
@@ -78,7 +78,7 @@
             grid-gap: 10px;
             padding: 50% 25%;
         }
-        
+
         .main #detect div {
             width: 100%;
             height: 100%;
@@ -86,29 +86,35 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .main #detect div div {
             background-color: #c5ffec69;
             width: 12px;
             height: 12px;
         }
-        
+
         .animation {
             animation-name: opacity;
             animation-duration: 1s;
             animation-iteration-count: infinite;
         }
-        
+
         @keyframes opacity {
             from {
                 background-color: #cddc39;
             }
+
             to {
                 background-color: #03a9f4;
             }
         }
     </style>
     <script src="socket.io.js"></script>
+    <script src="tfjs-core.js"></script>
+    <script src="tfjs-converter.js"></script>
+    <script src="tfjs-backend-webgl.js"></script>
+    <script src="face-landmarks-detection.js"></script>
+    <script src="humanseg.js"></script>
     <script src="peer.js"></script>
 </head>
 
@@ -158,6 +164,8 @@
     </main>
 
     <script>
+        humanseg.load();
+
         const video = document.querySelector(".main #video");
         const button = document.querySelector(".main #button");
         const select = document.querySelector(".main #select");
@@ -168,11 +176,15 @@
         let peer, conn, call;
         let currentStream, capture;
 
-        // initPeer();
+        initPeer();
 
-        document.querySelector('#peerId').addEventListener('click', initPeer);
+
+        // document.querySelector('#peerId').addEventListener('click', initPeer);
 
         function initPeer() {
+
+            document.querySelector('#targetId').value = getQueryVariable('id');
+
             if (!(peer && peer.destroyed || !peer)) return
 
             peer = new Peer(null, {
@@ -212,7 +224,7 @@
                 alert(e);
             });
 
-            peer.on('call', function(call) {
+            peer.on('call', function (call) {
                 var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
 
                 if (acceptsCall) {
@@ -228,7 +240,7 @@
                     // });
 
                     // Handle when the call finishes
-                    call.on('close', function() {
+                    call.on('close', function () {
                         alert("The videocall has finished");
                     });
 
@@ -291,8 +303,7 @@
                         canvas.height = video.height;
                         video.oncanplay = null;
                         capture = new DataGenerator(12, (t) => {
-                            // console.log(t)
-                            sendVideoCapture();
+                            drawResult();
                         });
 
                         connect();
@@ -361,15 +372,19 @@
             });
         }
 
-        function drawResult(base64) {
-            let im = new Image();
-            im.src = base64;
-            im.onload = () => {
-                canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-                canvas
-                    .getContext("2d")
-                    .drawImage(im, 0, 0, canvas.width, canvas.height);
-            };
+        async function drawResult() {
+            let c = document.createElement('canvas'), ctx = c.getContext("2d");
+            c.width = canvas.width;
+            c.height = canvas.height;
+            ctx.fillStyle = 'rgb(0,255,0)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const {
+                data
+            } = await humanseg.getGrayValue(video);
+            humanseg.drawHumanSeg(canvas, data);
+            ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+            canvas.getContext("2d").drawImage(c, 0, 0, canvas.width, canvas.height);
         }
 
         navigator.mediaDevices.enumerateDevices().then(gotDevices);
@@ -407,7 +422,7 @@
         function handleMessage(data) {
             console.log(data);
             let id = getQueryVariable('id');
-            peer.call(id, currentStream);
+            peer.call(id, canvas.captureStream());
         };
 
         function getQueryVariable(variable) {
@@ -425,7 +440,7 @@
         // 判断是否移动端
         function isMobile() {
             let mobile = false;
-            (function(a) {
+            (function (a) {
                 if (
                     /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
                         a
@@ -437,6 +452,42 @@
                     mobile = true;
             })(navigator.userAgent || navigator.vendor || window.opera);
             return mobile;
+        }
+
+        function t() {
+            ws = new WebSocket('wss://mixlab.top/peerids')
+            ws.onopen = function () {
+                // Web Socket 已连接上，使用 send() 方法发送数据
+                ws.send("发送数据");
+                alert("数据发送中...");
+            };
+
+            ws.onmessage = function (evt) {
+                var received_msg = evt.data;
+                alert("数据已接收...");
+            };
+
+            ws.onclose = function () {
+                // 关闭 websocket
+                alert("连接已关闭...");
+            };
+        };
+
+
+        // face model
+        class FaceModel {
+            constructor() {
+                let promise = faceLandmarksDetection.load(
+                    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
+                promise.then(model => {
+                    this.facemesh_ready = true;
+                    this.model = model;
+                })
+                    .catch(() => {
+                        alert('failed to load facemesh model');
+                    });
+            }
+
         }
     </script>
 </body>

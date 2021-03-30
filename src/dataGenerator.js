@@ -1,5 +1,5 @@
 class DataGenerator {
-    constructor(framerate = 0, cb) {
+    constructor(framerate = 10, cb) {
         if (typeof cb !== "function") {
             console.error("generator requires a callback");
             return;

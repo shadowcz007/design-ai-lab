@@ -28,7 +28,8 @@ class FF {
         let args = [...arguments];
         // newDirname 新的导出路径 ，当设置的时候，将把文件导出到这个路径
         this.newDirname = newDirname || args[0] || null;
-
+        this.ffmpeg = ffmpeg;
+        this.videoCodec = 'libx264';
     }
 
     // 创建导出的文件路径
@@ -94,7 +95,7 @@ class FF {
     getFileType(formatName = null) {
         if (formatName === null) return;
         if (formatName.match("image") || formatName.match('png')) return 'img';
-        if (Array.from(['mov', 'avi', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
+        if (Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
         if (Array.from(['gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "gif";
     }
@@ -104,7 +105,7 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg.ffprobe(filePath, (_err, metadata) => {
                 if (_err === null) {
-                    console.log('===', metadata)
+                    // console.log('===', metadata)
                     resolve({
                         // 秒
                         duration: metadata.format.duration,
@@ -112,7 +113,8 @@ class FF {
                         type: this.getFileType(metadata.format.format_name),
                         width: metadata.streams[0].width,
                         height: metadata.streams[0].height,
-                        frame_rate: metadata.streams[0].avg_frame_rate
+                        frame_rate: metadata.streams[0].avg_frame_rate,
+                        codec_name: metadata.streams[0].codec_name
                     });
                 } else {
                     reject(_err);
@@ -136,7 +138,7 @@ class FF {
         let { output } = this.createOutputPath(inputPath, 'imvideo', '.' + format);
 
         let r = ffmpeg(inputPath)
-            .videoCodec('mpeg4')
+            .videoCodec(this.videoCodec)
             //  libx264
             .format(format)
             .size(size)
@@ -148,14 +150,14 @@ class FF {
         return new Promise((resolve, reject) => {
             r.outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.frames / (fps * loop))
                     } else {
                         console.log(progress.frames / (fps * loop));
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -197,7 +199,8 @@ class FF {
         let { output } = this.createOutputPath(inputPath, 'resize', '.' + format);
 
         let r = ffmpeg(inputPath)
-            .videoCodec('mpeg4')
+            // .videoCodec('mpeg4')
+            .videoCodec(this.videoCodec)
             //.videoFilters(`scale=${size}`)
             .format(format)
             .size(size)
@@ -207,14 +210,14 @@ class FF {
         return new Promise((resolve, reject) => {
             r.outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.percent / 100)
                     } else {
                         console.log(progress.percent / 100);
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -241,24 +244,24 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg(inputPath)
                 .videoFilters([{
-                        filter: 'scale',
-                        options: `${width}:${height}`
-                    },
-                    {
-                        filter: 'pad',
-                        options: `${padding.join(':')}:${color}`
-                    }
+                    filter: 'scale',
+                    options: `${width}:${height}`
+                },
+                {
+                    filter: 'pad',
+                    options: `${padding.join(':')}:${color}`
+                }
                 ])
                 .outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.percent / 100)
                     } else {
                         console.log(progress.percent / 100);
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -287,7 +290,7 @@ class FF {
 
             try {
                 fs.mkdirSync(outputDir);
-            } catch (error) {}
+            } catch (error) { }
 
             let inp = ffmpeg(input);
             fadeIn > 0 ? inp.videoFilters(`fade=in:0:${fadeIn}`) : null;
@@ -363,7 +366,7 @@ class FF {
     videoAddAudio(video, audio, outputfile) {
         return new Promise((resolve, reject) => {
             ffmpeg()
-                .videoCodec('mpeg4')
+                .videoCodec(this.videoCodec)
                 // .audioCodec('libfaac')
                 .format('mp4')
                 .outputFormat('mp4')
@@ -390,14 +393,14 @@ class FF {
             let input = this.framesRename(filePath);
 
             ffmpeg(input)
-                .videoCodec('mpeg4')
+                .videoCodec(this.videoCodec)
                 .size(size)
                 .aspect(aspect)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     console.log('Processing: ' + progress.percent + '% done');
                 })
-                .on('end', function() {
+                .on('end', function () {
                     console.log('Finished processing');
                     resolve(output);
                 })
@@ -410,18 +413,18 @@ class FF {
     files2video(files, output, size, aspect, progressFn) {
         return new Promise((resolve, reject) => {
             ffmpeg(files)
-                .videoCodec('mpeg4')
+                .videoCodec(this.videoCodec)
                 // .audioCodec('libfaac')
                 // .format('mp4')
                 .size(size)
                 .aspect(aspect)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) { progressFn(progress.percent / 100) } else {
                         console.log('Processing: ', progress.percent);
                     }
                 })
-                .on('end', function() {
+                .on('end', function () {
                     // console.log('Finished processing');
                     resolve(output);
                 })
@@ -429,13 +432,33 @@ class FF {
         });
     }
 
-    video2gif(filePath, width = 320, fps = 15) {
+    // startTime 起点
+    // loop 终点
+    video2gif(filePath, width = 320, fps = 15, startTime = 0, loop = 5) {
         let { output } = this.createOutputPath(filePath, 'output', '.gif');
         return new Promise((resolve, reject) => {
-            ffmpeg(filePath)
+            this.getMediaDurationAndType(filePath).then(info => {
+                let duration=info.duration;
+                ffmpeg(filePath)
                 .outputOption("-vf", `scale=${width}:-1:flags=lanczos,fps=${fps}`)
+                .setStartTime(startTime)
+                .seek(duration - loop)
                 .save(output)
-                .on('end', function() {
+                .on('end', function () {
+                    // console.log('Finished processing');
+                    resolve(output);
+                })
+            }); 
+        });
+    }
+    video2mp4(filePath) {
+        let { output } = this.createOutputPath(filePath, 'output', '.mp4');
+        return new Promise((resolve, reject) => {
+            ffmpeg(filePath)
+                .videoCodec(this.videoCodec)
+                //.outputOption("-vf", `scale=${width}:-1:flags=lanczos,fps=${fps}`)
+                .save(output)
+                .on('end', function () {
                     // console.log('Finished processing');
                     resolve(output);
                 })
@@ -448,9 +471,9 @@ class FF {
         // });
         return new Promise((resolve, reject) => {
             ffmpeg(filePath)
-                .videoCodec('mpeg4')
+                .videoCodec(this.videoCodec)
                 .save(output)
-                .on('end', function() {
+                .on('end', function () {
                     setTimeout(() => {
                         resolve(output);
                     }, 500);
@@ -464,10 +487,10 @@ class FF {
 
     // 
     framesRename(fileDir) {
-            let files = this.sortFiles(fileDir);
-            return this.filesRename(files, fileDir)
-        }
-        // 
+        let files = this.sortFiles(fileDir);
+        return this.filesRename(files, fileDir)
+    }
+    // 
     filesRename(files, fileDir) {
         if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
         // let d = path.join(dirname, basename);
@@ -496,10 +519,10 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg(videoFilePath)
                 .input(waterMarkFilePath)
-                .videoCodec('mpeg4')
+                .videoCodec(this.videoCodec)
                 .format('mp4')
                 .inputOptions('-filter_complex', `overlay=${x}:${y}`)
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 })
                 .on('end', () => {
@@ -535,20 +558,20 @@ class FF {
                     this.paddingVideo(imvot,
                         parseInt(width),
                         parseInt(height), [tw, th, parseInt(content.layout.left), parseInt(content.layout.top)]).then(pot => {
-                        // 删除
-                        this.deleteFile(imvot);
-                        if (textImage && textImage.base64) {
-                            // pot视频
-                            this.drawText(pot, textImage.base64).then(textVideo => {
-                                // 删除
-                                this.deleteFile(pot);
-                                resolve(textVideo)
-                            });
-                        } else {
-                            resolve(pot)
-                        }
+                            // 删除
+                            this.deleteFile(imvot);
+                            if (textImage && textImage.base64) {
+                                // pot视频
+                                this.drawText(pot, textImage.base64).then(textVideo => {
+                                    // 删除
+                                    this.deleteFile(pot);
+                                    resolve(textVideo)
+                                });
+                            } else {
+                                resolve(pot)
+                            }
 
-                    })
+                        })
 
                 });
             } else if (content.type == 'video') {
@@ -560,18 +583,18 @@ class FF {
                     parseInt(width),
                     parseInt(height), [tw, th, 0, parseInt(content.layout.top)]).then(pot => {
 
-                    // pot视频
-                    if (textImage && textImage.base64) {
-                        this.drawText(pot, textImage.base64).then(textVideo => {
-                            // 删除
-                            this.deleteFile(pot);
-                            resolve(textVideo)
-                        });
-                    } else {
-                        resolve(pot)
-                    }
+                        // pot视频
+                        if (textImage && textImage.base64) {
+                            this.drawText(pot, textImage.base64).then(textVideo => {
+                                // 删除
+                                this.deleteFile(pot);
+                                resolve(textVideo)
+                            });
+                        } else {
+                            resolve(pot)
+                        }
 
-                })
+                    })
 
             }
         });

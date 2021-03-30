@@ -1,6 +1,6 @@
 // preload.js
 const { Lab, cv, Store, Canvas, Deeplab } = require('./lab');
-const { humanseg } = require('./humanseg');
+// const  humanseg  = require('./humanseg');
 const DataGenerator = require('./dataGenerator');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -20,7 +20,7 @@ process.once('loaded', () => {
     // global.CameraWeb=CameraWeb;
     global.PeerPC = PeerPC;
     global.DimensionsDb = DimensionsDb;
-    global.humanseg = humanseg;
+    // global.humanseg = humanseg;
     global.DataGenerator = DataGenerator;
 })
 

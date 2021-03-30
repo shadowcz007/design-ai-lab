@@ -51,7 +51,27 @@ const server = https.createServer((req, res) => {
         res.writeHead(200, { 'Content-type': 'application/javascript' });
         res.end(js);
 
-    } else if (reqUrlBase === '/mobilenet_v2/model.json') {
+    }else if(reqUrlBase === '/humanseg.js'){
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/@paddlejs-models/humanseg/lib/index.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    }else if(reqUrlBase === '/tfjs-core.js'){
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/@tensorflow/tfjs-core/dist/tf-core.min.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    }else if(reqUrlBase === '/tfjs-converter.js'){
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/@tensorflow/tfjs-converter/dist/tf-converter.min.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    }else if(reqUrlBase === '/tfjs-backend-webgl.js'){
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/@tensorflow/tfjs-backend-webgl/dist/tf-backend-webgl.min.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    }else if(reqUrlBase === '/face-landmarks-detection.js'){
+        const js = fs.readFileSync(path.join(__dirname, '../node_modules/@tensorflow-models/face-landmarks-detection/dist/face-landmarks-detection.min.js'), 'utf8');
+        res.writeHead(200, { 'Content-type': 'application/javascript' });
+        res.end(js);
+    }else if (reqUrlBase === '/mobilenet_v2/model.json') {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/model.json')));
