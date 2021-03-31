@@ -18,7 +18,8 @@ const fs = require('fs');
 const path = require('path');
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
-const mobilenet = require('@tensorflow-models/mobilenet');
+const Mobilenet = require('./mobilenet');
+const U2net = require('./u2net');
 const deeplab = require('@tensorflow-models/deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
@@ -166,6 +167,9 @@ class Clipboard {
             // }
         };
         return res
+    }
+    clear() {
+        clipboard.clear();
     }
     // 创建缓存对象
     store(type = 'text', cacheKey = "default") {
@@ -953,7 +957,7 @@ class Base {
     createIcon(key, eventListener, isAdd = true) {
         let icons = {
             'refresh': `<i class="fas fa-sync-alt"></i>`,
-            'download': `<i class="far fa-download"></i>`,
+            'download': `<i class="fas fa-download"></i>`,
             'play': `<i class="fas fa-caret-right"></i>`,
             'fan': '<i class="fas fa-fan"></i>',
             'clear': '<i class="far fa-trash-alt"></i>',
@@ -1340,18 +1344,25 @@ class Base {
         return res.length > 0 ? res : null;
     }
     // 
-    // canvasToURL() {
-    //     let canvas = this.createBaseCanvas(im.naturalWidth, im.naturalHeight);
-    //     let ctx = canvas.getContext('2d');
-    //     ctx.drawImage(im, 0, 0);
-    //     canvas.toBlob(blob => {
-    //         let nurl = URL.createObjectURL(blob);
-    //         this.createImage(nurl).then(nim => {
-    //             //URL.revokeObjectURL(nurl);
-    //             resolve(nim)
-    //         });
-    //     });
-    // }
+    saveNativeImageDialog(img, title = "保存") {
+        // const fs = require('fs');
+        let filepath = dialog.showSaveDialogSync({
+            title: title,
+            filters: [
+                { name: 'Image', extensions: ['png', 'jpg'] },
+            ]
+        });
+        if (filepath) {
+            let extname = path.extname(filepath);
+            console.log(filepath, extname)
+            if (extname.toLowerCase() === '.jpg'||extname.toLowerCase() === '.jpeg') {
+                fs.writeFileSync(filepath, img.toJPEG(80));
+            } else {
+                fs.writeFileSync(filepath, img.toPNG());
+            };
+            // fs.copyFile(file, filepath, e => e ? console.log(e) : null)
+        };
+    }
     // save
     saveDialog(file, title = "保存") {
         file = file.replace("file://", "");
@@ -1516,51 +1527,6 @@ class Knn {
 }
 
 
-// u2net
-class U2net {
-    constructor() {
-        const tf = require('@tensorflow/tfjs');
-        require('@tensorflow/tfjs-backend-webgl');
-        let model = tf.loadGraphModel('/Users/shadow/Documents/code/design-ai-lab/model/u2net/model.json', {
-            onProgress: function (progress) {
-                console.log({ type: "load_progress", progress: progress * 100 });
-            }
-        });
-        model.then((res) => {
-            this.model = res;
-            const warmupResult = this.model.predict(tf.zeros([1, 3, 320, 320]));
-            warmupResult.forEach((i) => i.dataSync());
-            warmupResult.forEach((i) => i.dispose());
-            console.log({ type: "load_model_done", backend: tf.getBackend() });
-        });
-    }
-
-    predict(originalImageElement,index=0) {
-        let ori_tf = tf.browser.fromPixels(originalImageElement);
-        let resizedImage = ori_tf.resizeNearestNeighbor([320, 320]).toFloat().div(tf.scalar(255));
-        let adj = resizedImage.div(resizedImage.max()).sub(tf.scalar(0.485)).div(tf.scalar(0.229));
-        let finalInput = adj.transpose([2, 0, 1]).expandDims(0);
-        // console.log(finalInput.arraySync());
-        let preds = this.model.predict(finalInput);
-        // preds = Array.from(preds, p => p.dataSync());
-
-        var mask_canvas = document.createElement('canvas');
-        let pred = preds[index];
-        var pred_max = pred.max();
-        var pred_min = pred.min();
-        pred = pred.sub(pred_min).div(pred_max.sub(pred_min));
-        pred = pred.squeeze();
-        pred = pred.reshape([320, 320]);
-        // console.log(pred.reshape([320, 320]));
-        return new Promise((resolve, reject) => {
-            tf.browser.toPixels(pred, mask_canvas).then(() => {
-                pred.dispose();
-                resolve(mask_canvas);
-            });
-        });
-    }
-}
-
 /**
  * 经过处理后返回的是p5的元素类型
  * 所有输出格式参考p5的数据类型 
@@ -1574,7 +1540,7 @@ class AI {
         this.shape = new Shape();
 
         // 
-        this.U2net=U2net;
+        this.U2net = U2net;
     }
     // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
@@ -1724,68 +1690,6 @@ class Deeplab {
         };
         await loadModel();
     }
-}
-
-class Mobilenet {
-    constructor(opts) {
-        this.IMAGE_SIZE = 224;
-        this.savePathHead = 'indexeddb://Mobilenet_';
-        this.opts = opts || {
-            version: 2,
-            alpha: 1.0,
-            modelUrl: `http://0.0.0.0/mobilenet_v2/model.json`
-        };
-        this.initSavePath(this.opts);
-    }
-    initSavePath(opts) {
-        this.savePath = this.savePathHead + hash(opts);
-        return this.savePath;
-    }
-    async init() {
-        if (!this.mobilenetModel) {
-            try {
-                this.mobilenetModel = await mobilenet.load(
-                    Object.assign({ ...this.opts }, {
-                        modelUrl: this.savePath
-                    }));
-                console.log('Prediction from loaded model:');
-            } catch (error) {
-                this.mobilenetModel = await mobilenet.load(this.opts);
-                this.mobilenetModel.model.save(this.savePath).then(console.log);
-                console.log(error);
-            };
-        }
-
-        // Warmup the model.
-        const result = tf.tidy(
-            () => this.mobilenetModel.infer(tf.zeros(
-                [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), true));
-        // result.print();
-        await result.data();
-        result.dispose();
-    }
-    /**
-     * 
-     * @param {tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} img 
-     * @param {number} topk 
-     */
-    classify(img = tf.zeros(
-        [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), topk = 5) {
-        return this.mobilenetModel.classify(img, topk);
-    }
-    /**
-     * 
-     * @param {*} img 
-     * @param {*} embedding 
-     */
-    infer(img = tf.zeros(
-        [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), embedding = true) {
-        if (this.mobilenetModel) return this.mobilenetModel.infer(
-            img,
-            embedding
-        )
-    }
-
 }
 
 

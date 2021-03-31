@@ -79,7 +79,20 @@ const server = https.createServer((req, res) => {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/weights.bin')));
-    };
+    }else if(reqUrlBase==='/u2net/model.json'){
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/u2net/model.json')));
+    } else if (reqUrlBase === '/u2net/group1-shard1of2.bin') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/u2net/group1-shard1of2.bin')));
+    } else if (reqUrlBase === '/u2net/group1-shard2of2.bin') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/u2net/group1-shard2of2.bin')));
+    }
+    
 
 });
 
