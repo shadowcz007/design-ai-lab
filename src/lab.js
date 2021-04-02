@@ -19,14 +19,14 @@ const path = require('path');
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
 const Mobilenet = require('./mobilenet');
-const U2net = require('./u2net');
+// const U2net = require('./u2net');
 const Yolov5 = require('./yolov5');
 const deeplab = require('@tensorflow-models/deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
 const hash = require('object-hash');
 const IdbKvStore = require('idb-kv-store');
-const colorThief = new (require('colorthief/dist/color-thief.umd'))();
+const colorThief = new(require('colorthief/dist/color-thief.umd'))();
 const Color = require('color');
 const _GIF = require('gif.js/dist/gif');
 const RecordRTC = require('recordrtc/RecordRTC');
@@ -36,7 +36,7 @@ console.log(parseGIF, decompressFrames)
 
 const ffmpeg = require('./ffmpeg');
 
-ffmpeg.recordCanvas = async function (canvas, time = 3000, frameRate = 24) {
+ffmpeg.recordCanvas = async function(canvas, time = 3000, frameRate = 24) {
     let recorder = new RecordRTC.RecordRTCPromisesHandler(canvas.captureStream(frameRate), {
         type: 'gif',
         frameRate: frameRate,
@@ -97,13 +97,13 @@ class Store {
 
 class GIF {
     constructor() {
-        this.gif = new _GIF({
-            workers: 2,
-            quality: 10,
-            workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
-        });
-    }
-    // canvasElement imageElement
+            this.gif = new _GIF({
+                workers: 2,
+                quality: 10,
+                workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
+            });
+        }
+        // canvasElement imageElement
     add(elt) {
         this.gif.addFrame(elt);
     }
@@ -117,7 +117,7 @@ class GIF {
 
     }
     render() {
-        this.gif.on('finished', function (blob) {
+        this.gif.on('finished', function(blob) {
             window.open(URL.createObjectURL(blob));
         });
         this.gif.render();
@@ -136,21 +136,21 @@ class Clipboard {
      * @param {String} type 
      */
     write(data, type = 'text') {
-        type = type.toLowerCase();
-        if (type === 'text') {
-            clipboard.writeText(data);
-        } else if (type === 'html') {
-            clipboard.writeHTML(data);
-        } else if (type === 'base64') {
-            let img = nativeImage.createFromDataURL(data)
-            clipboard.writeImage(img);
+            type = type.toLowerCase();
+            if (type === 'text') {
+                clipboard.writeText(data);
+            } else if (type === 'html') {
+                clipboard.writeHTML(data);
+            } else if (type === 'base64') {
+                let img = nativeImage.createFromDataURL(data)
+                clipboard.writeImage(img);
+            }
         }
-    }
-    //读取剪切板
-    /**
-     * 
-     * @param {*} type 
-     */
+        //读取剪切板
+        /**
+         * 
+         * @param {*} type 
+         */
     read(type = 'text') {
         type = type.toLowerCase();
         let res;
@@ -170,26 +170,26 @@ class Clipboard {
         return res
     }
     clear() {
-        clipboard.clear();
-    }
-    // 创建缓存对象
+            clipboard.clear();
+        }
+        // 创建缓存对象
     store(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
-        return this.clipboardStore
-    }
-    // 得到缓存的结果
+            if (!this.clipboardStore) this.clipboardStore = new Store(`clipboardListener_${type}_${cacheKey}`);;
+            return this.clipboardStore
+        }
+        // 得到缓存的结果
     async getAllStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-        return new Promise((resolve, reject) => {
-            this.clipboardStore.getJson().then(res => resolve(res));
-        });
-    }
-    // 清空缓存
+            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+            return new Promise((resolve, reject) => {
+                this.clipboardStore.getJson().then(res => resolve(res));
+            });
+        }
+        // 清空缓存
     clearStore(type = 'text', cacheKey = "default") {
-        if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
-        this.clipboardStore.clear();
-    }
-    //剪切板监听
+            if (!this.clipboardStore) this.clipboardStore = this.store(type, cacheKey);
+            this.clipboardStore.clear();
+        }
+        //剪切板监听
     listener(type = 'text', fn = null, cacheKey = "default", interval = 2000) {
         if (this.clipboardListenerStop == true) return;
         this.store(type, cacheKey);
@@ -197,8 +197,8 @@ class Clipboard {
         let data = this.read(type);
         let id = md5(
             type == 'img' && data ?
-                data.toDataURL() :
-                (data || '')
+            data.toDataURL() :
+            (data || '')
         );
 
         if (data && this.clipboardListenerData != id) {
@@ -298,35 +298,35 @@ class Shape {
 
     // 寻找轮廓
     findContours(src) {
-        // 轮廓
-        let contours = new cv.MatVector();
+            // 轮廓
+            let contours = new cv.MatVector();
 
-        // 层级 [Next, Previous, First_Child, Parent]
-        let hierarchy = new cv.Mat();
+            // 层级 [Next, Previous, First_Child, Parent]
+            let hierarchy = new cv.Mat();
 
-        // 模式
-        let mode = cv.RETR_EXTERNAL;
-        // cv.RETR_TREE 取回所有的轮廓并且创建完整的家族层级列表
-        // cv.RETR_CCOMP 获取所有轮廓并且把他们组织到一个2层结构里
-        // cv.RETR_EXTERNAL 返回最外层的,所有孩子轮廓都不要
-        // cv.RETR_LIST 获取所有轮廓，但是不建立父子关系
+            // 模式
+            let mode = cv.RETR_EXTERNAL;
+            // cv.RETR_TREE 取回所有的轮廓并且创建完整的家族层级列表
+            // cv.RETR_CCOMP 获取所有轮廓并且把他们组织到一个2层结构里
+            // cv.RETR_EXTERNAL 返回最外层的,所有孩子轮廓都不要
+            // cv.RETR_LIST 获取所有轮廓，但是不建立父子关系
 
-        let method = cv.CHAIN_APPROX_SIMPLE;
-        // CHAIN_APPROX_NONE：获取每个轮廓的每个像素，相邻的两个点的像素位置差不超过1
-        // CHAIN_APPROX_SIMPLE：压缩水平方向，垂直方向，对角线方向的元素，值保留该方向的重点坐标，如果一个矩形轮廓只需4个点来保存轮廓信息
-        // CHAIN_APPROX_TC89_L1和CHAIN_APPROX_TC89_KCOS使用Teh-Chinl链逼近算法中的一种
-        /**
-         * 如果传递cv.CHAIN_APPROX_NONE，则将存储所有边界点。但是实际上我们需要所有这些要点吗？
-         * 例如，您找到了一条直线的轮廓。您是否需要线上的所有点代表该线？
-         * 不，我们只需要该线的两个端点即可。
-         * 这就是cv.CHAIN_APPROX_SIMPLE所做的。
-         * 它删除所有冗余点并压缩轮廓，从而节省内存。
-         */
-        cv.findContours(src, contours, hierarchy, mode, method);
+            let method = cv.CHAIN_APPROX_SIMPLE;
+            // CHAIN_APPROX_NONE：获取每个轮廓的每个像素，相邻的两个点的像素位置差不超过1
+            // CHAIN_APPROX_SIMPLE：压缩水平方向，垂直方向，对角线方向的元素，值保留该方向的重点坐标，如果一个矩形轮廓只需4个点来保存轮廓信息
+            // CHAIN_APPROX_TC89_L1和CHAIN_APPROX_TC89_KCOS使用Teh-Chinl链逼近算法中的一种
+            /**
+             * 如果传递cv.CHAIN_APPROX_NONE，则将存储所有边界点。但是实际上我们需要所有这些要点吗？
+             * 例如，您找到了一条直线的轮廓。您是否需要线上的所有点代表该线？
+             * 不，我们只需要该线的两个端点即可。
+             * 这就是cv.CHAIN_APPROX_SIMPLE所做的。
+             * 它删除所有冗余点并压缩轮廓，从而节省内存。
+             */
+            cv.findContours(src, contours, hierarchy, mode, method);
 
-        return { contours, hierarchy };
-    }
-    //  比较两个轮廓
+            return { contours, hierarchy };
+        }
+        //  比较两个轮廓
     matchShape(contours1, contours2) {
         let result = cv.matchShapes(contours1.get(0), contours2.get(0), 1, 0);
         // contours1.delete();
@@ -336,8 +336,8 @@ class Shape {
 
     // Sort rectangles according to x coordinate.
     compareRect(a, b) {
-        if (a.width*a.height > b.x*b.height) return -1;
-        if (a.width*a.height < b.x*b.height) return 1;
+        if (a.width * a.height > b.x * b.height) return -1;
+        if (a.width * a.height < b.x * b.height) return 1;
         return 0;
     }
 
@@ -510,33 +510,33 @@ class Base {
     }
 
     clear() {
-        document.querySelector("#gui-main").innerHTML = "";
-    }
-    //当没有子元素的时候，隐藏，有则开启
+            document.querySelector("#gui-main").innerHTML = "";
+        }
+        //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
-        if (document.querySelector("#gui-main")) {
-            let children = document.querySelector("#gui-main").children;
-            if (children.length == 0) {
-                document.querySelector("#gui-main").style.display = "none";
-                document.querySelector("#p5").style.height = '100vh';
-            } else {
-                document.querySelector("#gui-main").style.display = "flex";
-                document.querySelector("#p5").style.height = '40vh';
+            if (document.querySelector("#gui-main")) {
+                let children = document.querySelector("#gui-main").children;
+                if (children.length == 0) {
+                    document.querySelector("#gui-main").style.display = "none";
+                    document.querySelector("#p5").style.height = '100vh';
+                } else {
+                    document.querySelector("#gui-main").style.display = "flex";
+                    document.querySelector("#p5").style.height = '40vh';
+                }
             }
         }
-    }
-    //手动隐藏,显示p5.js
+        //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-            // if (isShow == false && p5.instance) p5.instance.remove();
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
+            if (document.querySelector("#p5")) {
+                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+                // if (isShow == false && p5.instance) p5.instance.remove();
+            };
+            if (document.querySelector('#gui-main')) {
+                document.querySelector('#gui-main').style.top = '0';
+                document.querySelector('#gui-main').style.height = '100vh';
+            }
         }
-    }
-    // GUI布局
+        // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
@@ -638,7 +638,7 @@ class Base {
     // 粘贴组件，开启后旋转，监听页面的粘贴事件
     createPasteIcon(eventListener, isAdd = true) {
 
-        const pasteFn = function (e) {
+        const pasteFn = function(e) {
             // console.log(e)
             let img = clipboard.readImage();
             // console.log(e,img)
@@ -712,7 +712,7 @@ class Base {
         div.addEventListener('click', () => input.click());
 
         // 设置placeholder
-        div.setPlaceholder = function (value) {
+        div.setPlaceholder = function(value) {
 
             if (fileExt === 'image' && value) {
                 div.className = 'input-image';
@@ -834,59 +834,59 @@ class Base {
      * @param {*} isAdd 
      */
     createTextCanvas(txt, style, isAdd = true) {
-        let canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d');
-        canvas.className = 'text_canvas';
+            let canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d');
+            canvas.className = 'text_canvas';
 
-        let { fontSize, color, fontFamily } = style;
-        fontSize = fontSize || 12;
-        color = color || 'black';
-        fontFamily = fontFamily || 'monospace';
+            let { fontSize, color, fontFamily } = style;
+            fontSize = fontSize || 12;
+            color = color || 'black';
+            fontFamily = fontFamily || 'monospace';
 
-        // 导出图片
-        canvas.toDataURL = function (width = 300) {
-            let base64, height;
-            if (canvas.width > width) {
-                let nc = document.createElement('canvas'),
-                    nctx = nc.getContext('2d');
-                nc.width = width;
-                nc.height = parseInt(canvas.height * width / canvas.width) + 1;
-                nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
-                base64 = nc.toDataURL('image/png');
-                height = nc.height;
-            } else {
-                base64 = canvas.toDataURL('image/png');
-                height = canvas.height;
+            // 导出图片
+            canvas.toDataURL = function(width = 300) {
+                let base64, height;
+                if (canvas.width > width) {
+                    let nc = document.createElement('canvas'),
+                        nctx = nc.getContext('2d');
+                    nc.width = width;
+                    nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+                    nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+                    base64 = nc.toDataURL('image/png');
+                    height = nc.height;
+                } else {
+                    base64 = canvas.toDataURL('image/png');
+                    height = canvas.height;
+                };
+                return base64
+            }
+            canvas.update = function(textNew) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let x = 2;
+                ctx.font = `${fontSize * x}px ${fontFamily}`;
+                let font = ctx.measureText(textNew);
+                canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+                canvas.width = (font.width) + 10;
+
+                ctx.fillStyle = color;
+                ctx.textAlign = "start";
+                ctx.textBaseline = "top";
+                ctx.font = `${fontSize * x}px ${fontFamily}`;
+                ctx.fillText(textNew, 5, 10);
             };
-            return base64
+
+            canvas.update(txt);
+
+            if (isAdd) this.add(canvas);
+
+            return canvas
         }
-        canvas.update = function (textNew) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let x = 2;
-            ctx.font = `${fontSize * x}px ${fontFamily}`;
-            let font = ctx.measureText(textNew);
-            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
-            canvas.width = (font.width) + 10;
-
-            ctx.fillStyle = color;
-            ctx.textAlign = "start";
-            ctx.textBaseline = "top";
-            ctx.font = `${fontSize * x}px ${fontFamily}`;
-            ctx.fillText(textNew, 5, 10);
-        };
-
-        canvas.update(txt);
-
-        if (isAdd) this.add(canvas);
-
-        return canvas
-    }
-    //创建图片，根据url返回图片dom
+        //创建图片，根据url返回图片dom
     createImage(url, isAdd = false) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = url;
-            _img.onload = function () {
+            _img.onload = function() {
                 if (isAdd) this.add(_img);
                 resolve(_img);
             }
@@ -954,93 +954,93 @@ class Base {
     // img
     // gif
     createShortVideoInput() {
-        // console.log(this)
-        let filePaths = dialog.showOpenDialogSync({
-            title: "打开……",
-            properties: ['openFile', 'multiSelections'],
-            filters: [
-                { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
-            ]
-        });
+            // console.log(this)
+            let filePaths = dialog.showOpenDialogSync({
+                title: "打开……",
+                properties: ['openFile', 'multiSelections'],
+                filters: [
+                    { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
+                ]
+            });
 
-        let res = [];
+            let res = [];
 
-        if (filePaths && filePaths.length > 0) {
+            if (filePaths && filePaths.length > 0) {
 
-            for (const url of filePaths) {
-                // console.log(url)
-                let type = null;
-                let urlNew = url.toLowerCase();
-                var count = Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
-                if (count.length > 0) type = "video";
-                count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
-                if (count.length > 0) type = "audio";
-                count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
-                if (count.length > 0) type = "img";
-                count = Array.from(['gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
-                if (count.length > 0) type = "gif";
-                if (type) res.push({
-                    type,
-                    url
-                })
+                for (const url of filePaths) {
+                    // console.log(url)
+                    let type = null;
+                    let urlNew = url.toLowerCase();
+                    var count = Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                    if (count.length > 0) type = "video";
+                    count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                    if (count.length > 0) type = "audio";
+                    count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                    if (count.length > 0) type = "img";
+                    count = Array.from(['gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                    if (count.length > 0) type = "gif";
+                    if (type) res.push({
+                        type,
+                        url
+                    })
+                }
+
             }
-
+            return res.length > 0 ? res : null;
         }
-        return res.length > 0 ? res : null;
-    }
-    // 
+        // 
     saveNativeImageDialog(img, title = "保存") {
-        // const fs = require('fs');
-        let filepath = dialog.showSaveDialogSync({
-            title: title,
-            filters: [
-                { name: 'Image', extensions: ['png', 'jpg'] },
-            ]
-        });
-        if (filepath) {
-            let extname = path.extname(filepath);
-            console.log(filepath, extname)
-            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
-                fs.writeFileSync(filepath, img.toJPEG(80));
-            } else {
-                fs.writeFileSync(filepath, img.toPNG());
+            // const fs = require('fs');
+            let filepath = dialog.showSaveDialogSync({
+                title: title,
+                filters: [
+                    { name: 'Image', extensions: ['png', 'jpg'] },
+                ]
+            });
+            if (filepath) {
+                let extname = path.extname(filepath);
+                console.log(filepath, extname)
+                if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+                    fs.writeFileSync(filepath, img.toJPEG(80));
+                } else {
+                    fs.writeFileSync(filepath, img.toPNG());
+                };
+                // fs.copyFile(file, filepath, e => e ? console.log(e) : null)
             };
-            // fs.copyFile(file, filepath, e => e ? console.log(e) : null)
-        };
-    }
-    // save
+        }
+        // save
     saveDialog(file, title = "保存") {
-        file = file.replace("file://", "");
-        // const fs = require('fs');
-        let filepath = dialog.showSaveDialogSync({
-            title: title,
-            filters: [
-                { name: 'Movies', extensions: ['mp4'] },
-            ]
-        });
-        if (filepath) {
-            fs.copyFile(file, filepath, e => e ? console.log(e) : null)
-        };
-    }
-    // save
+            file = file.replace("file://", "");
+            // const fs = require('fs');
+            let filepath = dialog.showSaveDialogSync({
+                title: title,
+                filters: [
+                    { name: 'Movies', extensions: ['mp4'] },
+                ]
+            });
+            if (filepath) {
+                fs.copyFile(file, filepath, e => e ? console.log(e) : null)
+            };
+        }
+        // save
     saveJsonDialog(json, title = "保存") {
-        let filepath = dialog.showSaveDialogSync({
-            title: title,
-            filters: [
-                { name: 'json', extensions: ['json'] },
-            ]
-        });
-        if (filepath) {
-            json = JSON.stringify(json);
-            try {
-                fs.writeFile(filepath, json, e => console.log(e));
-            } catch (error) {
-                console.log(error)
-            }
+            let filepath = dialog.showSaveDialogSync({
+                title: title,
+                filters: [
+                    { name: 'json', extensions: ['json'] },
+                ]
+            });
+            if (filepath) {
+                json = JSON.stringify(json);
+                try {
+                    fs.writeFile(filepath, json, e => console.log(e));
+                } catch (error) {
+                    console.log(error)
+                }
 
-        };
-    }
-    // 读取
+            };
+        }
+        // 读取
     openJsonDialog() {
         let filepath = this.getFilePath(1, '读取');
         if (filepath) {
@@ -1054,12 +1054,12 @@ class Base {
 
     //随机来张图片
     randomPic(w = 200, h = 200, isAdd = false) {
-        this.randomPicNum++;
-        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-        return this.createImage(url, isAdd);
-    }
-    //随机来一句话
-    randomText() { }
+            this.randomPicNum++;
+            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+            return this.createImage(url, isAdd);
+        }
+        //随机来一句话
+    randomText() {}
 
     // toast
 
@@ -1073,9 +1073,9 @@ class Knn {
 
     // 统计各标签的样本数
     count() {
-        return this.knn.getClassExampleCount();
-    }
-    // 其他标签的样本数控制为最小的样本数
+            return this.knn.getClassExampleCount();
+        }
+        // 其他标签的样本数控制为最小的样本数
     async minDataset() {
         let c = this.count();
         let min = null;
@@ -1102,18 +1102,18 @@ class Knn {
     }
 
     train(tensors = [], classNames = []) {
-        for (let index = 0; index < tensors.length; index++) {
-            const t = tensors[index];
-            this.add(t, classNames[index]);
+            for (let index = 0; index < tensors.length; index++) {
+                const t = tensors[index];
+                this.add(t, classNames[index]);
+            }
         }
-    }
-    // 图片转tensor
-    // img2tensor(img){
-    //     if (!(img instanceof tf.Tensor)) {
-    //         img = tf.browser.fromPixels(img);
-    //     }
-    //     return img
-    // }
+        // 图片转tensor
+        // img2tensor(img){
+        //     if (!(img instanceof tf.Tensor)) {
+        //         img = tf.browser.fromPixels(img);
+        //     }
+        //     return img
+        // }
     async predict(tensor, topk = null) {
         if (Object.keys(this.count()).length === 0) return;
         if (!(tensor instanceof tf.Tensor)) tensor = tf.tensor(tensor);
@@ -1135,7 +1135,7 @@ class Knn {
             return false
         }
     }
-    export() {
+    export () {
         let dataset = this.knn.getClassifierDataset();
         var datasetObj = {};
         Object.keys(dataset).forEach((key) => {
@@ -1150,15 +1150,15 @@ class Knn {
         });
 
         let jsonModel = JSON.stringify(datasetObj)
-        //localStorage.setItem("easyteach_model",jsonModel);
+            //localStorage.setItem("easyteach_model",jsonModel);
         return jsonModel;
     }
     // 缓存模型
     save(key) {
-        let store = new Store(`knn_${key}`);
-        store.set((new Date()).getTime().toString(), this.export());
-    }
-    // 从缓存加载模型 
+            let store = new Store(`knn_${key}`);
+            store.set((new Date()).getTime().toString(), this.export());
+        }
+        // 从缓存加载模型 
     async loadFromStore(key) {
         let store = new Store(`knn_${key}`);
         let ms = await store.getValues();
@@ -1171,7 +1171,15 @@ class Knn {
     }
 }
 
-
+function createImage(url) {
+    return new Promise((resolve, reject) => {
+        let _img = new Image();
+        _img.src = url;
+        _img.onload = function() {
+            resolve(_img);
+        }
+    })
+}
 
 /**
  * 经过处理后返回的是p5的元素类型
@@ -1180,19 +1188,35 @@ class Knn {
  */
 class AI {
     constructor() {
-        // 预训练模型
-        this.Mobilenet = Mobilenet;
+            // 预训练模型
+            this.Mobilenet = Mobilenet;
 
-        // 轮廓
-        this.shape = new Shape();
+            // 轮廓
+            this.shape = new Shape();
 
-        // 
-        this.U2net = U2net;
+            // 
+            this.u2net = {
+                drawSegment: async(im) => {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = im.width;
+                    canvas.height = im.height;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+                    let res = await remote.getGlobal('_WINS').mainWindow.webContents.executeJavaScript(`
+                   
+                    u2netDrawSegment('${canvas.toDataURL()}');
+                    
+                    `, true);
 
-        // 
-        this.Yolov5 = Yolov5;
-    }
-    // 裁切p5的画布，用于下载
+                    return await createImage(res)
+                }
+
+            };
+
+            // 
+            this.Yolov5 = Yolov5;
+        }
+        // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
         let scale = _canvas.canvas.width / _canvas.width;
         let canvas = document.createElement("canvas");
@@ -1218,11 +1242,11 @@ class AI {
 
     // rgb转字符串
     colorStr(c = [0, 0, 0]) {
-        // console.log(c)
-        return `rgb(${c.join(',')})`;
-    }
-    // 计算主色
-    // mainColor
+            // console.log(c)
+            return `rgb(${c.join(',')})`;
+        }
+        // 计算主色
+        // mainColor
     getColor(_im) {
         return new Promise((resolve, reject) => {
             let color;
@@ -1268,7 +1292,7 @@ class AI {
                     c => p5.instance.color(this.colorStr(c)));
                 resolve(_img);
             } else {
-                _im.addEventListener('load', function () {
+                _im.addEventListener('load', function() {
                     _img.colorPalette = Array.from(
                         colorThief.getPalette(_im),
                         c => p5.instance.color(this.colorStr(c)));
@@ -1283,9 +1307,9 @@ class AI {
         var faceDetector = new FaceDetector({ fastMode: fastMode, maxDetectedFaces: maxDetectedFaces });
         let facesRes = [];
         return new Promise((resolve, reject) => {
-            faceDetector.detect(_im).then(function (faces) {
+            faceDetector.detect(_im).then(function(faces) {
                 console.log(`人脸检测`, faces)
-                faces.forEach(function (item) {
+                faces.forEach(function(item) {
                     facesResfaces.push({
                         x: parseInt(item.boundingBox.x),
                         y: parseInt(item.boundingBox.y),
@@ -1294,7 +1318,7 @@ class AI {
                     });
                 });
                 resolve(facesRes)
-            }).catch(function (err) {
+            }).catch(function(err) {
                 console.log("err", err);
                 reject(err);
             });
@@ -1354,7 +1378,7 @@ class AI {
 class Deeplab {
     async init() {
 
-        const loadModel = async () => {
+        const loadModel = async() => {
             const modelName = 'pascal'; // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
             const quantizationBytes = 2; // either 1, 2 or 4
             this.model = await deeplab.load({ base: modelName, quantizationBytes });

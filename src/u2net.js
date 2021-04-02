@@ -21,7 +21,7 @@ class U2net {
         this.url = `http://${host}/u2net/model.json`;
 
         let model = tf.loadGraphModel(this.url, {
-            onProgress: function (progress) {
+            onProgress: function(progress) {
                 let info = { type: "load_progress", progress: progress * 100 };
                 console.log(info);
                 if (progressFn) progressFn(info)
@@ -51,9 +51,7 @@ class U2net {
     }
 
     predict(originalImageElement) {
-        if (!this.ready) setTimeout(() => {
-            this.predict(originalImageElement);
-        })
+        if (this.ready !== true) return;
         let ori_tf = tf.browser.fromPixels(originalImageElement);
         // console.log(ori_tf)
         let resizedImage = ori_tf.resizeNearestNeighbor([320, 320]).toFloat().div(tf.scalar(255));
@@ -63,7 +61,6 @@ class U2net {
         // console.log(finalInput.arraySync());
         let preds = this.model.predict(finalInput);
         // preds = Array.from(preds, p => p.dataSync());
-
 
         let pred = preds[0];
         var pred_max = pred.max();
@@ -76,21 +73,18 @@ class U2net {
         // console.log(pred)
         // pred = pred.resizeNearestNeighbor([ori_tf.shape[0], ori_tf.shape[1]]);
         // console.log(pred.arraySync());
-        return new Promise((resolve, reject) => {
-
-            resolve(pred.arraySync());
-            pred.dispose();
-            ori_tf.dispose();
-            resizedImage.dispose();
-            adj.dispose();
-            finalInput.dispose();
-            preds.forEach((i) => i.dispose());
-
-        });
+        let res = pred.arraySync();
+        pred.dispose();
+        ori_tf.dispose();
+        resizedImage.dispose();
+        adj.dispose();
+        finalInput.dispose();
+        preds.forEach((i) => i.dispose());
+        return res
     }
 
     async drawSegment(originalImageElement) {
-        let maskMap = await this.predict(originalImageElement);
+        let maskMap = this.predict(originalImageElement);
         // console.log(maskMap)
         let mask_canvas = document.createElement('canvas');
         await tf.browser.toPixels(tf.tensor(maskMap), mask_canvas);

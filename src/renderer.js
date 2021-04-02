@@ -24,5 +24,25 @@ ipcRenderer.on("open-devtools", () => GUI.openPreviewDev());
 ipcRenderer.on("executeJavaScript-result", () => GUI.onPreviewWindowError());
 
 
-// const U2net=require('./u2net');
-// new U2net();
+
+
+
+// 为了减少u2net在实验过程中的重复加载，耗时
+const U2net = require('./u2net');
+const u2net = new U2net();
+
+async function u2netDrawSegment(base64) {
+    let im = await createImage(base64);
+    let canvas = await u2net.drawSegment(im);
+    return canvas.toDataURL();
+}
+
+function createImage(url) {
+    return new Promise((resolve, reject) => {
+        let _img = new Image();
+        _img.src = url;
+        _img.onload = function() {
+            resolve(_img);
+        }
+    })
+}
