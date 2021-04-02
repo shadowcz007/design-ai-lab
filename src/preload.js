@@ -1,7 +1,8 @@
 // preload.js
-const { Lab, cv, Store, Canvas, Deeplab } = require('./lab');
+const { Lab, cv, Store, Deeplab } = require('./lab');
 // const  humanseg  = require('./humanseg');
 const DataGenerator = require('./dataGenerator');
+const Canvas=require('./canvas');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 

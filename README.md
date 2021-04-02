@@ -22,6 +22,8 @@
 
 - 图像处理实验
 
+- 海报布局提取
+
 
 **Clone and run for a quick way to see Electron in action.**
 
@@ -53,7 +55,7 @@ npm start
 ## TODO
 - 图像搜索引擎
 - 多模态
-
+- [face mesh](https://github.com/shadowcz007/FaceMeshFaceGeometry)
 
 
 ## 感谢以下开源项目
@@ -79,6 +81,7 @@ npm start
 ##### 
 - 如何在fabricjs上显示gif ？
 方法1：gif经过ffmpeg转为mp4，通过video标签进行显示
+
 x 方法2：gifuct-js把gif解析为imagedata，通过
 
 - 如何把视频抠图后，显示在fabricjs上？
@@ -87,5 +90,7 @@ x 方法2：gifuct-js把gif解析为imagedata，通过
 - 移动端safari
 WebSocket network error: The operation couldn’t be completed. (OSStatus error -9807.)
 websock在iphone上建立连接失败，在mac和pc和安卓都是好的
+
 解决：ip替换成域名，或者不用https 或者用认证过的
+
 - peerjs server部署到mixlab.top官网上

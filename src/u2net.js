@@ -1,12 +1,23 @@
 const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-backend-webgl');
+// require('@tensorflow/tfjs-backend-wasm');
 
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
 
 // u2net
 class U2net {
+
+    //单例
+    static getInstance() {
+        if (!U2net.instance) {
+            U2net.instance = new U2net();
+        }
+        return U2net.instance;
+    }
+
     constructor(progressFn) {
+        let t1 = (new Date()).getTime();
         this.url = `http://${host}/u2net/model.json`;
 
         let model = tf.loadGraphModel(this.url, {
@@ -21,15 +32,26 @@ class U2net {
             const warmupResult = this.model.predict(tf.zeros([1, 3, 320, 320]));
             warmupResult.forEach((i) => i.dataSync());
             warmupResult.forEach((i) => i.dispose());
-            let info = { type: "load_model_done", backend: tf.getBackend() };
+            let info = {
+                type: `load_U2net_model_done`,
+                backend: tf.getBackend(),
+                time: (new Date()).getTime() - t1
+            };
             console.log(info);
-            this.ready=true;
+            this.ready = true;
             if (progressFn) progressFn(info)
         });
+
+    }
+
+    async load(url) {
+        url = url || this.url;
+        this.model = await tf.loadGraphModel(this.url);
+        this.ready = true;
     }
 
     predict(originalImageElement) {
-        if(!this.ready) setTimeout(()=>{
+        if (!this.ready) setTimeout(() => {
             this.predict(originalImageElement);
         })
         let ori_tf = tf.browser.fromPixels(originalImageElement);
@@ -68,7 +90,7 @@ class U2net {
     }
 
     async drawSegment(originalImageElement) {
-        let maskMap =await this.predict(originalImageElement);
+        let maskMap = await this.predict(originalImageElement);
         // console.log(maskMap)
         let mask_canvas = document.createElement('canvas');
         await tf.browser.toPixels(tf.tensor(maskMap), mask_canvas);
@@ -76,11 +98,11 @@ class U2net {
         let img = tf.browser.fromPixels(originalImageElement);
         let canvas = document.createElement('canvas');
         await tf.browser.toPixels(img, canvas);
-        canvas.className='opacity-background';
-        
-        let ctx=canvas.getContext('2d');
-        ctx.globalCompositeOperation='destination-in';
-        
+        canvas.className = 'opacity-background';
+
+        let ctx = canvas.getContext('2d');
+        ctx.globalCompositeOperation = 'destination-in';
+
         // mask的透明度处理
         let imageData = mask_canvas.getContext('2d').getImageData(0, 0, mask_canvas.width, mask_canvas.height);
         for (let i = 0; i < imageData.data.length; i += 4) {
@@ -88,11 +110,11 @@ class U2net {
             imageData.data[i + 3] = parseInt((imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3);
         };
         mask_canvas.getContext('2d').putImageData(imageData, 0, 0);
-        
-        ctx.drawImage(mask_canvas,0,0,mask_canvas.width,mask_canvas.height,0,0,canvas.width,canvas.height);
+
+        ctx.drawImage(mask_canvas, 0, 0, mask_canvas.width, mask_canvas.height, 0, 0, canvas.width, canvas.height);
 
         return canvas
     }
 }
 
-module.exports =  U2net;
+module.exports = U2net;

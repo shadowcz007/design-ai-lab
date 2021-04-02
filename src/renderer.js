@@ -24,7 +24,5 @@ ipcRenderer.on("open-devtools", () => GUI.openPreviewDev());
 ipcRenderer.on("executeJavaScript-result", () => GUI.onPreviewWindowError());
 
 
-
-// ipcRenderer.on("update-mobileUrl", (event, args) => {
-//     window.mobileUrl = Https.url + '?id=' + args;
-// });
+// const U2net=require('./u2net');
+// new U2net();

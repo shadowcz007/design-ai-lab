@@ -20,6 +20,7 @@ const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
 const Mobilenet = require('./mobilenet');
 const U2net = require('./u2net');
+const Yolov5 = require('./yolov5');
 const deeplab = require('@tensorflow-models/deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
@@ -239,6 +240,22 @@ class Shape {
         return res
     };
 
+    // 透明图的边缘识别
+    getBoundingRect(im) {
+        let {
+            src,
+            dst
+        } = this.initProcess(im);
+        // 灰度
+        cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
+        let { contours, hierarchy } = this.findContours(dst);
+        let res = this.getRectangles(contours);
+        dst.delete();
+        src.delete();
+        contours.delete();
+        hierarchy.delete();
+        return res
+    }
 
     // 
     findContoursForImg(im) {
@@ -250,6 +267,7 @@ class Shape {
         cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
         let { contours, hierarchy } = this.findContours(dst);
         let cs = this.contoursSave(contours);
+        // let res = this.getRectangles(contours);
         dst.delete();
         src.delete();
         contours.delete();
@@ -315,6 +333,24 @@ class Shape {
         // contours2.delete();
         return result;
     }
+
+    // Sort rectangles according to x coordinate.
+    compareRect(a, b) {
+        if (a.width*a.height > b.x*b.height) return -1;
+        if (a.width*a.height < b.x*b.height) return 1;
+        return 0;
+    }
+
+    // 从轮廓计算矩形
+    getRectangles(contours) {
+        let rectangles = [];
+        // Extract rectangle from each contour.
+        for (let i = 0; i < contours.size(); ++i) {
+            rectangles.push(cv.boundingRect(contours.get(i)));
+        }
+        return rectangles.sort(this.compareRect);
+    }
+
     // 保存
     contoursSave(contours) {
         let res = [];
@@ -323,7 +359,7 @@ class Shape {
             // 近似轮廓
             let tmp = new cv.Mat();
             cv.approxPolyDP(cnt, tmp, 12, true);
-
+            console.log(cnt)
             res.push({
                 rows: tmp.rows,
                 cols: tmp.cols,
@@ -348,397 +384,6 @@ class Shape {
 }
 
 
-class Canvas {
-    constructor(width = 300, height = 300, isStatic = false, isZoom = false) {
-        if (!global.fabric) {
-            const { fabric } = require('fabric');
-            global.fabric = fabric;
-        }
-
-        this.width = width;
-        this.height = height;
-        this.x = width / 2;
-        this.y = height / 2;
-        this.zoom = 0.8;
-        this.isStatic = isStatic;
-        this.isZoom = isZoom;
-
-        this.canvas = new fabric.Canvas(document.createElement('canvas'), {
-            width: width,
-            height: height,
-            backgroundColor: isStatic ? 'transparent' : '#eee',
-        });
-
-        if (isZoom == true) this.canvas.on('mouse:wheel', (opt) => {
-            let delta = opt.e.deltaY;
-            this.zoom = this.canvas.getZoom();
-            this.zoom *= 0.999 ** delta;
-            if (this.zoom > 20) this.zoom = 20;
-            if (this.zoom < 0.01) this.zoom = 0.01;
-            this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, this.zoom);
-            opt.e.preventDefault();
-            opt.e.stopPropagation();
-        });
-
-        if (isStatic === false) {
-            this.initStyle(width / 2, height / 2, this.zoom);
-            this.canvas.on('text:changed', (opt) => {
-                if (this.onTextChange) this.onTextChange(opt);
-            });
-
-            this.canvas.on('object:modified', opt => {
-                if (this.onModified) this.onModified(opt, this.exportJSON());
-            })
-
-            this.canvas.on('mouse:dblclick', opt => {
-                if (this.dblclick) this.dblclick(opt);
-                // console.log(opt)
-            })
-        };
-
-        // 扩充的方法 
-        // 获取缩放后的 坐标及宽高
-        fabric.Rect.prototype.getScaledBound = function () {
-            return {
-                left: this.left,
-                top: this.top,
-                width: this.getScaledWidth(),
-                height: this.getScaledHeight()
-            }
-        }
-
-    }
-    initStyle(x, y, zoom) {
-
-        this.canvas.selectionColor = 'rgba(255,0,0,0.1)';
-        this.canvas.selectionBorderColor = 'rgba(255,0,0,0.7)';
-        this.canvas.selectionLineWidth = 1;
-        this.canvas.hoverCursor = 'pointer';
-        this.canvas.zoomToPoint({ x: x, y: y }, zoom);
-
-        fabric.Object.prototype.hasControls = false;
-        fabric.Object.prototype.controls.mtr.visible = false;
-        fabric.Object.prototype.controls.deleteControl = new fabric.Control({
-            x: 0.5,
-            y: -0.5,
-            offsetY: -16,
-            offsetX: 16,
-            cursorStyle: 'pointer',
-            mouseUpHandler: deleteObject,
-            render: renderIcon,
-            cornerSize: 24
-        });
-        fabric.Textbox.prototype.controls.deleteControl = fabric.Object.prototype.controls.deleteControl;
-
-
-        var deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
-
-        var img = document.createElement('img');
-        img.src = deleteIcon;
-
-        function deleteObject(eventData, transform) {
-            let target = transform.target;
-            let canvas = target.canvas;
-            canvas.remove(target);
-            canvas.requestRenderAll();
-        }
-
-        function renderIcon(ctx, left, top, styleOverride, fabricObject) {
-            let size = this.cornerSize;
-            ctx.save();
-            ctx.translate(left, top);
-            ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
-            ctx.drawImage(img, -size / 2, -size / 2, size, size);
-            ctx.restore();
-        }
-
-    }
-    addRect(style, selectable = true, hasControls = false, isCanDelete = true) {
-        style = Object.assign({
-            lockMovementX: true,
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-        }, style || {});
-        delete style.type;
-        let rect = new fabric.Rect(style);
-        this.canvas.add(rect);
-        rect.hoverCursor = 'default';
-        rect.hasControls = hasControls;
-        rect.selectable = selectable;
-        rect.controls.deleteControl.visible = isCanDelete;
-
-        return rect
-    }
-    addText(text, style, selectable = true, hasControls = true) {
-        style = Object.assign({
-            splitByGrapheme: true,
-            // lockScalingX:true,
-            // lockScalingY: true,
-        }, style || {});
-        delete style.type;
-        let t = new fabric.Textbox(text, style);
-        this.canvas.add(t);
-        t.selectable = selectable;
-        t.hasControls = hasControls;
-        // t.charSpacing = 4;
-        // t.centeredScaling=true;
-        // console.log(t.controls)
-        // t.hasRotatingPoint=false;
-        return t
-    }
-    addImg(imageElement, style, selectable = true, hasControls = false) {
-        style = Object.assign({
-            lockMovementX: true,
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-        },
-            style || {}
-        );
-        delete style.type;
-        let imgInstance = new fabric.Image(imageElement, style);
-        this.canvas.add(imgInstance);
-        imgInstance.selectable = selectable;
-        imgInstance.hasControls = hasControls;
-        return imgInstance
-    }
-    addVideo(videoEl, style, selectable = true, hasControls = false) {
-        style = Object.assign({
-            lockMovementX: true,
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-        }, style || {});
-        delete style.type;
-        // console.log(videoEl)
-        let video = new fabric.Image(videoEl, style);
-        this.canvas.add(video);
-        video.selectable = selectable;
-        video.hasControls = hasControls;
-        // console.log(video)
-        video.getElement().play();
-        video.getElement().setAttribute('loop', 'loop');
-        this.render();
-        return video
-    }
-
-    addAndResizeImage(imageElement, style, type = 0, selectable = true) {
-        style = { ...style };
-        let { left, top, width, height } = style;
-        // type 类型
-        // 宽度缩放对齐
-        // 0 垂直居中
-        // 1 顶对齐
-        // 2 底对齐
-        // 3 高度
-        // 高度缩放对齐
-        // 4 水平居中
-        // 5 左对齐
-        // 6 右对齐
-
-        let nw = imageElement.naturalWidth,
-            nh = imageElement.naturalHeight;
-
-        let tw = width,
-            th = height;
-
-        // 宽度优先
-        if (type < 4) {
-            height = nh * width / nw;
-        } else {
-            // 高度优先
-            width = nw * height / nh;
-        }
-
-        if (type === 0) {
-            top += (th - height) / 2;
-        } else if (type === 2) {
-            top = top + th - height;
-        } else if (type === 3) {
-            // left
-            left += (tw - width) / 2;
-        } else if (type === 5) {
-            // left
-            left = left + tw - width;
-        };
-
-        style = Object.assign(style, {
-            left,
-            top,
-            nw,
-            nh
-        });
-        delete style.type;
-
-        let img = new fabric.Image(imageElement, {
-            left,
-            top,
-            width: nw,
-            height: nh
-        });
-
-        img.scaleToHeight(height);
-        img.scaleToWidth(width);
-        this.canvas.add(img);
-        this.render(false);
-
-        return
-
-    }
-    render(animate = true) {
-        this.canvas.renderAll();
-        fabric.util.requestAnimFrame(() => {
-            if (animate === true) this.render();
-        });
-    }
-
-    moveToTop(target) {
-        if (target) {
-            let objects = this.canvas.getObjects();
-            target.moveTo(objects.length + 99);
-            this.render(false);
-        }
-    }
-
-    getElement() {
-        return this.canvas.wrapperEl
-    }
-
-    getObjects() {
-        return this.canvas.getObjects();
-    }
-
-    exportJSON() {
-        this.canvas.includeDefaultValues = false;
-        return this.canvas.toJSON();
-    }
-
-    toDataURL(multiplier = 2, format = 'png') {
-        this.canvas.zoomToPoint({ x: this.x, y: this.y }, 1);
-        this.canvas.renderAll();
-        let res = this.canvas.toDataURL({
-            format: format,
-            multiplier: multiplier
-        });
-        this.canvas.zoomToPoint({ x: this.x, y: this.y }, this.zoom);
-        this.canvas.renderAll();
-        return res
-    }
-
-    reset() {
-        let objects = this.canvas.getObjects();
-        objects.forEach(o => {
-            this.canvas.remove(o);
-        })
-    }
-
-    // 动图
-    promisedGif(gifURL) {
-        return new Promise((resolve, reject) => {
-            fetch(gifURL)
-                .then(resp => resp.arrayBuffer())
-                .then(buff => parseGIF(buff))
-                .then(gif => decompressFrames(gif, true))
-                .then(resolve);
-        });
-    }
-    // 
-    imageData2canvas(imageData) {
-        let canvas = document.createElement('canvas');
-        canvas.width = imageData.width;
-        canvas.height = imageData.height;
-        canvas.getContext('2d').putImageData(imageData, 0, 0);
-        return canvas
-    }
-
-    // 从gif转为sprite图
-    // TODO 宽度不对
-    // async buildSprite(gifUrl, c) {
-    //     let canvas_sprite = c || new fabric.Canvas();
-    //     let frames = await this.promisedGif(gifUrl);
-
-    //     return new Promise((resolve, reject) => {
-    //         frames.forEach((frame, i) => {
-    //             // console.log(frame)
-    //             let canvas_frame = this.imageData2canvas(
-    //                 new ImageData(frame.patch, frame.dims.width,
-    //                     frame.dims.height)
-    //             );
-
-    //             if (frames.length > 1) {
-    //                 let img = new fabric.Image.fromURL(canvas_frame.toDataURL(), img => {
-    //                     // console.log(img)
-    //                     img.set('selectable', false);
-    //                     img.left = img.getScaledWidth() * i;
-    //                     // width = img.getWidth() * i + 1;
-
-    //                     canvas_sprite.setHeight(img.getScaledHeight());
-    //                     canvas_sprite.setWidth(img.getScaledWidth() * (i + 1));
-    //                     canvas_sprite.add(img);
-    //                     canvas_sprite.renderAll();
-    //                     // 需要调试
-
-    //                     if (i == frames.length - 1) {
-    //                         let im = canvas_sprite.toDataURL('png');
-    //                         resolve({
-    //                                 img: im,
-    //                                 width: canvas_frame.width,
-    //                                 height: canvas_frame.height
-    //                             })
-    //                             // this.buildView(im, canvas_frame.width, canvas_frame.height)
-    //                     }
-    //                 });
-    //             } else {
-    //                 alert("Invalid GIF");
-    //             }
-    //         });
-    //     });
-
-    // }
-
-    // buildView(img, width, height) {
-    //     var canvas = new fabric.Canvas('merge');
-    //     canvas.setBackgroundColor('lightgreen');
-    //     canvas.setWidth(5000)
-    //     canvas.setHeight(5000)
-
-    //     fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-    //     fabric.Object.prototype.transparentCorners = false;
-
-    //     var ratio = window.devicePixelRatio;
-    //     var imgData = {
-    //         spriteWidth: width * ratio,
-    //         spriteHeight: height * ratio,
-    //         spriteIndex: 0,
-    //         frameTime: 150,
-    //     }
-
-    //     fabric.Sprite.fromURL(img, createSprite(), imgData);
-
-    //     function createSprite() {
-    //         return function(sprite) {
-    //             sprite.set({
-    //                 left: 500,
-    //                 top: 250,
-    //             });
-    //             canvas.add(sprite);
-    //             setTimeout(function() {
-    //                 sprite.set('dirty', true);
-    //                 sprite.play();
-    //             }, fabric.util.getRandomInt(1, 10) * 100);
-    //         };
-    //     }
-
-    //     (function render() {
-    //         canvas.renderAll();
-    //         fabric.util.requestAnimFrame(render);
-    //     })();
-
-
-    // }
-
-}
 
 class Layout {
     constructor(element, isDev = false) {
@@ -1355,7 +1000,7 @@ class Base {
         if (filepath) {
             let extname = path.extname(filepath);
             console.log(filepath, extname)
-            if (extname.toLowerCase() === '.jpg'||extname.toLowerCase() === '.jpeg') {
+            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
                 fs.writeFileSync(filepath, img.toJPEG(80));
             } else {
                 fs.writeFileSync(filepath, img.toPNG());
@@ -1527,9 +1172,11 @@ class Knn {
 }
 
 
+
 /**
  * 经过处理后返回的是p5的元素类型
  * 所有输出格式参考p5的数据类型 
+ * TODO p5 的数据类型 和 原生的 剥离开
  */
 class AI {
     constructor() {
@@ -1541,6 +1188,9 @@ class AI {
 
         // 
         this.U2net = U2net;
+
+        // 
+        this.Yolov5 = Yolov5;
     }
     // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
@@ -1573,30 +1223,37 @@ class AI {
     }
     // 计算主色
     // mainColor
-    getColor(_img) {
+    getColor(_im) {
+        return new Promise((resolve, reject) => {
+            let color;
+            if (_im.complete) {
+                color = colorThief.getColor(_im);
+                resolve(color);
+            } else {
+                _im.addEventListener('load', () => {
+                    color = colorThief.getColor(_im);
+                    resolve(color);
+                });
+            };
+        });
+    };
+    getColorForP5(_img) {
         return new Promise((resolve, reject) => {
             //转为p5的元素类型
             _img = this.p5Image(_img);
 
             let _im = _img.elt;
 
-            if (_im.complete) {
+            this.getColor(_im).then(color => {
                 _img.mainColor = p5.instance.color(
-                    this.colorStr(colorThief.getColor(_im))
+                    this.colorStr(color)
                 );
                 resolve(_img);
-            } else {
-                _im.addEventListener('load', () => {
-                    _img.mainColor = p5.instance.color(
-                        this.colorStr(colorThief.getColor(_im))
-                    );
-                    resolve(_img);
-                });
-            };
-
+            });
         })
-
     };
+
+
     // 计算色板
     // colorPalette
     getPalette(_img) {
@@ -1618,61 +1275,78 @@ class AI {
                 });
                 resolve(_img);
             }
-
         });
-
     }
 
     // 人脸
-    getFace(_img, fastMode = false, maxDetectedFaces = 10) {
-        //转为p5的元素类型
-        _img = this.p5Image(_img);
-        let _im = _img.elt;
+    getFace(_im, fastMode = false, maxDetectedFaces = 10) {
         var faceDetector = new FaceDetector({ fastMode: fastMode, maxDetectedFaces: maxDetectedFaces });
-        _img.faces = [];
-
+        let facesRes = [];
         return new Promise((resolve, reject) => {
             faceDetector.detect(_im).then(function (faces) {
                 console.log(`人脸检测`, faces)
                 faces.forEach(function (item) {
-                    _img.faces.push({
+                    facesResfaces.push({
                         x: parseInt(item.boundingBox.x),
                         y: parseInt(item.boundingBox.y),
                         width: parseInt(item.boundingBox.width),
                         height: parseInt(item.boundingBox.height)
                     });
                 });
-                resolve(_img)
+                resolve(facesRes)
             }).catch(function (err) {
                 console.log("err", err);
                 reject(err);
             });
         });
-
     };
-    // 文本检测
-    getText(_img) {
+    getFaceForP5(_img, fastMode = false, maxDetectedFaces = 10) {
         //转为p5的元素类型
         _img = this.p5Image(_img);
-
         let _im = _img.elt;
+        _img.faces = [];
+
+        return new Promise((resolve, reject) => {
+            this.getFace(_im, fastMode, maxDetectedFaces).then(faces => {
+                _img.faces = faces;
+                resolve(_img)
+            })
+        });
+    };
+    // 文本检测
+    getText(_im) {
         let textDetector = new TextDetector();
-        _img.textBlocks = [];
-        textDetector.detect(_im)
-            .then(detectedTextBlocks => {
-                console.log(`文本检测`, detectedTextBlocks)
-                for (const textBlock of detectedTextBlocks) {
-                    _img.textBlocks.push({
-                        x: textBlock.boundingBox.x,
-                        y: textBlock.boundingBox.y,
-                        width: textBlock.boundingBox.width,
-                        height: textBlock.boundingBox.height
-                    });
-                }
-            }).catch(() => {
-                console.error("Text Detection failed, boo.");
+        let textBlocksRes = [];
+
+        return new Promise((resolve, reject) => {
+            textDetector.detect(_im)
+                .then(detectedTextBlocks => {
+                    // console.log(`文本检测`, detectedTextBlocks)
+                    for (const textBlock of detectedTextBlocks) {
+                        textBlocksRes.push({
+                            x: textBlock.boundingBox.x,
+                            y: textBlock.boundingBox.y,
+                            width: textBlock.boundingBox.width,
+                            height: textBlock.boundingBox.height
+                        });
+                    };
+                    resolve(textBlocksRes)
+                }).catch(e => {
+                    console.error("Text Detection failed, boo.");
+                    reject(e);
+                });
+        });
+    }
+    getTextForP5(_img) {
+        //转为p5的元素类型
+        _img = this.p5Image(_img);
+        let _im = _img.elt;
+        return new Promise((resolve, reject) => {
+            this.getText(_im).then(res => {
+                _img.textBlocks = res;
+                resolve(_img);
             });
-        return _img
+        });
     }
 }
 
@@ -1702,6 +1376,5 @@ module.exports = {
     },
     cv: cv,
     Store: Store,
-    Canvas: Canvas,
     Deeplab: Deeplab
 };
