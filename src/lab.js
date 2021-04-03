@@ -100,27 +100,32 @@ class GIF {
             this.gif = new _GIF({
                 workers: 2,
                 quality: 10,
+                background: 'rgba(0,0,0,0)',
+                transparent: 'rgba(0,0,0,0)',
                 workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
             });
         }
         // canvasElement imageElement
-    add(elt) {
-        this.gif.addFrame(elt);
+    add(elt, fps) {
+        this.gif.addFrame(elt, {
+            delay: 1000 / fps
+        });
     }
     init() {
-        // or a canvas element
-        gif.addFrame(canvasElement, { delay: 200 });
+        // // or a canvas element
+        // gif.addFrame(canvasElement, { delay: 200 });
 
-        // or copy the pixels from a canvas context
-        gif.addFrame(ctx, { copy: true });
-
+        // // or copy the pixels from a canvas context
+        // gif.addFrame(ctx, { copy: true });
 
     }
     render() {
-        this.gif.on('finished', function(blob) {
-            window.open(URL.createObjectURL(blob));
+        return new Promise((resolve, reject) => {
+            this.gif.on('finished', function(blob) {
+                resolve(URL.createObjectURL(blob));
+            });
+            this.gif.render();
         });
-        this.gif.render();
     }
 }
 
@@ -490,7 +495,7 @@ class Base {
         this.clipboard = new Clipboard();
 
         // gif功能
-        this.gif = new GIF();
+        this.GIF = GIF;
     }
 
     // 取id
@@ -1240,6 +1245,7 @@ class AI {
             return new Promise((resolve, reject) => {
                 let _img = new Image();
                 _img.src = url;
+                _img.className = 'opacity-background';
                 _img.onload = function() {
                     resolve(_img);
                 }
