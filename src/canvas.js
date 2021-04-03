@@ -28,7 +28,7 @@ class Canvas {
         this.zoom = 0.8;
         this.isStatic = isStatic;
         this.isZoom = isZoom;
-        this.dragMode=false;
+        this.dragMode = false;
 
         this.canvas = new fabric.Canvas(document.createElement('canvas'), {
             width: width,
@@ -65,7 +65,7 @@ class Canvas {
 
         // 扩充的方法 
         // 获取缩放后的 坐标及宽高
-        fabric.Rect.prototype.getScaledBound = function () {
+        fabric.Rect.prototype.getScaledBound = function() {
             return {
                 left: this.left,
                 top: this.top,
@@ -82,69 +82,69 @@ class Canvas {
             let state = STATE_IDLE;
             // We're entering dragmode
             if (dragMode) {
-              // Discard any active object
-              this.discardActiveObject();
-              // Set the cursor to 'move'
-              this.defaultCursor = 'move';
-              // Loop over all objects and disable events / selectable. We remember its value in a temp variable stored on each object
-              this.forEachObject(function(object) {
-                object.prevEvented = object.evented;
-                object.prevSelectable = object.selectable;
-                object.evented = false;
-                object.selectable = false;
-              });
-              // Remove selection ability on the canvas
-              this.selection = false;
-              // When MouseUp fires, we set the state to idle
-              this.on('mouse:up', function(e) {
-                state = STATE_IDLE;
-              });
-              // When MouseDown fires, we set the state to panning
-              this.on('mouse:down', (e) => {
-                state = STATE_PANNING;
-                lastClientX = e.e.clientX;
-                lastClientY = e.e.clientY;
-              });
-              // When the mouse moves, and we're panning (mouse down), we continue
-              this.on('mouse:move', (e) => {
-                if (state === STATE_PANNING && e && e.e) {
-                  // let delta = new fabric.Point(e.e.movementX, e.e.movementY); // No Safari support for movementX and movementY
-                  // For cross-browser compatibility, I had to manually keep track of the delta
-          
-                  // Calculate deltas
-                  let deltaX = 0;
-                  let deltaY = 0;
-                  if (lastClientX) {
-                    deltaX = e.e.clientX - lastClientX;
-                  }
-                  if (lastClientY) {
-                    deltaY = e.e.clientY - lastClientY;
-                  }
-                  // Update the last X and Y values
-                  lastClientX = e.e.clientX;
-                  lastClientY = e.e.clientY;
-          
-                  let delta = new fabric.Point(deltaX, deltaY);
-                  this.relativePan(delta);
-                //   this.trigger('moved');
-                }
-              });
+                // Discard any active object
+                this.discardActiveObject();
+                // Set the cursor to 'move'
+                this.defaultCursor = 'move';
+                // Loop over all objects and disable events / selectable. We remember its value in a temp variable stored on each object
+                this.forEachObject(function(object) {
+                    object.prevEvented = object.evented;
+                    object.prevSelectable = object.selectable;
+                    object.evented = false;
+                    object.selectable = false;
+                });
+                // Remove selection ability on the canvas
+                this.selection = false;
+                // When MouseUp fires, we set the state to idle
+                this.on('mouse:up', function(e) {
+                    state = STATE_IDLE;
+                });
+                // When MouseDown fires, we set the state to panning
+                this.on('mouse:down', (e) => {
+                    state = STATE_PANNING;
+                    lastClientX = e.e.clientX;
+                    lastClientY = e.e.clientY;
+                });
+                // When the mouse moves, and we're panning (mouse down), we continue
+                this.on('mouse:move', (e) => {
+                    if (state === STATE_PANNING && e && e.e) {
+                        // let delta = new fabric.Point(e.e.movementX, e.e.movementY); // No Safari support for movementX and movementY
+                        // For cross-browser compatibility, I had to manually keep track of the delta
+
+                        // Calculate deltas
+                        let deltaX = 0;
+                        let deltaY = 0;
+                        if (lastClientX) {
+                            deltaX = e.e.clientX - lastClientX;
+                        }
+                        if (lastClientY) {
+                            deltaY = e.e.clientY - lastClientY;
+                        }
+                        // Update the last X and Y values
+                        lastClientX = e.e.clientX;
+                        lastClientY = e.e.clientY;
+
+                        let delta = new fabric.Point(deltaX, deltaY);
+                        this.relativePan(delta);
+                        //   this.trigger('moved');
+                    }
+                });
             } else {
-              // When we exit dragmode, we restore the previous values on all objects
-              this.forEachObject(function(object) {
-                object.evented = (object.prevEvented !== undefined) ? object.prevEvented : object.evented;
-                object.selectable = (object.prevSelectable !== undefined) ? object.prevSelectable : object.selectable;
-              });
-              // Reset the cursor
-              this.defaultCursor = 'default';
-              // Remove the event listeners
-              this.off('mouse:up');
-              this.off('mouse:down');
-              this.off('mouse:move');
-              // Restore selection ability on the canvas
-              this.selection = true;
+                // When we exit dragmode, we restore the previous values on all objects
+                this.forEachObject(function(object) {
+                    object.evented = (object.prevEvented !== undefined) ? object.prevEvented : object.evented;
+                    object.selectable = (object.prevSelectable !== undefined) ? object.prevSelectable : object.selectable;
+                });
+                // Reset the cursor
+                this.defaultCursor = 'default';
+                // Remove the event listeners
+                this.off('mouse:up');
+                this.off('mouse:down');
+                this.off('mouse:move');
+                // Restore selection ability on the canvas
+                this.selection = true;
             }
-          }
+        }
 
     }
     initStyle(x, y, zoom) {
@@ -192,8 +192,8 @@ class Canvas {
         }
 
     }
-    toggleDragMode(dragMode){
-        this.canvas.toggleDragMode(dragMode||!this.dragMode);
+    toggleDragMode(dragMode) {
+        this.canvas.toggleDragMode(dragMode || !this.dragMode);
     }
     addRect(style, selectable = true, hasControls = false, isCanDelete = true) {
         style = Object.assign({
@@ -231,11 +231,11 @@ class Canvas {
     }
     addImg(imageElement, style, selectable = true, hasControls = false) {
         style = Object.assign({
-            lockMovementX: true,
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-        },
+                lockMovementX: true,
+                lockRotation: true,
+                lockScalingX: true,
+                lockScalingY: true,
+            },
             style || {}
         );
         delete style.type;
@@ -266,7 +266,7 @@ class Canvas {
     }
 
     addAndResizeImage(imageElement, style, type = 0, selectable = true) {
-        style = { ...style };
+        style = {...style };
         let { left, top, width, height } = style;
         // type 类型
         // 宽度缩放对齐
@@ -328,7 +328,27 @@ class Canvas {
         return
 
     }
-    render(animate = true) {
+    blur(object, value = 0.1) {
+        var filter = new fabric.Image.filters.Blur({
+            blur: value
+        });
+        object.filters.push(filter);
+        object.applyFilters();
+        this.canvas.renderAll();
+    }
+    blackWhite(object) {
+        var filter = new fabric.Image.filters.BlackWhite();
+        object.filters.push(filter);
+        object.applyFilters();
+        this.canvas.renderAll();
+    }
+    gray(object) {
+        var filter = new fabric.Image.filters.Grayscale();
+        object.filters.push(filter);
+        object.applyFilters();
+        this.canvas.renderAll();
+    }
+    render(animate = false) {
         this.canvas.renderAll();
         fabric.util.requestAnimFrame(() => {
             if (animate === true) this.render();
@@ -356,15 +376,22 @@ class Canvas {
         return this.canvas.toJSON();
     }
 
-    toDataURL(multiplier = 2, format = 'png') {
-        this.canvas.zoomToPoint({ x: this.x, y: this.y }, 1);
-        this.canvas.renderAll();
+    // zoom 会影响截图 
+    toDataURL(multiplier = 2, format = 'png', bound = { left: 0, top: 0 }) {
+        this.canvas.zoomToPoint({
+            x: this.x,
+            y: this.y
+        }, 1);
+        this.render();
         let res = this.canvas.toDataURL({
             format: format,
-            multiplier: multiplier
+            multiplier: multiplier,
+            left: bound.left || 0,
+            top: bound.top || 0,
+            width: bound.width || this.canvas.width,
+            height: bound.height || this.canvas.height
         });
-        this.canvas.zoomToPoint({ x: this.x, y: this.y }, this.zoom);
-        this.canvas.renderAll();
+        this.zoomToFitCanvas();
         return res
     }
 
@@ -379,52 +406,63 @@ class Canvas {
     zoomToFitCanvas = () => {
         //遍历所有对对象，获取最小坐标，最大坐标
         var objects = this.canvas.getObjects();
-        if (objects.length === 0) return this.canvas.zoomToPoint(new fabric.Point(0,0), 0.5);
+        if (objects.length === 0) return;
 
         // 需要传参，详见api文档说明
-        var rect = objects[0].getBoundingRect(true,true);
+        var rect = objects[0].getBoundingRect(true, true);
         var minX = rect.left;
         var minY = rect.top;
         var maxX = rect.left + rect.width;
         var maxY = rect.top + rect.height;
         for (var i = 1; i < objects.length; i++) {
-            rect = objects[i].getBoundingRect(true,true);
+            rect = objects[i].getBoundingRect(true, true);
             minX = Math.min(minX, rect.left);
             minY = Math.min(minY, rect.top);
             maxX = Math.max(maxX, rect.left + rect.width);
             maxY = Math.max(maxY, rect.top + rect.height);
-        }
-
-        //计算平移坐标
-        var panX = (maxX - minX - this.canvas.width) / 2 + minX;
-        var panY = (maxY - minY - this.canvas.height) / 2 + minY;
-        //开始平移
-        this.canvas.absolutePan({ x: panX, y: panY });
+        };
 
         //计算缩放比例
-        var zoom =Math.min(
+        var zoom = Math.min(
             this.canvas.width / (maxX - minX),
             this.canvas.height / (maxY - minY)
         );
-        //计算缩放中心
-        // var zoomPoint = new fabric.Point(this.x, this.y);
-        //开始缩放
+
         this.canvas.zoomToPoint({
-            x:this.x, y:this.y
+            x: this.x,
+            y: this.y
         }, zoom);
+
+        let g = new fabric.Group();
+        let locks = [];
+        objects.forEach(o => {
+            let { lockMovementX, lockMovementY } = o;
+            o.lockMovementX = false;
+            o.lockMovementY = false;
+            g.addWithUpdate(o);
+            locks.push({ lockMovementX, lockMovementY });
+        });
+        this.canvas.viewportCenterObject(g);
+        objects.forEach((o, i) => {
+            o.lockMovementX = locks[i].lockMovementX;
+            o.lockMovementY = locks[i].lockMovementY;
+        });
+        this.render();
+        g.getObjects().forEach(o => g.removeWithUpdate(o));
+        this.render();
     };
 
     // 动图
     promisedGif(gifURL) {
-        return new Promise((resolve, reject) => {
-            fetch(gifURL)
-                .then(resp => resp.arrayBuffer())
-                .then(buff => parseGIF(buff))
-                .then(gif => decompressFrames(gif, true))
-                .then(resolve);
-        });
-    }
-    // 
+            return new Promise((resolve, reject) => {
+                fetch(gifURL)
+                    .then(resp => resp.arrayBuffer())
+                    .then(buff => parseGIF(buff))
+                    .then(gif => decompressFrames(gif, true))
+                    .then(resolve);
+            });
+        }
+        // 
     imageData2canvas(imageData) {
         let canvas = document.createElement('canvas');
         canvas.width = imageData.width;

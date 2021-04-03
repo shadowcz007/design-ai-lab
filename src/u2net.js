@@ -33,7 +33,7 @@ class U2net {
             warmupResult.forEach((i) => i.dataSync());
             warmupResult.forEach((i) => i.dispose());
             let info = {
-                type: `load_U2net_model_done`,
+                type: `load_model_done`,
                 backend: tf.getBackend(),
                 time: (new Date()).getTime() - t1
             };

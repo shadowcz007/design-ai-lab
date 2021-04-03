@@ -18,9 +18,9 @@ const fs = require('fs');
 const path = require('path');
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
-const Mobilenet = require('./mobilenet');
+// const Mobilenet = require('./mobilenet');
 // const U2net = require('./u2net');
-const Yolov5 = require('./yolov5');
+// const Yolov5 = require('./yolov5');
 const deeplab = require('@tensorflow-models/deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const md5 = require('md5');
@@ -838,7 +838,11 @@ class Base {
                 ctx = canvas.getContext('2d');
             canvas.className = 'text_canvas';
 
-            let { fontSize, color, fontFamily } = style;
+            let { fontSize, color, fontFamily } = style || {
+                fontSize: 12,
+                color: 'black',
+                fontFamily: 'monospace'
+            };
             fontSize = fontSize || 12;
             color = color || 'black';
             fontFamily = fontFamily || 'monospace';
@@ -885,7 +889,7 @@ class Base {
     createImage(url, isAdd = false) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
-            _img.src = url;
+            _img.src = encodeURI(url);
             _img.onload = function() {
                 if (isAdd) this.add(_img);
                 resolve(_img);
@@ -1171,15 +1175,6 @@ class Knn {
     }
 }
 
-function createImage(url) {
-    return new Promise((resolve, reject) => {
-        let _img = new Image();
-        _img.src = url;
-        _img.onload = function() {
-            resolve(_img);
-        }
-    })
-}
 
 /**
  * 经过处理后返回的是p5的元素类型
@@ -1188,33 +1183,67 @@ function createImage(url) {
  */
 class AI {
     constructor() {
-            // 预训练模型
-            this.Mobilenet = Mobilenet;
-
-            // 轮廓
-            this.shape = new Shape();
-
-            // 
-            this.u2net = {
-                drawSegment: async(im) => {
-                    let canvas = document.createElement("canvas");
-                    canvas.width = im.width;
-                    canvas.height = im.height;
-                    let ctx = canvas.getContext('2d');
-                    ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
-                    let res = await remote.getGlobal('_WINS').mainWindow.webContents.executeJavaScript(`
-                   
-                    u2netDrawSegment('${canvas.toDataURL()}');
-                    
+        // 预训练模型
+        this.Mobilenet = {
+            classify: async(im) => {
+                let base64 = this.im2base64(im);
+                let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+                mobilenetClassify('${base64}');
                     `, true);
+                return res
+            },
+            infer: async(im) => {
+                let base64 = this.im2base64(im);
+                let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+                mobilenetInfer('${base64}');
+                    `, true);
+                return res
+            }
+        };
 
-                    return await createImage(res)
+        // 轮廓
+        this.shape = new Shape();
+
+        // 
+        this.u2net = {
+            segment: async(im) => {
+                let base64 = this.im2base64(im);
+                let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+                    u2netDrawSegment('${base64}');
+                    `, true);
+                return await this.createImage(res)
+            }
+        };
+
+        // 
+        this.yolo = {
+            detect: async(im) => {
+                let base64 = this.im2base64(im);
+                let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+                yoloDetectAndBox('${base64}');
+                    `, true);
+                return res
+            }
+        };
+    }
+
+    im2base64(im) {
+        let canvas = document.createElement("canvas");
+        canvas.width = im.width;
+        canvas.height = im.height;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL();
+    }
+
+    createImage(url) {
+            return new Promise((resolve, reject) => {
+                let _img = new Image();
+                _img.src = url;
+                _img.onload = function() {
+                    resolve(_img);
                 }
-
-            };
-
-            // 
-            this.Yolov5 = Yolov5;
+            })
         }
         // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {

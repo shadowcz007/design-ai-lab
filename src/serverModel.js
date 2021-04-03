@@ -1,31 +1,44 @@
-const http = require("http"),fs=require('fs'),path=require('path');
-const internalIp = require('internal-ip');
-const _port=3399;
-let url = `http://${internalIp.v4.sync()}:${_port}`;
-// 更新ip地址
-function updateHost() {
-    url = `http://${internalIp.v4.sync()}:${_port}`;
+// 为了减少u2net在实验过程中的重复加载，耗时
+
+const Yolov5 = require('./yolov5');
+const U2net = require('./u2net');
+const Mobilenet = require('./mobilenet');
+
+
+const u2net = new U2net();
+const yolo = new Yolov5();
+yolo.load();
+
+const mobilenet = new Mobilenet();
+mobilenet.init();
+
+async function u2netDrawSegment(base64) {
+    let im = await createImage(base64);
+    let canvas = await u2net.drawSegment(im);
+    return canvas.toDataURL();
 }
 
-const server = http.createServer(function(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Request-Method', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-
-
-    if (req.url === '/mobilenet_v2/model.json') {
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/model.json')));
-    }else if(req.url === '/mobilenet_v2/weights.bin') {
-        res.writeHead(200, {'Content-Type': 'application/x-binary'});
-        res.end(fs.readFileSync(path.join(__dirname, '../model/mobilenet_v2/weights.bin')));
-    };
-
-});
-
-server.listen(_port);
-
-module.exports = {
-    url,updateHost
+async function yoloDetectAndBox(base64) {
+    let im = await createImage(base64);
+    let res = await yolo.detectAndBox(im);
+    return res;
 }
+
+async function mobilenetClassify(base64) {
+    let im = await createImage(base64);
+    return mobilenet.classify(im);
+}
+async function mobilenetInfer(base64) {
+    let im = await createImage(base64);
+    return mobilenet.infer(im);
+}
+
+function createImage(url) {
+    return new Promise((resolve, reject) => {
+        let _img = new Image();
+        _img.src = url;
+        _img.onload = function() {
+            resolve(_img);
+        }
+    })
+};
