@@ -1,0 +1,17 @@
+{
+  "poster": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAADmCAYAAAAeCEHhAAABS0lEQVR4nO3TwQnDMAAEQTkY9V9jCnABekSpwgiWmQoOlrue59mDrM/pAbxL4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOu8cYv9MjeM895/TisHut9T09gvdce+95egQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAwh/kzgxtpcSaowAAAABJRU5ErkJggg==",
+  "knowledge": {
+    "readme": "## Animated sprite",
+    "course": ""
+  },
+  "code": "\nvar c=new Canvas(300,300);\n\nfunction gui(){\n    Lab.base.p5Show(false);\n    Lab.base.createInput('img', 'Animated sprite',url=>{\n        console.log(url)\n    });\n    Lab.base.add(c.getElement())\n}",
+  "code_length": 5,
+  "size": [
+    328,
+    656
+  ],
+  "extname": "designlabplugin",
+  "version": "0.1.1",
+  "package_id": "3bc909fb241f493dde9ba4db0ed2b5254cad0b6c",
+  "create_time": 1617616096134
+}
