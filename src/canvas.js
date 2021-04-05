@@ -13,19 +13,21 @@
 const STATE_IDLE = 'idle';
 const STATE_PANNING = 'panning';
 
-function i() {
+
+function initSprite() {
     fabric.Sprite = fabric.util.createClass(fabric.Image, {
 
         type: 'sprite',
-
-        spriteWidth: 50,
-        spriteHeight: 72,
+        spriteWidth: 136,
+        spriteHeight: 75,
         spriteIndex: 0,
-        frameTime: 100,
+        frameTime: 50,
 
         initialize: function(element, options) {
             options || (options = {});
 
+            this.spriteWidth = this.spriteWidth || this.width;
+            this.spriteHeight = this.spriteHeight || this.height;
             options.width = this.spriteWidth;
             options.height = this.spriteHeight;
 
@@ -37,8 +39,8 @@ function i() {
 
         createTmpCanvas: function() {
             this.tmpCanvasEl = fabric.util.createCanvasElement();
-            this.tmpCanvasEl.width = this.spriteWidth || this.width;
-            this.tmpCanvasEl.height = this.spriteHeight || this.height;
+            this.tmpCanvasEl.width = this.spriteWidth;
+            this.tmpCanvasEl.height = this.spriteHeight;
         },
 
         createSpriteImages: function() {
@@ -71,8 +73,7 @@ function i() {
 
         play: function() {
             var _this = this;
-            this.animInterval = setInterval(function() {
-
+            this.animInterval = setInterval(() => {
                 _this.onPlay && _this.onPlay();
                 _this.dirty = true;
                 _this.spriteIndex++;
@@ -89,7 +90,12 @@ function i() {
 
     fabric.Sprite.fromURL = function(url, callback, imgOptions) {
         fabric.util.loadImage(url, function(img) {
-            callback(new fabric.Sprite(img, imgOptions));
+            imgOptions.spriteWidth = imgOptions.spriteWidth || imgOptions.width;
+            imgOptions.spriteHeight = imgOptions.spriteHeight || imgOptions.height;
+            let s = new fabric.Sprite(img, imgOptions);
+            s.width = imgOptions.spriteWidth;
+            s.height = imgOptions.spriteHeight;
+            callback(s);
         });
     };
 
@@ -101,7 +107,7 @@ class Canvas {
         if (!global.fabric) {
             const { fabric } = require('fabric');
             global.fabric = fabric;
-            i()
+            initSprite();
             this.fabric = fabric;
         }
 
@@ -348,23 +354,27 @@ class Canvas {
         this.render();
         return video
     }
-    addSprite(url) {
-        fabric.Sprite.fromURL(url, sprite => {
-            sprite.originX = sprite.originY = 'center';
-            sprite.transparentCorners = false;
-            sprite.set({
-                left: 0,
-                top: 0,
-                //angle: fabric.util.getRandomInt(-30, 30)
-            });
-            this.canvas.add(sprite);
-            setTimeout(() => {
-                sprite.set('dirty', true);
-                sprite.play();
-            }, fabric.util.getRandomInt(1, 10) * 100);
+    addSprite(url, style) {
+        return new Promise((resolve, reject) => {
+            fabric.Sprite.fromURL(url, sprite => {
+                sprite.originX = sprite.originY = 'center';
+                sprite.transparentCorners = false;
+                sprite.set({
+                    left: 0,
+                    top: 0,
+                    //angle: fabric.util.getRandomInt(-30, 30)
+                });
+                this.canvas.add(sprite);
+                setTimeout(() => {
+                    sprite.set('dirty', true);
+                    sprite.play();
+                }, fabric.util.getRandomInt(1, 10) * 100);
 
-            this.render(true);
-        });
+                this.render(true);
+                resolve(sprite);
+            }, style);
+        })
+
     }
 
     addAndResizeImage(imageElement, style, type = 0, selectable = true) {
@@ -453,7 +463,8 @@ class Canvas {
     render(animate = false) {
         this.canvas.renderAll();
         fabric.util.requestAnimFrame(() => {
-            if (animate === true) this.render();
+            // console.log(this)
+            if (animate === true) this.render(animate);
         });
     }
 

@@ -32,7 +32,7 @@ const _GIF = require('gif.js/dist/gif');
 const RecordRTC = require('recordrtc/RecordRTC');
 
 const { parseGIF, decompressFrames } = require('gifuct-js');
-console.log(parseGIF, decompressFrames)
+// console.log(parseGIF, decompressFrames)
 
 const ffmpeg = require('./ffmpeg');
 
@@ -496,6 +496,45 @@ class Base {
 
         // gif功能
         this.GIF = GIF;
+
+        this.parseGIF = (url) => {
+            return new Promise((resolve, reject) => {
+                let tempCanvas = document.createElement('canvas');
+                var tempCtx = tempCanvas.getContext('2d')
+                    // full gif canvas
+                var gifCanvas = document.createElement('canvas')
+                var gifCtx = gifCanvas.getContext('2d')
+
+                fetch(url)
+                    .then(resp => resp.arrayBuffer())
+                    .then(buff => parseGIF(buff))
+                    .then(gif => decompressFrames(gif, true))
+                    .then(frames => {
+                        tempCanvas.width = frames[0].dims.width;
+                        tempCanvas.height = frames[0].dims.height;
+                        gifCanvas.width = frames[0].dims.width;
+                        gifCanvas.height = frames[0].dims.height;
+
+                        frames = Array.from(frames, f => {
+                            console.log(f)
+                            let c = document.createElement('canvas');
+                            c.width = f.dims.width;
+                            c.height = f.dims.height;
+                            let imgData = new ImageData(f.patch, c.width, c.height);
+                            tempCtx.putImageData(imgData, 0, 0);
+                            gifCtx.drawImage(tempCanvas, f.dims.left, f.dims.top);
+
+                            c.getContext('2d').drawImage(gifCanvas, 0, 0);
+
+                            return c
+                        });
+                        resolve(frames);
+                    })
+            })
+
+        };
+
+
     }
 
     // 取id
@@ -692,7 +731,10 @@ class Base {
         } else if (type == "file") {
             type = "file";
             fileExt = "other";
-        };
+        } else if (type == 'color') {
+            type = 'color';
+            //fileExt = "other";
+        }
         let div = document.createElement('div');
 
         //如果是图片，则多一个图片预览
@@ -767,7 +809,9 @@ class Base {
                 // console.log(e)
                 //文本输入
                 res = input.value;
-            };
+            } else if (type === 'color') {
+                res = input.value;
+            }
 
             //存储
             if (cache) localStorage.setItem(key, res);
@@ -792,7 +836,9 @@ class Base {
             } else if (type === 'text' && value) {
                 //文本输入
                 input.value = value;
-            };
+            } else if (type === 'color' && value) {
+                input.value = value;
+            }
             //eventListener,处理input的结果
             if (eventListener && value) {
                 setTimeout(() => {
@@ -1071,6 +1117,23 @@ class Base {
     randomText() {}
 
     // toast
+
+    //笛卡尔积 
+    cartesian(arr) {
+        if (arr.length < 2) return arr[0] || [];
+        return [].reduce.call(arr, (col, set) => {
+            let res = [];
+            col.forEach(c => {
+                set.forEach(s => {
+                    let t = [].concat(Array.isArray(c) ? c : [c]);
+                    t.push(s);
+                    res.push(t);
+                })
+            });
+            return res;
+        });
+    }
+
 
 }
 

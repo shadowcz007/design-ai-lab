@@ -172,6 +172,13 @@ class Editor {
                             insertText: 'Lab.base.p5Show(false);',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: 'p5画布的显示与隐藏'
+                        }, {
+                            label: 'Lab.base.cartesian',
+                            kind: 1,
+                            insertText: 'Lab.base.cartesian(${1:arr})',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '笛卡尔积'
+
                         },
                         {
                             label: 'Lab.base.createCanvas',
@@ -179,7 +186,7 @@ class Editor {
                             insertText: 'Lab.base.createCanvas(${1:width}, ${2:height},${3: className}, ${4: id}, ${5: show})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建画布'
-                            
+
                         },
                         {
                             label: 'Lab.base.createBaseText',
@@ -187,16 +194,16 @@ class Editor {
                             insertText: 'Lab.base.createBaseText()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建文本'
-                            
+
                         },
-                        
+
                         {
                             label: 'Lab.base.createGroup',
                             kind: 1,
                             insertText: 'Lab.base.createGroup()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建组'
-                            
+
                         },
                         {
                             label: 'Lab.base.createImage',
@@ -204,7 +211,7 @@ class Editor {
                             insertText: 'Lab.base.createImage(${1:url})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建图片'
-                            
+
                         },
                         {
                             label: 'Lab.base.createInput',
@@ -213,7 +220,7 @@ class Editor {
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建输入'
                         },
-                        
+
                         {
                             label: 'Lab.base.createIcon',
                             kind: 1,
@@ -276,14 +283,14 @@ class Editor {
                             insertText: 'Lab.base.createShortVideoInput()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '从本地读取视频素材路径'
-                        }, 
-                        // {
-                        //     label: 'Lab.video.createShortVideoFromLocal()',
-                        //     kind: 1,
-                        //     insertText: 'Lab.video.createShortVideoFromLocal()',
-                        //     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        //     detail: '短视频合成从本地'
-                        // }
+                        },
+                        {
+                            label: 'Lab.video.getMediaDurationAndType',
+                            kind: 1,
+                            insertText: 'Lab.video.getMediaDurationAndType(${1:filePath})',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: '读取文件媒体信息'
+                        }
                     ];
 
                     //p5内部常用
@@ -293,15 +300,15 @@ class Editor {
                             insertText: 'windowWidth',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '窗口内部宽度'
-                        }, 
+                        },
                         {
                             label: 'frameRate()',
                             kind: 0,
                             insertText: 'frameRate(25)',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '帧速率'
-                            
-                        },{
+
+                        }, {
                             label: 'noise(x, [y], [z])',
                             kind: 0,
                             insertText: 'noise(${1:x});',

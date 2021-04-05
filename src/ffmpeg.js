@@ -94,6 +94,7 @@ class FF {
     // 映射文件格式
     getFileType(formatName = null) {
         if (formatName === null) return;
+        if (formatName.match("webp")) return 'webp';
         if (formatName.match("image") || formatName.match('png')) return 'img';
         if (Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
@@ -113,7 +114,7 @@ class FF {
                         type: this.getFileType(metadata.format.format_name),
                         width: metadata.streams[0].width,
                         height: metadata.streams[0].height,
-                        frame_rate: metadata.streams[0].avg_frame_rate,
+                        frame_rate: eval(metadata.streams[0].avg_frame_rate),
                         codec_name: metadata.streams[0].codec_name
                     });
                 } else {
@@ -385,7 +386,7 @@ class FF {
     }
 
     //把帧图片转为视频文件
-    frames2video(filePath, size, aspect, fps = 24) {
+    frames2video(filePath, size, fps = 24) {
         return new Promise((resolve, reject) => {
 
             let { output } = this.createOutputPath(filePath, 'output', '.mp4');
@@ -395,7 +396,7 @@ class FF {
             ffmpeg(input)
                 .videoCodec(this.videoCodec)
                 .size(size)
-                .aspect(aspect)
+                // .aspect(aspect)
                 .outputFps(fps)
                 .output(output)
                 .on('progress', function(progress) {
