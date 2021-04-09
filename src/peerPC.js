@@ -7,8 +7,8 @@ class PeerPC {
         //手机传来的视频
         this.displayVideo = displayVideo || ((v) => {});
         this.open = open || ((v) => {});
-
-        const peer = new Peer(null, {
+        
+        const peer = new Peer(localStorage.getItem('peerId')||null, {
             host: 'mixlab.top',
             secure: true,
             path: "/myapp"
@@ -16,6 +16,7 @@ class PeerPC {
 
         peer.on('open', id => {
             console.log('peer open', id);
+            localStorage.setItem('peerId',id);
             this.id = id;
             this.open(this.getMobileUrl());
         });

@@ -187,7 +187,7 @@
 
             if (!(peer && peer.destroyed || !peer)) return
 
-            peer = new Peer(null, {
+            peer = new Peer(localStorage.getItem('peerId')||null, {
                 host: 'mixlab.top',
                 secure: true,
                 path: "/myapp"
@@ -198,6 +198,7 @@
             //连接成功后显示id
             peer.on('open', id => {
                 console.log('peer open', id);
+                localStorage.setItem('peerId',id);
                 document.querySelector('#peerId').innerText = id;
             });
 
@@ -302,7 +303,7 @@
                         canvas.width = video.width;
                         canvas.height = video.height;
                         video.oncanplay = null;
-                        capture = new DataGenerator(12, (t) => {
+                        capture = new DataGenerator(24, (t) => {
                             drawResult();
                         });
 
@@ -382,6 +383,7 @@
             const {
                 data
             } = await humanseg.getGrayValue(video);
+            // console.log(data)
             humanseg.drawHumanSeg(canvas, data);
             ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
             canvas.getContext("2d").drawImage(c, 0, 0, canvas.width, canvas.height);

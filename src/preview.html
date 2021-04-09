@@ -77,8 +77,8 @@
             cursor: pointer;
             box-shadow: var(--box-shadow);
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: flex-end;
+            align-items: flex-end;
             color: lightsteelblue;
             margin: 12px;
         }
@@ -94,8 +94,37 @@
             box-shadow: var(--box-shadow);
         }
 
+
+        #gui-main .input-more-files:after {
+           content: attr(data-count);
+            background-color: #272727;
+            width: 12px;
+            font-size: 10px;
+            height: 12px;
+            text-align: center;
+            line-height: 12px;
+            /* position: sticky; */
+            color: white;
+            border-radius: 100%;
+
+        }
+
         #gui-main .input-file {
-            height: 32px
+            height: 32px;
+            font-size: 12px;
+            outline: 1px solid gray;
+            line-height: 4px;
+            padding: 4px;
+            display: flex;
+            cursor: pointer;
+            width: 100%;
+            margin: 12px 0;
+        }
+
+       #gui-main .input-file:hover {
+             
+            outline: 1px solid var(--hover-color);
+            
         }
 
         #gui-main .input-file p {
@@ -119,7 +148,7 @@
         }
 
         #gui-main .input-text {
-            width: 80%;
+            width: 100%;
         }
 
         #gui-main .input-text p {
@@ -133,12 +162,13 @@
             font-family: inherit;
             padding-top: 16px;
             margin: 8px 0;
-            color: lightsteelblue;
+            color: #2f3031;
             word-break: break-word;
+            user-select: none;
         }
 
         #gui-main .input-text input {
-            border-color: lightsteelblue;
+            border-color: #4c5258;
             border-width: thin;
             border-top: none;
             border-left: none;
@@ -149,7 +179,7 @@
             width: 100%;
             padding: 0 8px;
             font-size: 16px;
-            color: #265b8c;
+            color: #373a40;
         }
 
         #gui-main button {
@@ -199,6 +229,7 @@
             cursor: pointer;
             width: 32px;
             outline: none;
+            margin: 12px 0;
         }
 
         #gui-main input[type="color"]:hover {

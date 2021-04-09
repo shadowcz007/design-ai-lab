@@ -5,6 +5,8 @@ require('@tensorflow/tfjs-backend-webgl');
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
 
+const _IMG_SIZE=320;
+
 // u2net
 class U2net {
 
@@ -29,7 +31,7 @@ class U2net {
         });
         model.then((res) => {
             this.model = res;
-            const warmupResult = this.model.predict(tf.zeros([1, 3, 320, 320]));
+            const warmupResult = this.model.predict(tf.zeros([1, 3, _IMG_SIZE, _IMG_SIZE]));
             warmupResult.forEach((i) => i.dataSync());
             warmupResult.forEach((i) => i.dispose());
             let info = {
@@ -54,7 +56,7 @@ class U2net {
         if (this.ready !== true) return;
         let ori_tf = tf.browser.fromPixels(originalImageElement);
         // console.log(ori_tf)
-        let resizedImage = ori_tf.resizeNearestNeighbor([320, 320]).toFloat().div(tf.scalar(255));
+        let resizedImage = ori_tf.resizeNearestNeighbor([_IMG_SIZE, _IMG_SIZE]).toFloat().div(tf.scalar(255));
         let adj = resizedImage.div(resizedImage.max()).sub(tf.scalar(0.485)).div(tf.scalar(0.229));
         let finalInput = adj.transpose([2, 0, 1]).expandDims(0);
 
@@ -67,7 +69,7 @@ class U2net {
         var pred_min = pred.min();
         pred = pred.sub(pred_min).div(pred_max.sub(pred_min));
         pred = pred.squeeze();
-        pred = pred.reshape([320, 320]);
+        pred = pred.reshape([_IMG_SIZE, _IMG_SIZE]);
 
         // pred=pred.mul(tf.scalar(255));
         // console.log(pred)

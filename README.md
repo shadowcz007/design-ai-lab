@@ -1,9 +1,10 @@
 ![LOGO](https://shadowcz007.github.io/design-ai-lab/assets/icons/ios/AppIcon.appiconset/icon-20-ipad.png)
-![DEMO](https://shadowcz007.github.io/design-ai-lab/examples/demo.jpg)
+![DEMO](https://shadowcz007.github.io/design-ai-lab/assets/demo.jpg)
 
-# design-ai-lab
+# design-ai-lab【实验ing】
 
 智能设计实验工具 Artificial Intelligence for Graph Design
+！！！暂未完成开发，快速迭代中～～
 
 - 使用JavaScript易于上手
 - 集成p5.js、tensorflow.js、opencv.js
@@ -56,6 +57,10 @@ npm start
 - 图像搜索引擎
 - 多模态
 - [face mesh](https://github.com/shadowcz007/FaceMeshFaceGeometry)
+- 增强剪切板功能 A new way to manage your clipboard history.
+- 形态分类：三角形、方形、圆形、倒三角……
+- PPT文件格式支持
+- 
 
 
 ## 感谢以下开源项目
@@ -94,3 +99,6 @@ websock在iphone上建立连接失败，在mac和pc和安卓都是好的
 解决：ip替换成域名，或者不用https 或者用认证过的
 
 - peerjs server部署到mixlab.top官网上
+
+- 系统文件类型注册
+暂时没找到方案

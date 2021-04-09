@@ -386,13 +386,14 @@ class FF {
     }
 
     //把帧图片转为视频文件
+    // TODO 个位数图片合成有bug
     frames2video(filePath, size, fps = 24) {
         return new Promise((resolve, reject) => {
 
             let { output } = this.createOutputPath(filePath, 'output', '.mp4');
 
             let input = this.framesRename(filePath);
-
+// console.log(input)
             ffmpeg(input)
                 .videoCodec(this.videoCodec)
                 .size(size)
@@ -405,6 +406,10 @@ class FF {
                 .on('end', function() {
                     console.log('Finished processing');
                     resolve(output);
+                })
+                .on('error', (_err) => {
+                    console.log(_err)
+                    reject(_err);
                 })
                 .run();
         });
@@ -492,6 +497,7 @@ class FF {
             let files = this.sortFiles(fileDir);
             return this.filesRename(files, fileDir)
         }
+    
         // 
     filesRename(files, fileDir) {
         if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
@@ -503,12 +509,10 @@ class FF {
             if (t < c) {
                 filename = (new Array(c - t)).fill(0).join("") + "" + filename
             };
-            filename = path.join(fileDir, `${filename}.jpg`);
+            filename = path.join(fileDir, `${filename}.png`);
             fs.renameSync(files[index], filename);
-            //let filename=path.join(d,files[index]);
-            // console.log(filename,files[index])
         }
-        return path.join(fileDir, `%0${c}d.jpg`)
+        return path.join(fileDir, c>1?`%0${c}d.png`:`%1d.png`);
     }
 
 

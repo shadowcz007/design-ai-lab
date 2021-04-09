@@ -216,7 +216,7 @@ class Editor {
                         {
                             label: 'Lab.base.createInput',
                             kind: 1,
-                            insertText: 'Lab.base.createInput(${1:type}, ${2:text},${3:eventListener}, ${4:cache})',
+                            insertText: 'Lab.base.createInput(${1:type}, ${2:text},${3:eventListener}, ${4:cache},${5:add})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建输入'
                         },

@@ -6,6 +6,8 @@ const Canvas=require('./canvas');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 
+const screenpoint=require('./screenpoint')
+
 const DimensionsDb = require('./dimensionsDb');
 // const _setImmediate = setImmediate;
 // const _clearImmediate = clearImmediate;
@@ -23,6 +25,8 @@ process.once('loaded', () => {
     global.DimensionsDb = DimensionsDb;
     // global.humanseg = humanseg;
     global.DataGenerator = DataGenerator;
+
+    global.screenpoint=screenpoint;
 })
 
 // ipcRenderer.send('preview-ready', true);
