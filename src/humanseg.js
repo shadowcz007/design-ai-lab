@@ -8,22 +8,24 @@ async function start(video) {
     } = await humanseg.getGrayValue(video);
     const canvas = document.createElement('canvas');
     humanseg.drawHumanSeg(canvas, data);
-    return toImg(canvas);
+    let img = await toImg(canvas);
+    return img;
 }
 
-function toImg(canvas){
-    let base64=canvas.toDataURL();
-    let img=new Image();
-    img.onload=()=>{
-
-    }
-    img.src=base64;
-    return img;
+function toImg(canvas) {
+    return new Promise((resolve, reject) => {
+        let base64 = canvas.toDataURL();
+        let img = new Image();
+        img.onload = () => {
+            resolve(img);
+        }
+        img.src = base64;
+    })
 };
 
 
 
 module.exports = {
-    humanseg,
+    // humanseg,
     start
 };

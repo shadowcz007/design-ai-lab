@@ -1,12 +1,12 @@
 // preload.js
 const { Lab, cv, Store, Deeplab } = require('./lab');
-// const  humanseg  = require('./humanseg');
+
 const DataGenerator = require('./dataGenerator');
-const Canvas=require('./canvas');
+const Canvas = require('./canvas');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 
-const screenpoint=require('./screenpoint')
+const screenpoint = require('./screenpoint')
 
 const DimensionsDb = require('./dimensionsDb');
 // const _setImmediate = setImmediate;
@@ -26,7 +26,7 @@ process.once('loaded', () => {
     // global.humanseg = humanseg;
     global.DataGenerator = DataGenerator;
 
-    global.screenpoint=screenpoint;
+    global.screenpoint = screenpoint;
 })
 
 // ipcRenderer.send('preview-ready', true);
