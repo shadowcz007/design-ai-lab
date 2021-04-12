@@ -106,12 +106,12 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg.ffprobe(filePath, (_err, metadata) => {
                 if (_err === null) {
-                    // console.log('===', metadata)
-                    // img、video、audio
-                    let t=this.getFileType(metadata.format.format_name);
-                    let stream=Array.from(metadata.streams,s=>{
-                        if(s.codec_type===t)return s;
-                    }).filter(s=>s)[0]||{};
+                    console.log('===', metadata)
+                        // img、video、audio
+                    let t = this.getFileType(metadata.format.format_name);
+                    let stream = Array.from(metadata.streams, s => {
+                        if (s.codec_name === t) return s;
+                    }).filter(s => s)[0] || {};
                     resolve({
                         // 秒
                         duration: metadata.format.duration,
@@ -397,7 +397,7 @@ class FF {
             let { output } = this.createOutputPath(filePath, 'output', '.mp4');
 
             let input = this.framesRename(filePath);
-// console.log(input)
+            // console.log(input)
             ffmpeg(input)
                 .videoCodec(this.videoCodec)
                 .size(size)
@@ -498,11 +498,11 @@ class FF {
 
     // 
     framesRename(fileDir) {
-            let files = this.sortFiles(fileDir);
-            return this.filesRename(files, fileDir)
-        }
-    
-        // 
+        let files = this.sortFiles(fileDir);
+        return this.filesRename(files, fileDir)
+    }
+
+    // 
     filesRename(files, fileDir) {
         if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
         // let d = path.join(dirname, basename);
@@ -516,7 +516,7 @@ class FF {
             filename = path.join(fileDir, `${filename}.png`);
             fs.renameSync(files[index], filename);
         }
-        return path.join(fileDir, c>1?`%0${c}d.png`:`%1d.png`);
+        return path.join(fileDir, c > 1 ? `%0${c}d.png` : `%1d.png`);
     }
 
 
