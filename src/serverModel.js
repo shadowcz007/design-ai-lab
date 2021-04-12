@@ -3,11 +3,16 @@
 const Yolov5 = require('./yolov5');
 const U2net = require('./u2net');
 const Mobilenet = require('./mobilenet');
+const Posenet = require('./posenet');
+const Bodypix=require('./bodypix');
 
 
 const u2net = new U2net();
 const yolo = new Yolov5();
 yolo.load();
+
+const posenet = new Posenet();
+const bodypix=new Bodypix();
 
 const mobilenet = new Mobilenet();
 mobilenet.init();
@@ -33,11 +38,28 @@ async function mobilenetInfer(base64) {
     return mobilenet.infer(im);
 }
 
+async function estimatePose(base64) {
+    let im = await createImage(base64);
+    let res = await posenet.estimatePoseOnImage(im);
+    return res
+}
+async function estimateMultiplePoses(base64) {
+    let im = await createImage(base64);
+    let res = await posenet.estimateMultiplePosesOnImage(im);
+    return res
+}
+
+async function segmentPerson(base64){
+    let im = await createImage(base64);
+    let canvas = await bodypix.segmentPerson(im);
+    return canvas.toDataURL();
+}
+
 function createImage(url) {
     return new Promise((resolve, reject) => {
         let _img = new Image();
         _img.src = url;
-        _img.onload = function() {
+        _img.onload = function () {
             resolve(_img);
         }
     })

@@ -133,8 +133,24 @@ function doReq(req, res) {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model' + reqUrlBase)));
+    }else if (reqUrlBase === '/posenet/model.json') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/posenet_mobilenet_float075_stride16/model.json')));
+    } else if (reqUrlBase.match(/\/posenet\/.*\.bin/ig)) {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/posenet_mobilenet_float075_stride16/weights.bin')));
+    } else if (reqUrlBase === '/bodypix/model.json') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/bodypix/model.json')));
+    } else if (reqUrlBase.match(/\/bodypix\/.*\.bin/ig)) {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/bodypix/weights.bin')));
     }
-
+    
 }
 
 // const io = require('socket.io')(server);

@@ -1,6 +1,6 @@
 {
     "name": "design-ai-lab",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {
@@ -36,6 +36,7 @@
         "@tensorflow-models/face-landmarks-detection": "0.0.1",
         "@tensorflow-models/knn-classifier": "^1.2.2",
         "@tensorflow-models/mobilenet": "^2.1.0",
+        "@tensorflow-models/posenet": "^2.2.2",
         "@tensorflow/tfjs": "^3.3.0",
         "@tensorflow/tfjs-backend-wasm": "^3.3.0",
         "@tensorflow/tfjs-converter": "^2.8.6",

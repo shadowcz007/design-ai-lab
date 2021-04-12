@@ -107,15 +107,19 @@ class FF {
             ffmpeg.ffprobe(filePath, (_err, metadata) => {
                 if (_err === null) {
                     // console.log('===', metadata)
+                    // img、video、audio
+                    let t=this.getFileType(metadata.format.format_name);
+                    let stream=Array.from(metadata.streams,s=>{
+                        if(s.codec_type===t)return s;
+                    }).filter(s=>s)[0]||{};
                     resolve({
                         // 秒
                         duration: metadata.format.duration,
-                        // img、video、audio
-                        type: this.getFileType(metadata.format.format_name),
-                        width: metadata.streams[0].width,
-                        height: metadata.streams[0].height,
-                        frame_rate: eval(metadata.streams[0].avg_frame_rate),
-                        codec_name: metadata.streams[0].codec_name
+                        type: t,
+                        width: stream.width,
+                        height: stream.height,
+                        frame_rate: eval(stream.avg_frame_rate),
+                        codec_name: stream.codec_name
                     });
                 } else {
                     reject(_err);
