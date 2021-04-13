@@ -4,6 +4,7 @@ const mobilenet = require('@tensorflow-models/mobilenet');
 const hash = require('object-hash');
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
+const utils = require('./utils');
 
 class Mobilenet {
     constructor(opts) {
@@ -11,10 +12,13 @@ class Mobilenet {
         this.savePathHead = 'indexeddb://Mobilenet_';
         this.opts = opts || {
             version: 2,
-            alpha: 1.0,
-            modelUrl: `http://${host}/mobilenet_v2/model.json`
+            alpha: 1.0
         };
-        this.initSavePath(this.opts);
+        utils.checkURLIsOk(this.url).then(status => {
+            if (status) this.opts.modelUrl = `http://${host}/mobilenet_v2/model.json`;
+            this.initSavePath(this.opts);
+        });
+
     }
     initSavePath(opts) {
         this.savePath = this.savePathHead + hash(opts);

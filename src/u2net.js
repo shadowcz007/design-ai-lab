@@ -4,6 +4,7 @@ require('@tensorflow/tfjs-backend-webgl');
 
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
+// const utils = require('./utils');
 
 const _IMG_SIZE=320;
 
@@ -21,7 +22,6 @@ class U2net {
     constructor(progressFn) {
         let t1 = (new Date()).getTime();
         this.url = `http://${host}/u2net/model.json`;
-
         let model = tf.loadGraphModel(this.url, {
             onProgress: function(progress) {
                 let info = { type: "load_progress", progress: progress * 100 };

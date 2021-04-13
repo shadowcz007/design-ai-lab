@@ -5,7 +5,7 @@ require('@tensorflow/tfjs-backend-webgl');
 
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
-
+const utils=require('./utils');
 //
 class Bodypix {
 
@@ -20,29 +20,36 @@ class Bodypix {
     constructor(progressFn) {
         let t1 = (new Date()).getTime();
         this.url = `http://${host}/bodypix/model.json`;
+        
+        utils.checkURLIsOk(this.url).then(status => {
+            
+            let opts={};
+            if(status) opts.modelUrl=this.url;
 
-        let model = bodyPix.load({
-            modelUrl: this.url
-        });
-        model.then(net => {
-            this.model = net;
+            let model = bodyPix.load(opts);
+            
+            model.then(net => {
+                this.model = net;
+            });
+    
+            model.then(async (net) => {
+                this.model = net;
+                let c = document.createElement('canvas');
+                c.width = 1;
+                c.height = 1;
+                const res = await this.model.segmentPerson(c);;
+                let info = {
+                    type: `load_model_done`,
+                    backend: tf.getBackend(),
+                    time: (new Date()).getTime() - t1
+                };
+                console.log(info, res);
+                this.ready = true;
+                if (progressFn) progressFn(info)
+            });
         });
 
-        model.then(async (net) => {
-            this.model = net;
-            let c = document.createElement('canvas');
-            c.width = 1;
-            c.height = 1;
-            const res = await this.model.segmentPerson(c);;
-            let info = {
-                type: `load_model_done`,
-                backend: tf.getBackend(),
-                time: (new Date()).getTime() - t1
-            };
-            console.log(info, res);
-            this.ready = true;
-            if (progressFn) progressFn(info)
-        });
+        
 
     }
 

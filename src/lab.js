@@ -357,7 +357,7 @@ class Shape {
         // 灰度
         cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
         let { contours, hierarchy } = this.findContours(dst);
-        let res = this.getRectangles(contours);
+        let res = this.getRectangles(contours)[0];
         dst.delete();
         src.delete();
         contours.delete();
@@ -374,13 +374,13 @@ class Shape {
         // 灰度
         cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
         let { contours, hierarchy } = this.findContours(dst);
-        let cs = this.contoursSave(contours);
+        let c = this.contourSave(contours.get(0));
         // let res = this.getRectangles(contours);
         dst.delete();
         src.delete();
         contours.delete();
         hierarchy.delete();
-        return cs
+        return c
     }
 
     // 初始化
@@ -442,11 +442,9 @@ class Shape {
         return result;
     }
 
-    // Sort rectangles according to x coordinate.
-    compareRect(a, b) {
-        if (a.width * a.height > b.x * b.height) return -1;
-        if (a.width * a.height < b.x * b.height) return 1;
-        return 0;
+    // Sort rectangles 从大到小
+    compareRect(b, a) {
+        return a.width * a.height - b.width * b.height
     }
 
     // 从轮廓计算矩形
@@ -459,23 +457,31 @@ class Shape {
         return rectangles.sort(this.compareRect);
     }
 
+    contourSave(contour) {
+
+        let cnt = contour;
+        // 近似轮廓
+        let tmp = new cv.Mat();
+        cv.approxPolyDP(cnt, tmp, 12, true);
+        // console.log(cnt)
+        let res = {
+            rows: tmp.rows,
+            cols: tmp.cols,
+            type: tmp.type(),
+            // 长度不等
+            array: tmp.data32S
+        };
+        tmp.delete();
+
+        return res;
+    };
+
     // 保存
     contoursSave(contours) {
         let res = [];
         for (let i = 0; i < contours.size(); i++) {
             let cnt = contours.get(i);
-            // 近似轮廓
-            let tmp = new cv.Mat();
-            cv.approxPolyDP(cnt, tmp, 12, true);
-            console.log(cnt)
-            res.push({
-                rows: tmp.rows,
-                cols: tmp.cols,
-                type: tmp.type(),
-                // 长度不等
-                array: tmp.data32S
-            });
-            tmp.delete();
+            res.push(this.contourSave(cnt));
         };
         return res;
     };
