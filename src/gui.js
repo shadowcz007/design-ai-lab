@@ -392,7 +392,7 @@ class GUI {
         Win.move();
 
         //预览窗口注入代码
-        this.previewWinExecuteJavaScript(res.code);
+        this.previewWinExecuteJavaScript(res.code, true);
 
         //存至数据库
         // fileDb.fileAdd(res);
@@ -418,7 +418,6 @@ class GUI {
         if (!this.practiceBtn.getAttribute('sync-stop')) {
             Win.stopExecuteJavaScript2Preview();
             this.closePracticeHtml();
-            //this.previewWinExecuteJavaScript();
         } else {
             //编程模式
             Win.startExecuteJavaScript2Preview();
@@ -708,19 +707,19 @@ class GUI {
         }]);
     }
 
-    previewWinExecuteJavaScript(code = null) {
+    // forceRun强制执行
+    previewWinExecuteJavaScript(code = null, forceRun = false) {
         Editor.format();
         code = this.createExecuteJs(code || Editor.getCode());
         //Win.startExecuteJavaScript2Preview();
         // 自动更新
         console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'))
-        if (!this.practiceBtn.getAttribute('sync-stop')) {
+        if (!this.practiceBtn.getAttribute('sync-stop') || forceRun) {
             Win.executeJavaScript2Preview(code);
         } else {
             // 关闭自动更新
             Win.stopExecuteJavaScript2Preview();
         }
-
     }
 
     createElement(className, type = 'div') {
@@ -774,7 +773,7 @@ class GUI {
             Win.move();
 
             //注入的js
-            this.previewWinExecuteJavaScript(data.code);
+            this.previewWinExecuteJavaScript(data.code, true);
         });
 
         this.addClickEventListener(div, e => this.openFile(data));
