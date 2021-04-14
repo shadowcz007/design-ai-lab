@@ -167,7 +167,7 @@ class YoloV3 {
     * @param {input} image, canvas, or video element
     * @param {flipHorizontal} flip the input image tensor for webcam input
     */
-    async detectAndBox(input, flipHorizontal = true) {
+    async detectAndBox(input, flipHorizontal = false) {
         if (this.ready !== true) return [];
         const features = await this.predict(input, flipHorizontal)
 

@@ -112,7 +112,7 @@ class GUI {
          * editor面板
          */
         this.practiceBtn = document.querySelector("#practice-btn");
-        // this.logdBtn = document.querySelector("#log-btn");
+        this.openBtn = document.querySelector("#open-btn");
         // this.devBtn = document.querySelector("#devtool-btn");
 
 
@@ -133,6 +133,13 @@ class GUI {
         this.addClickEventListener(this.editFileBtn, () => this.editFileFn());
         //实时编辑代码
         this.addClickEventListener(this.practiceBtn, () => this.practiceFn());
+
+        // 暂停实时更新
+        this.addClickEventListener(this.openBtn, () => {
+            this.openBtn.classList.toggle('button-active');
+            this.togglePracticeHtml();
+        });
+
         //调试界面打开
         // this.addClickEventListener(this.devBtn, () => {
         //     // Win.get(1).devToolsWebContents.isDestroyed()
@@ -163,11 +170,7 @@ class GUI {
             this.recentFiles();
         });
 
-        // log
-        // this.addClickEventListener(this.logdBtn, () => {
-        //     Log.add('success');
-        //     this.onPreviewWindowError();
-        // });
+
     }
 
 
@@ -181,12 +184,12 @@ class GUI {
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function(error) {
+        storage.set('app', obj, function (error) {
             if (error) throw error;
         });
     }
     loadWindowStatus() {
-        storage.get('app', function(error, data) {
+        storage.get('app', function (error, data) {
             console.log('storage', data)
         })
     }
@@ -278,62 +281,62 @@ class GUI {
     /**
      * devtool
      */
-    closeDevTool() {
-        document.getElementById("devtools").style.display = "none";
-        document.getElementById("frame").style.height = "100%";
-        Win.get(1).closeDevTools();
-    }
-    openDevTool(inner = true) {
-        const devtoolsView = document.getElementById("devtools");
-        Win.get(1).openDevTools({
-            activate: inner,
-            mode: 'undocked'
-        });
-        if (inner == true) return;
-        const port = remote.getGlobal('_DEBUG_PORT');
-        fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
-            res => {
-                let target = res.filter(r => r.url === Win.get(1).getURL());
-                if (target[0]) {
+    // closeDevTool() {
+    //     document.getElementById("devtools").style.display = "none";
+    //     document.getElementById("frame").style.height = "100%";
+    //     Win.get(1).closeDevTools();
+    // }
+    // openDevTool(inner = true) {
+    //     const devtoolsView = document.getElementById("devtools");
+    //     Win.get(1).openDevTools({
+    //         activate: inner,
+    //         mode: 'undocked'
+    //     });
+    //     if (inner == true) return;
+    //     const port = remote.getGlobal('_DEBUG_PORT');
+    //     fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
+    //         res => {
+    //             let target = res.filter(r => r.url === Win.get(1).getURL());
+    //             if (target[0]) {
 
-                    devtoolsView.setAttribute("src", `http://127.0.0.1:${port}${target[0].devtoolsFrontendUrl}`);
-                    //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
+    //                 devtoolsView.setAttribute("src", `http://127.0.0.1:${port}${target[0].devtoolsFrontendUrl}`);
+    //                 //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
 
-                    devtoolsView.addEventListener('did-finish-load', e => {
-                        // const { webContents } = remote.webContents;
+    //                 devtoolsView.addEventListener('did-finish-load', e => {
+    //                     // const { webContents } = remote.webContents;
 
-                        const browser = Win.get(1).webContents;
-                        const devtools = remote.webContents.fromId(devtoolsView.getWebContentsId());
+    //                     const browser = Win.get(1).webContents;
+    //                     const devtools = remote.webContents.fromId(devtoolsView.getWebContentsId());
 
-                        browser.setDevToolsWebContents(devtools);
-                        browser.openDevTools();
+    //                     browser.setDevToolsWebContents(devtools);
+    //                     browser.openDevTools();
 
-                        document.getElementById("devtools").style.display = "flex";
-                        if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
-                        this.resizer = new Resizer('#frame', {
-                            grabSize: 10,
-                            resize: 'vertical',
-                            handle: 'bar'
-                        });
+    //                     document.getElementById("devtools").style.display = "flex";
+    //                     if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
+    //                     this.resizer = new Resizer('#frame', {
+    //                         grabSize: 10,
+    //                         resize: 'vertical',
+    //                         handle: 'bar'
+    //                     });
 
-                        // console.log('====21=====', this.resizer)
+    //                     // console.log('====21=====', this.resizer)
 
-                    });
-                    devtoolsView.addEventListener('did-fail-load', event => {
-                        console.log(event)
-                    })
+    //                 });
+    //                 devtoolsView.addEventListener('did-fail-load', event => {
+    //                     console.log(event)
+    //                 })
 
-                }
-            }
-        )
-    }
+    //             }
+    //         }
+    //     )
+    // }
 
-    openPreviewDev() {
-        Win.get(1).openDevTools({
-            activate: true,
-            mode: 'undocked'
-        });
-    }
+    // openPreviewDev() {
+    //     Win.get(1).openDevTools({
+    //         activate: true,
+    //         mode: 'undocked'
+    //     });
+    // }
 
     /*
     捕捉previewWindow的错误
@@ -411,16 +414,16 @@ class GUI {
 
     practiceFn(readOnly = null) {
         // console.log('practiceFn')
-        let t = Editor.toggle(readOnly);
-        if (t === true) {
+        Editor.toggle(false);
+        console.log('编程模式', this.practiceBtn.getAttribute('sync-stop'))
+        if (!this.practiceBtn.getAttribute('sync-stop')) {
+            Win.stopExecuteJavaScript2Preview();
             this.closePracticeHtml();
-            Layout.reset();
-            // Editor.execute();
-            this.previewWinExecuteJavaScript();
-
+            //this.previewWinExecuteJavaScript();
         } else {
             //编程模式
-            Layout.destroy();
+            Win.startExecuteJavaScript2Preview();
+            this.openPracticeHtml();
             this.openPracticeFn();
         };
     };
@@ -434,13 +437,13 @@ class GUI {
     }
 
     previewStatus() {
-            //预览状态
-            // console.log("预览状态")
-            this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-            Layout.init();
-        }
-        //编辑状态切换
+        //预览状态
+        // console.log("预览状态")
+        this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+        Layout.init();
+    }
+    //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -513,7 +516,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -604,24 +607,38 @@ class GUI {
         this.createCards(fileDb.fileGetAll(), true);
     }
 
+    // 放大编程页面
+    togglePracticeHtml() {
+        if (this.openBtn.classList.contains('button-active')) {
+            Layout.destroy();
+            document.getElementById("knowledge-pannel").style.display = "none";
+            document.getElementById("editor-pannel").classList.add("pannel-large");
+        } else {
+            document.getElementById("knowledge-pannel").style.display = "block";
+            document.getElementById("editor-pannel").classList.remove("pannel-large");
+            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+            document.body.querySelector('#frame').style.height = "100%";
+            Layout.reset();
+        }
+    }
+
     //编程，UI状态关闭
     closePracticeHtml() {
-        document.getElementById("knowledge-pannel").style.display = "block";
-        document.getElementById("editor-pannel").classList.remove("pannel-large");
-
-        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-        document.body.querySelector('#frame').style.height = "100%";
+        // document.getElementById("knowledge-pannel").style.display = "block";
+        // document.getElementById("editor-pannel").classList.remove("pannel-large");
         this.practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
-
-        this.closeDevTool();
+        // console.log(Editor)
+        Editor.toggle(false);
+        this.practiceBtn.setAttribute('sync-stop', 1);
+        // this.closeDevTool();
     }
 
     //编程，UI状态
     openPracticeHtml() {
-        document.getElementById("knowledge-pannel").style.display = "none";
-        document.getElementById("editor-pannel").classList.add("pannel-large");
+        // document.getElementById("knowledge-pannel").style.display = "none";
+        // document.getElementById("editor-pannel").classList.add("pannel-large");
         this.practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
-
+        this.practiceBtn.removeAttribute('sync-stop');
         // document.getElementById("log").style.display = "block";
         // if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
         // this.resizer = new Resizer('#frame', {
@@ -633,7 +650,6 @@ class GUI {
 
     //编程功能，按钮
     openPracticeFn() {
-        this.openPracticeHtml();
         this.openPractice(true, true);
     };
 
@@ -645,12 +661,11 @@ class GUI {
             mainWindow = Win.get(0);
         if (previewWindow && mainWindow) {
             mainWindow.focus();
+            // TODO 优化，判断是否需要重载 
             previewWindow.webContents.reload();
             previewWindow.webContents.once('dom-ready', () => {
-
                 this.previewWinExecuteJavaScript();
                 Win.edit();
-
             });
         };
     }
@@ -678,15 +693,24 @@ class GUI {
     previewWinExecuteJavaScript(code = null) {
         Editor.format();
         code = this.createExecuteJs(code || Editor.getCode());
-        Win.executeJavaScript2Preview(code);
+        //Win.startExecuteJavaScript2Preview();
+        // 自动更新
+        console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'))
+        if (!this.practiceBtn.getAttribute('sync-stop')) {
+            Win.executeJavaScript2Preview(code);
+        } else {
+            // 关闭自动更新
+            Win.stopExecuteJavaScript2Preview();
+        }
+
     }
 
     createElement(className, type = 'div') {
-            let div = document.createElement(type);
-            div.className = className;
-            return div
-        }
-        //创建卡片
+        let div = document.createElement(type);
+        div.className = className;
+        return div
+    }
+    //创建卡片
     createCard(data, isCanClose = false) {
         let div = this.createElement("card");
         let card = this.createElement("card-body");

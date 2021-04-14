@@ -85,14 +85,43 @@ class Posenet {
 
         return pose;
     };
-    async estimateMultiplePosesOnImage(imageElement, flipHorizontal = false, maxDetections = 5, scoreThreshold = 0.5, nmsRadius = 20) {
-        const poses = await this.model.estimateMultiplePoses(imageElement, {
+    async estimateMultiplePosesOnImage(imageElement,
+        flipHorizontal = false,
+        maxDetections = 5,
+        scoreThreshold = 0.5,
+        nmsRadius = 20,
+        isDev = true) {
+        let poses = await this.model.estimateMultiplePoses(imageElement, {
             flipHorizontal: flipHorizontal,
             maxDetections: maxDetections,
             scoreThreshold: scoreThreshold,
             nmsRadius: nmsRadius
         });
-        return poses
+
+        let res = {};
+        res.poses = Array.from(poses, pose => {
+            //特征向量
+            pose.feature = this.getFeature(pose.keypoints);
+            return pose
+        });
+
+        // dev
+        if (isDev) {
+            let canvas = document.createElement('canvas');
+            canvas.width = imageElement.width;
+            canvas.height = imageElement.height;
+            let ctx = canvas.getContext('2d');
+
+            Array.from(poses, pose => {
+
+                this.drawSkeleton(pose.keypoints, 0, ctx);
+                this.drawKeypoints(pose.keypoints, 0, ctx);
+            });
+
+            res.dev = canvas.toDataURL();
+        };
+
+        return res
     }
 
     //特征向量
@@ -145,10 +174,10 @@ class Posenet {
             return [y, x];
         };
 
-         
+
         adjacentKeyPoints.forEach((keypoints) => {
             this.drawSegment(
-                toTuple(keypoints[0].position), toTuple(keypoints[1].position), `rgba(255,0,0,${(keypoints[0].score+keypoints[1].score)})`,
+                toTuple(keypoints[0].position), toTuple(keypoints[1].position), `rgba(255,0,0,${(keypoints[0].score + keypoints[1].score)})`,
                 scale, ctx);
         });
     }
