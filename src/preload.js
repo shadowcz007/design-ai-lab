@@ -3,8 +3,7 @@ const { Lab, cv, Store, Deeplab } = require('./lab');
 
 const DataGenerator = require('./dataGenerator');
 const Canvas = require('./canvas');
-// 连接到peerjs服务
-const PeerPC = require('./peerPC');
+
 
 const screenpoint = require('./screenpoint')
 
@@ -20,8 +19,7 @@ process.once('loaded', () => {
     global.Store = Store;
     global.Canvas = Canvas;
     global.Deeplab = Deeplab;
-    // global.CameraWeb=CameraWeb;
-    global.PeerPC = PeerPC;
+
     global.DimensionsDb = DimensionsDb;
     // global.humanseg = humanseg;
     global.DataGenerator = DataGenerator;

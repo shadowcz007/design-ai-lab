@@ -1,6 +1,12 @@
 const fs = require('fs');
 const md5 = require('md5');
 
+const { clipboard, remote, nativeImage } = require('electron');
+const dialog = remote.dialog;
+
+
+// 连接到peerjs服务
+const PeerPC = require('./peerPC');
 
 class Layout {
     constructor(element, isDev = false) {
@@ -271,80 +277,81 @@ class UI {
 
 
     createBaseInput(type = 'text', text, isMultiple = false, key, eventListener, setPlaceholder) {
-            let p = document.createElement('p');
-            p.innerText = text;
+        let p = document.createElement('p');
+        p.innerText = text;
 
-            let input = document.createElement('input');
-            input.setAttribute('type', type);
+        let input = document.createElement('input');
+        input.setAttribute('type', type);
 
-            // 容器
-            let div = document.createElement('div');
-            // 设置placeholder
-            div.setPlaceholder = setPlaceholder;
+        // 容器
+        let div = document.createElement('div');
+        // 设置placeholder
+        div.setPlaceholder = setPlaceholder;
 
-            //多文件
-            if (isMultiple === true) {
-                input.setAttribute('multiple', 'multiple');
-                div.classList.add('input-more-files');
-                div.setAttribute('data-count', 0);
+        //多文件
+        if (isMultiple === true) {
+            input.setAttribute('multiple', 'multiple');
+            div.classList.add('input-more-files');
+            div.setAttribute('data-count', 0);
+        };
+
+        // 事件绑定
+        div.addEventListener('click', e => {
+            // e.preventDefault();
+            input.click();
+        });
+
+        let isInput = false;
+        // 监听事件
+        function eventFn(e) {
+            console.log('e', e)
+            if (isInput === true) return;
+            isInput = true;
+            let res;
+
+            if (e.target.files) {
+                res = Array.from(e.target.files, f => f.path);
             };
 
-            // 事件绑定
-            div.addEventListener('click', e => {
-                // e.preventDefault();
-                input.click();
-            });
+            if (typeof e === 'string') {
+                res = [e];
+            } else if (type !== 'file' && type !== 'checkbox' && e.target.value) {
+                res = [e.target.value];
+            } else if (type === 'checkbox') {
+                res = [e.target.checked];
+            }
 
-            let isInput = false;
-            // 监听事件
-            function eventFn(e) {
-                console.log('e', e)
-                if (isInput === true) return;
-                isInput = true;
-                let res;
+            // 缓存
+            localStorage.setItem(key, JSON.stringify(res));
 
-                if (e.target.files) {
-                    res = Array.from(e.target.files, f => f.path);
-                };
-
-                if (typeof e === 'string') {
-                    res = [e];
-                } else if (type !== 'file' && type !== 'checkbox' && e.target.value) {
-                    res = [e.target.value];
-                } else if (type === 'checkbox') {
-                    res = [e.target.checked];
-                }
-
-                // 缓存
-                localStorage.setItem(key, JSON.stringify(res));
-
-                div.setAttribute('data-count', res.length);
-                div.setPlaceholder(res);
-                if (eventListener) eventListener(res);
-                isInput = false;
+            div.setAttribute('data-count', res.length);
+            div.setPlaceholder(res);
+            if (eventListener) eventListener(res);
+            isInput = false;
 
 
-            };
-            input.addEventListener('change', eventFn);
+        };
+        input.addEventListener('change', eventFn);
 
-            div.setDefaultValue = value => {
-                div.setPlaceholder(value);
-                div.setAttribute('data-count', value.length);
-                if (eventListener && value) {
-                    setTimeout(() => {
-                        eventListener(value);
-                    }, 1200);
-                };
-
+        div.setDefaultValue = value => {
+            div.setPlaceholder(value);
+            div.setAttribute('data-count', value.length);
+            if (eventListener && value) {
+                setTimeout(() => {
+                    eventListener(value);
+                }, 1200);
             };
 
-            div.p = p;
-            div.input = input;
-            div.appendChild(p);
-            div.appendChild(input);
-            return div
-        }
-        // 图片上传
+        };
+
+        div.p = p;
+        div.input = input;
+        div.appendChild(p);
+        div.appendChild(input);
+        return div
+    }
+
+    // 图片上传
     createImgInput(text, isMultiple = false, key, eventListener = null) {
             let setPlaceholder = function(value) {
                 // console.log(isMultiple, value)
@@ -451,6 +458,28 @@ class UI {
             });
         }
         return div
+    }
+
+    createMobileCameraInput() {
+        var video = this.createGroup();
+        video.style = `outline:1px solid black;width:300px;height:300px`;
+        var qrcode = this.createGroup();
+        qrcode.style = `width: 220px;height: 220px;`;
+        var g = this.createGroup(video, qrcode);
+        // g.layout(1);
+        new PeerPC(async(id, stream) => {
+            let v = await this.createVideo(stream, false);
+            v.style = `outline: none;
+            width: 100%;
+            height: 100%;`;
+            video.innerHTML = '';
+            video.appendChild(v);
+        }, url => {
+            let { img } = createQRCode(url);
+            qrcode.innerHTML = '';
+            qrcode.appendChild(img);
+        });
+        return g;
     }
 
     //TODO 多文件的支持 当文件过大的时候，opencv需要提示

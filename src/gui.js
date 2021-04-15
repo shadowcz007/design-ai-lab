@@ -394,6 +394,9 @@ class GUI {
         //预览窗口注入代码
         this.previewWinExecuteJavaScript(res.code, true);
 
+        // 关闭自动更新
+        setTimeout(Win.stopExecuteJavaScript2Preview(), 1000);
+
         //存至数据库
         // fileDb.fileAdd(res);
 

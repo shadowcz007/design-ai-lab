@@ -9,18 +9,18 @@
         body {
             overflow: hidden;
         }
-
+        
         .main {
             height: 100%;
             background: #ffffff;
         }
-
+        
         .main .controls {
             text-align: center;
             padding: 0.5em 0;
             width: 300px;
         }
-
+        
         .main video {
             width: 100%;
             position: fixed;
@@ -31,19 +31,19 @@
             background: black;
             display: none;
         }
-
+        
         .main canvas {
             margin: 0 auto;
             display: block;
             /* position: fixed; */
             top: 0;
         }
-
+        
         .main img {
             width: 0;
             height: 0;
         }
-
+        
         .main button {
             width: 56px;
             height: 56px;
@@ -57,14 +57,14 @@
             border-radius: 12px;
             user-select: none;
         }
-
+        
         .main #select {
             margin: 24px;
             height: 32px;
             user-select: none;
             outline: none;
         }
-
+        
         .main #detect {
             width: 50%;
             height: 50%;
@@ -78,7 +78,7 @@
             grid-gap: 10px;
             padding: 50% 25%;
         }
-
+        
         .main #detect div {
             width: 100%;
             height: 100%;
@@ -86,24 +86,23 @@
             justify-content: center;
             align-items: center;
         }
-
+        
         .main #detect div div {
             background-color: #c5ffec69;
             width: 12px;
             height: 12px;
         }
-
+        
         .animation {
             animation-name: opacity;
             animation-duration: 1s;
             animation-iteration-count: infinite;
         }
-
+        
         @keyframes opacity {
             from {
                 background-color: #cddc39;
             }
-
             to {
                 background-color: #03a9f4;
             }
@@ -152,6 +151,7 @@
         <div class="controls">
             <button id="button">Camera</button>
             <select id="select"></select>
+            <input type="checkbox" id="isSegment" checked='true'>
             <input type="text" placeholder="目标id" id="targetId">
             <p id="peerId">连接</p>
             <!-- <button id="connect">投影至电脑</button> -->
@@ -168,6 +168,7 @@
 
         const video = document.querySelector(".main #video");
         const button = document.querySelector(".main #button");
+        const isSegment = document.querySelector('#isSegment');
         const select = document.querySelector(".main #select");
         const canvas = document.querySelector(".main #canvas");
         const img = document.querySelector(".main #img");
@@ -187,7 +188,7 @@
 
             if (!(peer && peer.destroyed || !peer)) return
 
-            peer = new Peer(localStorage.getItem('peerId')||null, {
+            peer = new Peer(localStorage.getItem('peerId') || null, {
                 host: 'mixlab.top',
                 secure: true,
                 path: "/myapp"
@@ -198,7 +199,7 @@
             //连接成功后显示id
             peer.on('open', id => {
                 console.log('peer open', id);
-                localStorage.setItem('peerId',id);
+                localStorage.setItem('peerId', id);
                 document.querySelector('#peerId').innerText = id;
             });
 
@@ -225,7 +226,7 @@
                 alert(e);
             });
 
-            peer.on('call', function (call) {
+            peer.on('call', function(call) {
                 var acceptsCall = confirm("Videocall incoming, do you want to accept it ?");
 
                 if (acceptsCall) {
@@ -241,7 +242,7 @@
                     // });
 
                     // Handle when the call finishes
-                    call.on('close', function () {
+                    call.on('close', function() {
                         alert("The videocall has finished");
                     });
 
@@ -303,8 +304,15 @@
                         canvas.width = video.width;
                         canvas.height = video.height;
                         video.oncanplay = null;
-                        capture = new DataGenerator(24, (t) => {
-                            drawResult();
+
+                        capture = new DataGenerator(28, (t) => {
+
+                            if (isSegment.checked) {
+                                drawResult();
+                            } else {
+                                canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+                            }
+
                         });
 
                         connect();
@@ -374,7 +382,8 @@
         }
 
         async function drawResult() {
-            let c = document.createElement('canvas'), ctx = c.getContext("2d");
+            let c = document.createElement('canvas'),
+                ctx = c.getContext("2d");
             c.width = canvas.width;
             c.height = canvas.height;
             ctx.fillStyle = 'rgb(0,255,0)';
@@ -442,7 +451,7 @@
         // 判断是否移动端
         function isMobile() {
             let mobile = false;
-            (function (a) {
+            (function(a) {
                 if (
                     /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
                         a
@@ -458,18 +467,18 @@
 
         function t() {
             ws = new WebSocket('wss://mixlab.top/peerids')
-            ws.onopen = function () {
+            ws.onopen = function() {
                 // Web Socket 已连接上，使用 send() 方法发送数据
                 ws.send("发送数据");
                 alert("数据发送中...");
             };
 
-            ws.onmessage = function (evt) {
+            ws.onmessage = function(evt) {
                 var received_msg = evt.data;
                 alert("数据已接收...");
             };
 
-            ws.onclose = function () {
+            ws.onclose = function() {
                 // 关闭 websocket
                 alert("连接已关闭...");
             };
@@ -482,9 +491,9 @@
                 let promise = faceLandmarksDetection.load(
                     faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
                 promise.then(model => {
-                    this.facemesh_ready = true;
-                    this.model = model;
-                })
+                        this.facemesh_ready = true;
+                        this.model = model;
+                    })
                     .catch(() => {
                         alert('failed to load facemesh model');
                     });
