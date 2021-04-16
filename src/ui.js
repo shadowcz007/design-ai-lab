@@ -466,7 +466,6 @@ class UI {
         var qrcode = this.createGroup();
         qrcode.style = `width: 220px;height: 220px;`;
         var g = this.createGroup(video, qrcode);
-        // g.layout(1);
         new PeerPC(async(id, stream) => {
             let v = await this.createVideo(stream, false);
             v.style = `outline: none;
@@ -479,6 +478,51 @@ class UI {
             qrcode.innerHTML = '';
             qrcode.appendChild(img);
         });
+        return g;
+    }
+
+    createDesktopCameraInput(eventListener = null) {
+
+        var video = this.createGroup();
+        video.style = `outline:1px solid black;width:300px;height:300px`;
+
+        let btn = this.createButton('摄像头', () => {
+            navigator.mediaDevices
+                .getUserMedia({
+                    video: {
+                        width: 400,
+                        height: 400,
+                        facingMode: "environment"
+                    },
+                    audio: false,
+                })
+                .then(async(stream) => {
+                    let v = await this.createVideo(stream, false);
+                    v.style = `outline: none;
+                width: 100%;
+                height: 100%;`;
+                    v.width = 400;
+                    v.height = 400;
+                    video.innerHTML = '';
+                    video.appendChild(v);
+                    if (eventListener) eventListener(v);
+                    return;
+                });
+        }, false);
+
+        var g = this.createGroup(btn, video);
+
+        navigator.mediaDevices.enumerateDevices().then(gotDevices);
+
+        function gotDevices(mediaDevices) {
+            let count = 1;
+            mediaDevices.forEach((mediaDevice) => {
+                if (mediaDevice.kind === "videoinput") {
+                    console.log(mediaDevice)
+                }
+            });
+        }
+
         return g;
     }
 
@@ -677,7 +721,7 @@ class UI {
             title: "打开……",
             properties: ['openFile', 'multiSelections'],
             filters: [
-                { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'gif'] }
+                { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'webp', 'png', 'gif'] }
             ]
         });
 
@@ -693,7 +737,7 @@ class UI {
                 if (count.length > 0) type = "video";
                 count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                 if (count.length > 0) type = "audio";
-                count = Array.from(['jpeg', 'jpg', 'png', 'gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                count = Array.from(['jpeg', 'jpg', 'png', 'webp'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                 if (count.length > 0) type = "img";
                 count = Array.from(['gif'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                 if (count.length > 0) type = "gif";

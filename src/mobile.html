@@ -184,6 +184,9 @@
 
         function initPeer() {
 
+            //init camera
+            navigator.mediaDevices.enumerateDevices().then(gotDevices);
+
             document.querySelector('#targetId').value = getQueryVariable('id');
 
             if (!(peer && peer.destroyed || !peer)) return
@@ -318,12 +321,6 @@
                         connect();
                         // capture.stop();
                     };
-
-                    return navigator.mediaDevices.enumerateDevices();
-                })
-                .then(gotDevices)
-                .catch((error) => {
-                    console.error(error);
                 });
         });
 
@@ -398,7 +395,7 @@
             canvas.getContext("2d").drawImage(c, 0, 0, canvas.width, canvas.height);
         }
 
-        navigator.mediaDevices.enumerateDevices().then(gotDevices);
+        
 
         class DataGenerator {
             constructor(framerate = 0, cb) {

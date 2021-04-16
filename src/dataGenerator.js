@@ -9,22 +9,25 @@ class DataGenerator {
         this.frameWaitTime = 0;
         this.lastTime = Date.now();
         let wrapperFn = () => {
+            if (this.interval === null) return;
             this.frameWaitTime = Date.now() - this.lastTime;
             this.lastTime = Date.now();
+            // console.log(this)
             cb(this.frameWaitTime);
             if (this.framerate === 0) {
-                requestAnimationFrame(wrapperFn);
+                window.requestAnimationFrame(wrapperFn);
             } else {
                 setTimeout(() => {
-                    requestAnimationFrame(wrapperFn);
+                    window.requestAnimationFrame(wrapperFn);
                 }, (1 / framerate) * (1000 - this.frameWaitTime));
             }
         };
-        this.interval = requestAnimationFrame(wrapperFn);
+        this.interval = window.requestAnimationFrame(wrapperFn);
     }
 
     stop() {
-        cancelAnimationFrame(this.interval);
+        window.cancelAnimationFrame(this.interval);
+        this.interval = null;
     }
 }
 

@@ -679,11 +679,11 @@ class GUI {
             if (shouldReload) {
                 previewWindow.webContents.reload();
                 previewWindow.webContents.once('dom-ready', () => {
-                    this.previewWinExecuteJavaScript();
+                    this.previewWinExecuteJavaScript(null, true);
                     Win.edit();
                 });
             } else {
-                this.previewWinExecuteJavaScript();
+                this.previewWinExecuteJavaScript(null, true);
                 Win.edit();
             }
 
