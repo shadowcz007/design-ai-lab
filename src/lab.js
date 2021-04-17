@@ -773,7 +773,7 @@ class AI {
                 let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
                 segmentPerson('${base64}');
                     `, true);
-                return res
+                return await this.createImage(res)
             },
         };
 
