@@ -304,7 +304,7 @@ class UI {
         let isInput = false;
         // 监听事件
         function eventFn(e) {
-            console.log('e', e)
+            // console.log('e', e)
             if (isInput === true) return;
             isInput = true;
             let res;
@@ -329,7 +329,6 @@ class UI {
             if (eventListener) eventListener(res);
             isInput = false;
 
-
         };
         input.addEventListener('change', eventFn);
 
@@ -348,16 +347,37 @@ class UI {
         div.input = input;
         div.appendChild(p);
         div.appendChild(input);
+
+        //TODO 更新数量
+        div.add = (obj) => {
+            // 缓存
+            let defaultValue = localStorage.getItem(key) || '[]';
+            if (!defaultValue.match(/\[/)) defaultValue = '[]';
+            // console.log(defaultValue, !defaultValue.match(/\[/))
+            defaultValue = JSON.parse(defaultValue);
+            defaultValue.push(obj);
+            localStorage.setItem(key, JSON.stringify(defaultValue));
+            // div.setAttribute('data-count', defaultValue.length);
+            div.setDefaultValue(defaultValue);
+        };
+
+        div.reset = () => {
+            // 缓存
+            let defaultValue = [];
+            localStorage.setItem(key, JSON.stringify(defaultValue));
+            div.setDefaultValue(defaultValue);
+            div.classList.remove('input-image');
+            div.style.backgroundImage = null;
+        }
+
         return div
     }
 
     // 图片上传
     createImgInput(text, isMultiple = false, key, eventListener = null) {
             let setPlaceholder = function(value) {
-                // console.log(isMultiple, value)
                 if (!value || !(value && value[0])) return
                 this.classList.add('input-image');
-                // console.log(isMultiple, value[0])
                 this.style.backgroundImage = `url(${encodeURI(value[0])})`;
             };
 
@@ -534,7 +554,7 @@ class UI {
         let key = md5(`_${type}_${text}`);
         let defaultValue = localStorage.getItem(key) || '[]';
         if (!defaultValue.match(/\[/)) defaultValue = '[]';
-        console.log(defaultValue, !defaultValue.match(/\[/))
+        // console.log(defaultValue, !defaultValue.match(/\[/))
         defaultValue = JSON.parse(defaultValue);
 
         let div;
