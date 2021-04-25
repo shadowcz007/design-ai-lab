@@ -28,7 +28,7 @@ const _IS_MAC = process.platform === 'darwin';
 global._WINS = {};
 global._APPICON = null;
 
-const _INDEX_HTML = path.join(__dirname, 'src/index.html');
+const _INDEX_HTML = path.join(__dirname, 'src/index_v2.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
 const _BASIC_HTML = path.join(__dirname, 'src/basic.html');
 const _READ_HTML = path.join(__dirname, 'src/read.html');

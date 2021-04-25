@@ -1,6 +1,6 @@
 //lab提供封装好的功能
 const { clipboard, remote, nativeImage } = require('electron');
-const dialog = remote.dialog;
+// const dialog = remote.dialog;
 
 
 const _APPICON = remote.getGlobal('_APPICON');
@@ -19,7 +19,7 @@ const path = require('path');
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
 const humanseg = require('./humanseg');
-const bodyPix = require('@tensorflow-models/body-pix');
+// const bodyPix = require('@tensorflow-models/body-pix');
 
 // const U2net = require('./u2net');
 // const Yolov5 = require('./yolov5');
@@ -1053,7 +1053,26 @@ class Deeplab {
     }
 }
 
-
+const jieba = require('@node-rs/jieba');
+class Jieba{
+    //单例
+    static getInstance() {
+        if (!Jieba.instance) {
+            Jieba.instance = new Jieba();
+        }
+        return Jieba.instance;
+    }
+    constructor(){
+        try {
+            jieba.load();
+        } catch (error) {
+            console.log(error);
+        };
+        Object.keys(jieba).forEach(k=>{
+            if(k!='load') this[k]=jieba[k];
+        })
+    };
+}
 
 module.exports = {
     Lab: {
@@ -1065,5 +1084,6 @@ module.exports = {
     },
     cv: cv,
     Store: Store,
-    Deeplab: Deeplab
+    Deeplab: Deeplab,
+    Jieba:Jieba
 };

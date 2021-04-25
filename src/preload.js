@@ -1,5 +1,5 @@
 // preload.js
-const { Lab, cv, Store, Deeplab } = require('./lab');
+const { Lab, cv, Store, Deeplab,Jieba } = require('./lab');
 
 const DataGenerator = require('./dataGenerator');
 const Canvas = require('./canvas');
@@ -25,6 +25,8 @@ process.once('loaded', () => {
     global.DataGenerator = DataGenerator;
 
     global.screenpoint = screenpoint;
+
+    global.jieba=new Jieba();
 })
 
 // ipcRenderer.send('preview-ready', true);

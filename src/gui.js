@@ -94,7 +94,7 @@ class GUI {
                                 //console.log(Object.is(window.Lab,undefined)?3000:100)
                                 gui();
                             }else{
-                                Lab.base.isDisplay();
+                                Lab.ui.isDisplay();
                             }
                             console.log('createExecuteJs-success')
                             `
@@ -184,12 +184,12 @@ class GUI {
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function(error) {
+        storage.set('app', obj, function (error) {
             if (error) throw error;
         });
     }
     loadWindowStatus() {
-        storage.get('app', function(error, data) {
+        storage.get('app', function (error, data) {
             console.log('storage', data)
         })
     }
@@ -331,12 +331,12 @@ class GUI {
     //     )
     // }
 
-    // openPreviewDev() {
-    //     Win.get(1).openDevTools({
-    //         activate: true,
-    //         mode: 'undocked'
-    //     });
-    // }
+    openPreviewDev() {
+        Win.get(1).openDevTools({
+            activate: true,
+            mode: 'undocked'
+        });
+    }
 
     /*
     捕捉previewWindow的错误
@@ -438,13 +438,13 @@ class GUI {
     }
 
     previewStatus() {
-            //预览状态
-            // console.log("预览状态")
-            this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-            Layout.init();
-        }
-        //编辑状态切换
+        //预览状态
+        // console.log("预览状态")
+        this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+        Layout.init();
+    }
+    //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -517,7 +517,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -620,14 +620,14 @@ class GUI {
     }
 
     closeEditorWin() {
-            document.getElementById("knowledge-pannel").style.display = "block";
-            document.getElementById("editor-pannel").classList.remove("pannel-large");
-            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-            document.body.querySelector('#frame').style.height = "100%";
-            Layout.reset();
-            this.openBtn.classList.remove('button-active');
-        }
-        // 放大编程页面
+        document.getElementById("knowledge-pannel").style.display = "block";
+        document.getElementById("editor-pannel").classList.remove("pannel-large");
+        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+        document.body.querySelector('#frame').style.height = "100%";
+        Layout.reset();
+        this.openBtn.classList.remove('button-active');
+    }
+    // 放大编程页面
     toggleEditorWin() {
         if (this.openBtn.classList.contains('button-active')) {
             this.openEditorWin();
@@ -726,11 +726,11 @@ class GUI {
     }
 
     createElement(className, type = 'div') {
-            let div = document.createElement(type);
-            div.className = className;
-            return div
-        }
-        //创建卡片
+        let div = document.createElement(type);
+        div.className = className;
+        return div
+    }
+    //创建卡片
     createCard(data, isCanClose = false) {
         let div = this.createElement("card");
         let card = this.createElement("card-body");

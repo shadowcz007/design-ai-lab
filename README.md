@@ -60,7 +60,12 @@ npm start
 - 增强剪切板功能 A new way to manage your clipboard history.
 - 形态分类：三角形、方形、圆形、倒三角……
 - PPT文件格式支持
-- 
+- 匿名头像 Protect your identity with generative media ，Upload your photo and discover look-a-like generated photos.
+- 匿名人流统计
+- 拟人摄像头，灵感来自Eyecam
+- 图像智能缩放 JS Image Carver
+- 虚拟偶像
+- ffmpeg需要调研下wasm版本
 
 
 ## 感谢以下开源项目

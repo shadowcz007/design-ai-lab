@@ -167,9 +167,9 @@ class Editor {
                             detail: '调整色彩模式'
                         },
                         {
-                            label: 'Lab.base.p5Show',
+                            label: 'Lab.ui.p5Show',
                             kind: 1,
-                            insertText: 'Lab.base.p5Show(false);',
+                            insertText: 'Lab.ui.p5Show(false);',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: 'p5画布的显示与隐藏'
                         }, {
@@ -181,65 +181,65 @@ class Editor {
 
                         },
                         {
-                            label: 'Lab.base.createCanvas',
+                            label: 'Lab.ui.createCanvas',
                             kind: 1,
-                            insertText: 'Lab.base.createCanvas(${1:width}, ${2:height},${3: className}, ${4: id}, ${5: show})',
+                            insertText: 'Lab.ui.createCanvas(${1:width}, ${2:height},${3: className}, ${4: id}, ${5: show})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建画布'
 
                         },
                         {
-                            label: 'Lab.base.createBaseText',
+                            label: 'Lab.ui.createBaseText',
                             kind: 1,
-                            insertText: 'Lab.base.createBaseText()',
+                            insertText: 'Lab.ui.createBaseText()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建文本'
 
                         },
 
                         {
-                            label: 'Lab.base.createGroup',
+                            label: 'Lab.ui.createGroup',
                             kind: 1,
-                            insertText: 'Lab.base.createGroup()',
+                            insertText: 'Lab.ui.createGroup()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建组'
 
                         },
                         {
-                            label: 'Lab.base.createImage',
+                            label: 'Lab.ui.createImage',
                             kind: 1,
-                            insertText: 'Lab.base.createImage(${1:url})',
+                            insertText: 'Lab.ui.createImage(${1:url})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建图片'
 
                         },
                         {
-                            label: 'Lab.base.createInput',
+                            label: 'Lab.ui.createInput',
                             kind: 1,
-                            insertText: 'Lab.base.createInput(${1:type}, ${2:text},${3:eventListener}, ${4:cache},${5:add})',
+                            insertText: 'Lab.ui.createInput(${1:type}, ${2:text},${3:eventListener}, ${4:cache},${5:add})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建输入'
                         },
 
                         {
-                            label: 'Lab.base.createIcon',
+                            label: 'Lab.ui.createIcon',
                             kind: 1,
-                            insertText: 'Lab.base.createIcon(${1:key},${2:eventListener})',
+                            insertText: 'Lab.ui.createIcon(${1:key},${2:eventListener})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建图标'
                         },
                         {
-                            label: 'Lab.base.createButton',
+                            label: 'Lab.ui.createButton',
                             kind: 1,
-                            insertText: 'Lab.base.createButton',
+                            insertText: 'Lab.ui.createButton',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建按钮'
                         },
 
                         {
-                            label: 'Lab.base.createTextImage',
+                            label: 'Lab.ui.createTextImage',
                             kind: 1,
-                            insertText: 'Lab.base.createTextImage(${1:txt},${2:fontSize},${3:color})',
+                            insertText: 'Lab.ui.createTextImage(${1:txt},${2:fontSize},${3:color})',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '创建文本图片'
                         },
@@ -278,9 +278,9 @@ class Editor {
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '文本检测'
                         }, {
-                            label: 'Lab.base.createShortVideoInput()',
+                            label: 'Lab.ui.createShortVideoInput()',
                             kind: 1,
-                            insertText: 'Lab.base.createShortVideoInput()',
+                            insertText: 'Lab.ui.createShortVideoInput()',
                             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                             detail: '从本地读取视频素材路径'
                         },

@@ -111,7 +111,7 @@ class FF {
                     let t = this.getFileType(metadata.format.format_name);
                     let stream = Array.from(metadata.streams, s => {
                         if (s.codec_name === t || s.codec_type === t) return s;
-                    }).filter(s => s)[0] || {};
+                    }).filter(s => s)[0] || metadata.streams[0];
                     resolve({
                         // 秒
                         duration: metadata.format.duration,
@@ -122,7 +122,7 @@ class FF {
                         codec_name: stream.codec_name
                     });
                 } else {
-                    reject(_err);
+                    resolve(null);
                 }
             });
         });
@@ -155,14 +155,14 @@ class FF {
         return new Promise((resolve, reject) => {
             r.outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.frames / (fps * loop))
                     } else {
                         console.log(progress.frames / (fps * loop));
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -215,14 +215,14 @@ class FF {
         return new Promise((resolve, reject) => {
             r.outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.percent / 100)
                     } else {
                         console.log(progress.percent / 100);
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -249,24 +249,24 @@ class FF {
         return new Promise((resolve, reject) => {
             ffmpeg(inputPath)
                 .videoFilters([{
-                        filter: 'scale',
-                        options: `${width}:${height}`
-                    },
-                    {
-                        filter: 'pad',
-                        options: `${padding.join(':')}:${color}`
-                    }
+                    filter: 'scale',
+                    options: `${width}:${height}`
+                },
+                {
+                    filter: 'pad',
+                    options: `${padding.join(':')}:${color}`
+                }
                 ])
                 .outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) {
                         progressFn(progress.percent / 100)
                     } else {
                         console.log(progress.percent / 100);
                     };
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(output);
                 })
                 .on('error', (_err) => {
@@ -295,7 +295,7 @@ class FF {
 
             try {
                 fs.mkdirSync(outputDir);
-            } catch (error) {}
+            } catch (error) { }
 
             let inp = ffmpeg(input);
             fadeIn > 0 ? inp.videoFilters(`fade=in:0:${fadeIn}`) : null;
@@ -329,7 +329,7 @@ class FF {
     audioCut(audio, duration = null, startTime = 0, loop = 5) {
         if (duration == null) return
         let format = 'mp3';
-        let { output } = this.createOutputPath(audio, `cut_${loop}`, '.' + format);
+        let { output } = this.createOutputPath(audio, `cut_${loop.toString().replace('.','_')}`, '.' + format);
         return new Promise((resolve, reject) => {
             ffmpeg()
                 .input(audio)
@@ -383,6 +383,7 @@ class FF {
                     // fs.unlinkSync(music_output);
                     resolve(outputfile);
                 }).on('error', (_err) => {
+                    // console.log(_err)
                     reject(_err);
                 })
                 .run();
@@ -404,10 +405,10 @@ class FF {
                 // .aspect(aspect)
                 .outputFps(fps)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     console.log('Processing: ' + progress.percent + '% done');
                 })
-                .on('end', function() {
+                .on('end', function () {
                     console.log('Finished processing');
                     resolve(output);
                 })
@@ -426,16 +427,16 @@ class FF {
             ffmpeg(files)
                 .videoCodec(this.videoCodec)
                 // .audioCodec('libfaac')
-                // .format('mp4')
+                .format('mp4')
                 .size(size)
                 .aspect(aspect)
                 .output(output)
-                .on('progress', function(progress) {
+                .on('progress', function (progress) {
                     if (progressFn) { progressFn(progress.percent / 100) } else {
                         console.log('Processing: ', progress.percent);
                     }
                 })
-                .on('end', function() {
+                .on('end', function () {
                     // console.log('Finished processing');
                     resolve(output);
                 })
@@ -455,7 +456,7 @@ class FF {
                     .setStartTime(startTime)
                     .seek(duration - loop)
                     .save(output)
-                    .on('end', function() {
+                    .on('end', function () {
                         // console.log('Finished processing');
                         resolve(output);
                     })
@@ -469,7 +470,7 @@ class FF {
                 .videoCodec(this.videoCodec)
                 //.outputOption("-vf", `scale=${width}:-1:flags=lanczos,fps=${fps}`)
                 .save(output)
-                .on('end', function() {
+                .on('end', function () {
                     // console.log('Finished processing');
                     resolve(output);
                 })
@@ -484,7 +485,7 @@ class FF {
             ffmpeg(filePath)
                 .videoCodec(this.videoCodec)
                 .save(output)
-                .on('end', function() {
+                .on('end', function () {
                     setTimeout(() => {
                         resolve(output);
                     }, 500);
@@ -504,8 +505,8 @@ class FF {
 
     // 
     filesRename(files, fileDir) {
-        if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
-        // let d = path.join(dirname, basename);
+        // if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
+
         let c = ((files.length).toString()).length;
         for (let index = 0; index < files.length; index++) {
             let filename = index + 1;
@@ -533,14 +534,13 @@ class FF {
                 .videoCodec(this.videoCodec)
                 .format('mp4')
                 .inputOptions('-filter_complex', `overlay=${x}:${y}`)
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 })
                 .on('end', () => {
-                    console.log('水印添加成功');
+                    // console.log('水印添加成功', `overlay=${x}:${y}`);
                     // 删除
                     this.deleteFile(waterMarkFilePath);
-
                     resolve(output);
                 })
                 .save(output);
@@ -555,10 +555,12 @@ class FF {
     }
 
     mergeFrame(frame, tw, th) {
-        let { content, textImage } = frame;
+        // 内容、字幕、变量
+        let { content, textImage, variable } = frame;
 
         return new Promise((resolve, reject) => {
             if (content.type == 'img') {
+                // console.log(textImage,content)
                 let width = content.layout.width,
                     height = content.layout.height,
                     url = content.url,
@@ -569,20 +571,21 @@ class FF {
                     this.paddingVideo(imvot,
                         parseInt(width),
                         parseInt(height), [tw, th, parseInt(content.layout.left), parseInt(content.layout.top)]).then(pot => {
-                        // 删除
-                        this.deleteFile(imvot);
-                        if (textImage && textImage.base64) {
-                            // pot视频
-                            this.drawText(pot, textImage.base64).then(textVideo => {
-                                // 删除
-                                this.deleteFile(pot);
-                                resolve(textVideo);
-                            });
-                        } else {
-                            resolve(pot)
-                        }
+                            // 删除
+                            this.deleteFile(imvot);
+                            if (textImage && textImage.base64) {
+                                // pot视频
+                                // console.log('textImage.layout',textImage.layout)
+                                this.drawText(pot, textImage.base64, textImage.layout.left, textImage.layout.top).then(textVideo => {
+                                    // 删除
+                                    this.deleteFile(pot);
+                                    resolve(textVideo);
+                                });
+                            } else {
+                                resolve(pot)
+                            }
 
-                    })
+                        })
 
                 });
             } else if (content.type == 'video') {
@@ -594,18 +597,18 @@ class FF {
                     parseInt(width),
                     parseInt(height), [tw, th, 0, parseInt(content.layout.top)]).then(pot => {
 
-                    // pot视频
-                    if (textImage && textImage.base64) {
-                        this.drawText(pot, textImage.base64).then(textVideo => {
-                            // 删除
-                            this.deleteFile(pot);
-                            resolve(textVideo)
-                        });
-                    } else {
-                        resolve(pot)
-                    }
+                        // pot视频
+                        if (textImage && textImage.base64) {
+                            this.drawText(pot, textImage.base64, textImage.layout.left, textImage.layout.top).then(textVideo => {
+                                // 删除
+                                this.deleteFile(pot);
+                                resolve(textVideo)
+                            });
+                        } else {
+                            resolve(pot)
+                        }
 
-                })
+                    })
 
             }
         });
@@ -614,66 +617,116 @@ class FF {
     mergeAll(data, progressFn) {
         const { width, height, frames, backgroudAudio } = data;
 
-        return new Promise((resolve, reject) => {
-            Promise.all(
-                Array.from(frames, frame => this.mergeFrame(frame, width, height))
-            ).then(framesFile => {
-                // 合成好文字的视频地址
-                // 分解视频成图片
-                Promise.all(Array.from(
-                    framesFile, frame => this.videoExtract(frame, width + "x" + height)
-                )).then(exframes => {
-                    //删除
-                    Array.from(framesFile, f => this.deleteFile(f));
+        return new Promise((resolve,reject)=>{
 
-                    // 从图片合成视频
-                    let imagesAll = [];
-                    Array.from(exframes, ex => {
-                        imagesAll = imagesAll.concat(ex.images);
-                    });
+            // 存放图片的目录
+            let filesDir = path.join(__dirname, '../test/files');
+            if (!fs.existsSync(filesDir)) fs.mkdirSync(filesDir);
+            
+            // 从图片合成视频
+            let imagesAll = [];
+            Array.from(frames, ex => {
+                let filePath=path.join(filesDir,`${ex.index}.png`);
+                this.saveImage(ex.content.base64,filePath);
+                imagesAll.push(filePath);
+            });
 
-                    // 存放图片的目录
-                    let filesDir = path.join(__dirname, '../test/files');
-                    let files = this.filesRename(imagesAll, filesDir);
-                    let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'v');
-                    this.files2video(files, output, width + "x" + height, width / height, progressFn).then(video => {
-                        // 删除图片
-                        Array.from(exframes, ex => this.deleteFile(ex.filePath));
-                        // 
-                        this.deleteFile(filesDir);
+            let files = this.filesRename(imagesAll, filesDir);
+            let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'v');
+            this.files2video(files, output, width + "x" + height, width / height, progressFn).then(video => {
+                // 删除图片
+                // Array.from(frames, ex => this.deleteFile(path.join(filesDir,`${ex.index}.png`)));
+                // 
+                this.deleteFile(filesDir);
 
-                        let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'result');
+                let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'result');
 
-                        if (backgroudAudio && backgroudAudio.url) {
-                            // 计算视频长度
-                            this.getMediaDurationAndType(video).then(info => {
-                                // 裁切音乐
-                                this.audioCutAuto(backgroudAudio.url, info.duration).then(audio => {
-                                    // 删除audio
-
-                                    // 添加音乐
-
-                                    this.videoAddAudio(video, audio, output).then((finish) => {
-                                        this.deleteFile(video);
-                                        this.deleteFile(audio);
-                                        resolve(finish);
-                                    })
-
-                                })
-
+                if (backgroudAudio && backgroudAudio.url) {
+                    // 计算视频长度
+                    this.getMediaDurationAndType(video).then(info => {
+                        // 裁切音乐
+                        this.audioCutAuto(backgroudAudio.url, (~~info.duration)||1).then(audio => {
+                            // 删除audio
+// console.log(audio)
+                            // 添加音乐
+                            this.videoAddAudio(video, audio, output).then((finish) => {
+                                this.deleteFile(video);
+                                this.deleteFile(audio);
+                                resolve(finish);
                             })
 
-                        } else {
-                            fs.renameSync(video, output);
-                            resolve(output);
-                        }
+                        })
 
                     })
 
-                })
+                } else {
+                    fs.renameSync(video, output);
+                    resolve(output);
+                }
 
             })
         });
+
+        // return new Promise((resolve, reject) => {
+        //     Promise.all(
+        //         Array.from(frames, frame => this.mergeFrame(frame, width, height))
+        //     ).then(framesFile => {
+        //         // 合成好文字的视频地址
+        //         // 分解视频成图片
+        //         Promise.all(Array.from(
+        //             framesFile, frame => this.videoExtract(frame, width + "x" + height)
+        //         )).then(exframes => {
+        //             //删除
+        //             Array.from(framesFile, f => this.deleteFile(f));
+
+        //             // 从图片合成视频
+        //             let imagesAll = [];
+        //             Array.from(exframes, ex => {
+        //                 imagesAll = imagesAll.concat(ex.images);
+        //             });
+
+        //             // 存放图片的目录
+        //             let filesDir = path.join(__dirname, '../test/files');
+        //             if (!fs.existsSync(filesDir)) fs.mkdirSync(filesDir);
+        //             let files = this.filesRename(imagesAll, filesDir);
+        //             let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'v');
+        //             this.files2video(files, output, width + "x" + height, width / height, progressFn).then(video => {
+        //                 // 删除图片
+        //                 Array.from(exframes, ex => this.deleteFile(ex.filePath));
+        //                 // 
+        //                 this.deleteFile(filesDir);
+
+        //                 let { output } = this.createOutputPath(path.join(__dirname, '../test/video'), 'result');
+
+        //                 if (backgroudAudio && backgroudAudio.url) {
+        //                     // 计算视频长度
+        //                     this.getMediaDurationAndType(video).then(info => {
+        //                         // 裁切音乐
+        //                         this.audioCutAuto(backgroudAudio.url, info.duration).then(audio => {
+        //                             // 删除audio
+
+        //                             // 添加音乐
+        //                             this.videoAddAudio(video, audio, output).then((finish) => {
+        //                                 this.deleteFile(video);
+        //                                 this.deleteFile(audio);
+        //                                 resolve(finish);
+        //                             })
+
+        //                         })
+
+        //                     })
+
+        //                 } else {
+        //                     fs.renameSync(video, output);
+        //                     resolve(output);
+        //                 }
+
+        //             })
+
+        //         })
+
+        //     })
+        // });
 
     }
 
