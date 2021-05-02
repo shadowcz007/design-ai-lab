@@ -17,57 +17,115 @@
     <script>if (window.module) module = window.module;</script>
     <script src="../node_modules/fomantic-ui/dist/semantic.min.js"></script>
 
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-    <main>
+    <div class="ui left demo vertical inverted sidebar labeled icon menu" style='padding-top: 32px;'>
 
-        <div class="ui placeholder very padded segment">
-            <div class="ui two column doubling stackable grid container">
-                <div class="column">
+        <a class="item">
+            <i class="gamepad icon"></i>
+            PIPELINE
+        </a>
 
-                    <div class="ui vertical labeled icon menu">
-                        <a class="item">
-                            <i class="gamepad icon"></i>
-                            PIPELINE
-                        </a>
-                        <a class="item">
-                            <i class="video camera icon"></i>
-                            APP
-                        </a>
-                        <a class="item">
-                            <i class="video play icon"></i>
-                            HISTORY
-                        </a>
-                    </div>
+        <a class="item" id='my-course-btn'>
+            <i class="video camera icon"></i>
+            APP
+        </a>
+        <a class="item" id='recent-btn'>
+            <i class="video play icon"></i>
+            HISTORY
+        </a>
 
+    </div>
+
+    <div class="grid">
+        <div class="pannel" data-id="1" id="knowledge-pannel">
+
+            <div class="btns">
+                <button id="edit-file"><i class="far fa-eye"></i></button>
+            </div>
+
+            <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
+                <div id="readme">智能设计</div>
+                <div id="course">
+                    <p>- 工具箱</p>
                 </div>
+                <br><br><br>
+            </div>
+
+        </div>
+
+        <div class="pannel" data-id="2" id="editor-pannel">
+
+            <div id="frame">
+                <div id="editor-container">
+                    <div class="btns">
+                        <button id="server-url"><i class="fas fa-cog"></i></button>
+                        <button id="open-btn"><i class="fas fa-stop"></i></button>
+                        <!-- <div id="qrcode"></div> <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
+                        <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
+                        <button id="practice-btn" sync-stop='1'><i class="fas fa-sync"></i></button>
+                    </div>
+                    <div id="editor"></div>
+                </div>
+            </div>
+
+            <!--<webview id="devtools" src="about:blank"></webview> -->
+            <!-- <div id="log">
+                    <div class="btns">
+                        <button id="log-btn"><i class="fas fa-ban"></i></button>
+                        
+                    </div>
+                    
+                    <div class="content"></div>
+                </div> -->
+
+
+        </div>
+
+        <!-- <div class="pannel" data-id="3" >
+                
+            </div> -->
+
+        <!-- <div class="pannel" data-id="4">
+          <div class="pannel-content">4</div>
+        </div> -->
+    </div>
+
+
+    <main id="blank-pannel">
+
+        <div class='head'>
+            <div class="info">
+                <h1>HELLO AI WORLD!</h1>
+            </div>
+            <div style='display: flex;
+            height: 32px;
+            justify-content: center;
+            padding: 8px;
+            align-items: center;'>
+                <p id="info">-</p>
+                <button id="setup" class="button-light"><i class="fas fa-cog"></i></button>
+            </div>
+        </div>
+
+        <div class="ui animated blue tertiary button" id="open-files" style='position: fixed;margin-top: 32px !important;
+       margin-left: 32px !important;'>
+            <div class="visible content"><i class="left th icon"></i></div>
+            <div class="hidden content">菜单</div>
+        </div>
+
+
+        <div class="ui placeholder padded segment" 
+        style='height: 100vh;margin: 0;
+        flex-direction: row;'>
+            <div class="ui one column doubling stackable grid container">
+
                 <div class="middle aligned column">
 
-                    <div class="ui cards">
-                        
-                        
-                        <div class="card">
-                            <div class="content">
-                                <img class="right floated mini ui image" src="/images/avatar/large/jenny.jpg">
-                                <div class="header">
-                                    Jenny Hess
-                                </div>
-                                <div class="meta">
-                                    New Member
-                                </div>
-                                <div class="description">
-                                    Jenny wants to add you to the group <b>best friends</b>
-                                </div>
-                            </div>
-                            <div class="extra content">
-                                <div class="ui two buttons">
-                                    <div class="ui basic green button">运行</div>
-                                    <div class="ui basic red button">编辑</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="ui cards" id="recent-files">
 
 
                         <div class="card">
@@ -90,23 +148,42 @@
                                 </div>
                             </div>
                         </div>
-
 
                     </div>
-
-
 
                 </div>
             </div>
 
         </div>
- 
-       
+
+        <div class="ui buttons inverted segment" style='position: fixed;
+        bottom: 32px;
+        right: 32px;'>
+            <button class="ui labeled icon inverted button" id="pre-page-btn">
+                <i class="left chevron icon"></i>
+                上一页
+            </button>
+            <button class="ui compact icon inverted disabled button" id="page-num-info">
+                共99
+            </button>
+            <button class="ui right labeled icon inverted button" id="next-page-btn">
+                下一页
+                <i class="right chevron icon"></i>
+            </button>
+        </div>
 
     </main>
 
 
 
 </body>
+<script>
+    $('#open-files').click(() => {
+        $('.ui.labeled.icon.sidebar').sidebar('toggle');
+    });
+
+</script>
+
+<script src="./renderer.js"></script>
 
 </html>

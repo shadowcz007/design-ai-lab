@@ -11,6 +11,7 @@ const Win = require("./win");
 const fileDb = require('./fileDb');
 const Log = require('./log');
 const Layout = require('./layout');
+const { resolve } = require("url");
 
 
 // window.Win = Win;
@@ -122,6 +123,13 @@ class GUI {
         this.setupBtn = document.querySelector("#setup");
         this.myCourseBtn = document.querySelector("#my-course-btn");
         this.recentBtn = document.querySelector("#recent-btn");
+        this.nextPageBtn = document.querySelector('#next-page-btn');
+        this.prePageBtn = document.querySelector('#pre-page-btn');
+        this.pageNumInfo = document.querySelector('#page-num-info');
+
+        // 记录是app =0 还是历史= 1
+        this.currentCardsFrom = 0;
+        this.currentPage = 1;
 
         /**
          * editor面板中的窗口resize功能
@@ -155,21 +163,46 @@ class GUI {
         // });
         //设置路径
         this.addClickEventListener(this.setupBtn, () => this.setupExampleFilePath());
-        //我的
+
+        //APP
         this.addClickEventListener(this.myCourseBtn, e => {
             e.stopPropagation();
-            this.myCourseBtn.classList.add('button-select');
-            this.recentBtn.classList.remove('button-select');
-            this.exampleFiles();
+            this.currentCardsFrom = 0;
+            this.currentPage = 1;
+            this.exampleFiles().then(() => {
+                $('.ui.labeled.icon.sidebar').sidebar('toggle');
+            });
+
         });
-        //最近
+        //历史
         this.addClickEventListener(this.recentBtn, e => {
             e.stopPropagation();
-            this.myCourseBtn.classList.remove('button-select');
-            this.recentBtn.classList.add('button-select');
+            this.currentCardsFrom = 1;
+            this.currentPage = 1;
             this.recentFiles();
+            $('.ui.labeled.icon.sidebar').sidebar('toggle');
         });
 
+        // 下一页
+        this.addClickEventListener(this.nextPageBtn, e => {
+            e.stopPropagation();
+            this.currentPage++;
+            if (this.currentCardsFrom === 0) {
+                this.exampleFiles(this.currentPage);
+            } else if (this.currentCardsFrom === 1) {
+                this.recentFiles(this.currentPage);
+            }
+        });
+        // 上一页
+        this.addClickEventListener(this.prePageBtn, e => {
+            e.stopPropagation();
+            this.currentPage--;
+            if (this.currentCardsFrom === 0) {
+                this.exampleFiles(this.currentPage);
+            } else if (this.currentCardsFrom === 1) {
+                this.recentFiles(this.currentPage);
+            }
+        });
 
     }
 
@@ -558,7 +591,7 @@ class GUI {
         // this.practiceFn(true);
 
         document.querySelector(".grid").style.display = "none";
-        document.getElementById("blank-pannel").style.display = "block";
+        document.getElementById("blank-pannel").style.display = "flex";
 
         //读取版本信息等
         let keywords = document.createElement('p');
@@ -590,7 +623,7 @@ class GUI {
         document.getElementById("recent-files").innerHTML = '';
 
         let div = document.createDocumentFragment();
-        data = data.sort((a, b) => b.create_time - a.create_time);
+
         Array.from(data, d => {
             div.appendChild(
                 //插件/课程-卡片
@@ -602,13 +635,41 @@ class GUI {
     }
 
     //我的卡片
-    exampleFiles() {
-        this.loadExampleFiles().then((ds) => this.createCards(ds));
+    exampleFiles(pageNum = 1, pageSize = 9) {
+        return new Promise((resolve, reject) => {
+            this.loadExampleFiles().then((ds) => {
+                this.getCardsByPage(ds, pageNum, pageSize);
+                resolve();
+            });
+        })
     }
 
     //最近打开的卡片
-    recentFiles() {
-        this.createCards(fileDb.fileGetAll(), true);
+    recentFiles(pageNum = 1, pageSize = 9) {
+        let data = fileDb.fileGetAll();
+        this.getCardsByPage(data, pageNum, pageSize, true);
+        // this.createCards(fileDb.fileGetAll(), true);
+    }
+
+    getCardsByPage(data = [], pageNum = 1, pageSize = 9, isCanClose = false) {
+        this.pageNumInfo.innerText = `${pageNum} / 共${~~(data.length / pageSize) + 1}`;
+
+        if (pageNum === 1) {
+            this.prePageBtn.classList.add('disabled');
+        } else {
+            this.prePageBtn.classList.remove('disabled')
+        };
+
+        if (pageSize * pageNum >= data.length) {
+            this.nextPageBtn.classList.add('disabled');
+        } else {
+            this.nextPageBtn.classList.remove('disabled')
+        };
+
+        data = data.sort((a, b) => b.create_time - a.create_time);
+        data = data.slice(pageSize * (pageNum - 1), pageSize * pageNum);
+        // ks.slice(3*(i-1),3*i);
+        this.createCards(data, isCanClose);
     }
 
     // 
@@ -732,54 +793,74 @@ class GUI {
     }
     //创建卡片
     createCard(data, isCanClose = false) {
-        let div = this.createElement("card");
-        let card = this.createElement("card-body");
-        let img = this.createElement("img");
-        let content = this.createElement("content");
+
         let readme = this.createElement('', 'h5');
-        let t = this.createElement('', 'p');
-        let version = this.createElement("version");
-        let close = this.createElement('close');
-
-
-        img.style.backgroundImage = `url(${URL.createObjectURL(this.base64ToBlob(data.poster))})`;
-        //img.innerHTML = '<div><i class="fas fa-eye"></i></div>';
         readme.innerHTML = Knowledge.marked(data.knowledge.readme);
         readme.innerText = readme.innerText;
-        t.innerHTML = data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : "";
-        version.innerHTML = `代码量 ${data.code_length}<br>版本 ${data.version} ${((fileDb.id(_package) === data.package_id) ? '<i class="far fa-check-circle"></i>' : '<i class="fas fa-ban"></i>')}`;
-        close.innerHTML = '<i class="fas fa-times"></i>';
+
+        let html = `<div class="content">
+                                <img class="right floated mini ui image" src="${URL.createObjectURL(this.base64ToBlob(data.poster))}">
+                                <div class="header">
+                                    ${readme.innerText}
+                                </div>
+                                <div class="meta">
+                                    ${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""}
+                                </div>
+                                <div class="description">
+                                    代码量 ${data.code_length}
+                                    <br>${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="ui two buttons">
+                                    
+                                </div>
+                            </div>
+                   
+                        `
+
+        let div = this.createElement('card');
+        div.innerHTML = html;
 
 
-        div.appendChild(card);
-        card.appendChild(img);
-        card.appendChild(content);
-        content.appendChild(close);
-        content.appendChild(readme);
-        content.appendChild(t);
-        t.appendChild(version);
+        if (isCanClose !== true) {
+            let runBtn = this.createElement("ui basic blue button");
+            runBtn.innerText = '运行';
+            div.querySelector('.buttons').appendChild(runBtn);
 
-        isCanClose === true ? this.addClickEventListener(close, e => {
-            e.stopPropagation();
-            // console.log(e)
-            div.remove();
-            fileDb.fileRemoveById(data.id);
-        }) : close.style.color = 'white';
+            this.addClickEventListener(runBtn, e => {
+                e.stopPropagation();
+                // console.log(data)
+                //控制窗口大小
+                Win.resize(data.size, 1);
+    
+                //移动窗口
+                Win.move();
+    
+                //注入的js
+                this.previewWinExecuteJavaScript(data.code, true);
+            });
 
-        this.addClickEventListener(img, e => {
-            e.stopPropagation();
-            // console.log(data)
-            //控制窗口大小
-            Win.resize(data.size, 1);
+        };
 
-            //移动窗口
-            Win.move();
+        let editBtn = this.createElement("ui basic black button");
+        editBtn.innerText = '编辑';
+        div.querySelector('.buttons').appendChild(editBtn);
+        this.addClickEventListener(editBtn, e => this.openFile(data));
 
-            //注入的js
-            this.previewWinExecuteJavaScript(data.code, true);
-        });
-
-        this.addClickEventListener(div, e => this.openFile(data));
+        if (isCanClose === true) {
+            let closeBtn = this.createElement("ui basic black button");
+            div.querySelector('.buttons').appendChild(closeBtn);
+            closeBtn.innerText = '删除';
+            this.addClickEventListener(closeBtn, e => {
+                e.stopPropagation();
+                div.remove();
+                fileDb.fileRemoveById(data.id);
+                // setTimeout(()=>{
+                //     this.recentFiles(this.currentPage);
+                // },1000);
+            })
+        };
 
         return div;
     }

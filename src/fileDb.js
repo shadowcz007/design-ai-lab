@@ -26,6 +26,7 @@ class FileDb {
 
     // 删除文件
     fileRemoveById(id) {
+        console.log(id)
         return this.db.get(this.key)
             .remove({ id })
             .write()
