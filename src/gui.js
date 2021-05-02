@@ -217,12 +217,12 @@ class GUI {
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function (error) {
+        storage.set('app', obj, function(error) {
             if (error) throw error;
         });
     }
     loadWindowStatus() {
-        storage.get('app', function (error, data) {
+        storage.get('app', function(error, data) {
             console.log('storage', data)
         })
     }
@@ -471,13 +471,13 @@ class GUI {
     }
 
     previewStatus() {
-        //预览状态
-        // console.log("预览状态")
-        this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-        Layout.init();
-    }
-    //编辑状态切换
+            //预览状态
+            // console.log("预览状态")
+            this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+            Layout.init();
+        }
+        //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -550,7 +550,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -681,14 +681,14 @@ class GUI {
     }
 
     closeEditorWin() {
-        document.getElementById("knowledge-pannel").style.display = "block";
-        document.getElementById("editor-pannel").classList.remove("pannel-large");
-        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-        document.body.querySelector('#frame').style.height = "100%";
-        Layout.reset();
-        this.openBtn.classList.remove('button-active');
-    }
-    // 放大编程页面
+            document.getElementById("knowledge-pannel").style.display = "block";
+            document.getElementById("editor-pannel").classList.remove("pannel-large");
+            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+            document.body.querySelector('#frame').style.height = "100%";
+            Layout.reset();
+            this.openBtn.classList.remove('button-active');
+        }
+        // 放大编程页面
     toggleEditorWin() {
         if (this.openBtn.classList.contains('button-active')) {
             this.openEditorWin();
@@ -701,7 +701,7 @@ class GUI {
     closePracticeHtml() {
         // document.getElementById("knowledge-pannel").style.display = "block";
         // document.getElementById("editor-pannel").classList.remove("pannel-large");
-        this.practiceBtn.innerHTML = `<i class="fas fa-sync"></i>`;
+        this.practiceBtn.innerHTML = `<i class="sync icon"></i>`;
         // console.log(Editor)
         Editor.toggle(false);
         this.practiceBtn.setAttribute('sync-stop', 1);
@@ -712,7 +712,7 @@ class GUI {
     openPracticeHtml() {
         // document.getElementById("knowledge-pannel").style.display = "none";
         // document.getElementById("editor-pannel").classList.add("pannel-large");
-        this.practiceBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
+        this.practiceBtn.innerHTML = `<i class="sync icon fa-spin"></i>`;
         this.practiceBtn.removeAttribute('sync-stop');
         // document.getElementById("log").style.display = "block";
         // if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
@@ -777,9 +777,9 @@ class GUI {
         code = this.createExecuteJs(code || Editor.getCode());
         //Win.startExecuteJavaScript2Preview();
         // 自动更新
-        console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'))
+        console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'), forceRun)
         if (!this.practiceBtn.getAttribute('sync-stop') || forceRun) {
-            Win.executeJavaScript2Preview(code);
+            Win.executeJavaScript2Preview(code, forceRun);
         } else {
             // 关闭自动更新
             Win.stopExecuteJavaScript2Preview();
@@ -787,18 +787,18 @@ class GUI {
     }
 
     createElement(className, type = 'div') {
-        let div = document.createElement(type);
-        div.className = className;
-        return div
-    }
-    //创建卡片
+            let div = document.createElement(type);
+            div.className = className;
+            return div
+        }
+        //创建卡片
     createCard(data, isCanClose = false) {
 
-        let readme = this.createElement('', 'h5');
-        readme.innerHTML = Knowledge.marked(data.knowledge.readme);
-        readme.innerText = readme.innerText;
+            let readme = this.createElement('', 'h5');
+            readme.innerHTML = Knowledge.marked(data.knowledge.readme);
+            readme.innerText = readme.innerText;
 
-        let html = `<div class="content">
+            let html = `<div class="content">
                                 <img class="right floated mini ui image" src="${URL.createObjectURL(this.base64ToBlob(data.poster))}">
                                 <div class="header">
                                     ${readme.innerText}

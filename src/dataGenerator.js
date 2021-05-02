@@ -12,7 +12,7 @@ class DataGenerator {
             if (this.interval === null) return;
             this.frameWaitTime = Date.now() - this.lastTime;
             this.lastTime = Date.now();
-            // console.log(this)
+            console.log(this)
             cb(this.frameWaitTime);
             if (this.framerate === 0) {
                 window.requestAnimationFrame(wrapperFn);

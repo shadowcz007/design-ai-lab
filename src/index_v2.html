@@ -44,7 +44,7 @@
         <div class="pannel" data-id="1" id="knowledge-pannel">
 
             <div class="btns">
-                <button id="edit-file"><i class="far fa-eye"></i></button>
+                <button id="edit-file"><i class="tools icon"></i></button>
             </div>
 
             <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
@@ -63,10 +63,10 @@
                 <div id="editor-container">
                     <div class="btns">
                         <button id="server-url"><i class="fas fa-cog"></i></button>
-                        <button id="open-btn"><i class="fas fa-stop"></i></button>
+                        <button id="open-btn"><i class="code icon"></i></button>
                         <!-- <div id="qrcode"></div> <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
                         <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
-                        <button id="practice-btn" sync-stop='1'><i class="fas fa-sync"></i></button>
+                        <button id="practice-btn" sync-stop='1'><i class="sync icon"></i></button>
                     </div>
                     <div id="editor"></div>
                 </div>
@@ -125,9 +125,24 @@
 
                 <div class="middle aligned column">
 
+                      <div class="ui buttons inverted segment" >
+                        <button class="ui labeled icon inverted button" id="pre-page-btn">
+                            <i class="left chevron icon"></i>
+                            上一页
+                        </button>
+                        <button class="ui compact icon inverted disabled button" id="page-num-info">
+                            共99
+                        </button>
+                        <button class="ui right labeled icon inverted button" id="next-page-btn">
+                            下一页
+                            <i class="right chevron icon"></i>
+                        </button>
+                    </div>
+                    
+
                     <div class="ui cards" id="recent-files">
 
-
+                        <!--
                         <div class="card">
                             <div class="content">
                                 <img class="right floated mini ui image" src="/images/avatar/large/jenny.jpg">
@@ -147,30 +162,18 @@
                                     <div class="ui basic red button">编辑</div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
+
+                  
 
                 </div>
             </div>
 
         </div>
 
-        <div class="ui buttons inverted segment" style='position: fixed;
-        bottom: 32px;
-        right: 32px;'>
-            <button class="ui labeled icon inverted button" id="pre-page-btn">
-                <i class="left chevron icon"></i>
-                上一页
-            </button>
-            <button class="ui compact icon inverted disabled button" id="page-num-info">
-                共99
-            </button>
-            <button class="ui right labeled icon inverted button" id="next-page-btn">
-                下一页
-                <i class="right chevron icon"></i>
-            </button>
-        </div>
+
 
     </main>
 

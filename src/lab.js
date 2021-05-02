@@ -603,9 +603,6 @@ class Base {
         });
     }
 
-
-
-
 }
 
 class Knn {
@@ -1054,7 +1051,7 @@ class Deeplab {
 }
 
 const jieba = require('@node-rs/jieba');
-class Jieba{
+class Jieba {
     //单例
     static getInstance() {
         if (!Jieba.instance) {
@@ -1062,14 +1059,14 @@ class Jieba{
         }
         return Jieba.instance;
     }
-    constructor(){
+    constructor() {
         try {
             jieba.load();
         } catch (error) {
             console.log(error);
         };
-        Object.keys(jieba).forEach(k=>{
-            if(k!='load') this[k]=jieba[k];
+        Object.keys(jieba).forEach(k => {
+            if (k != 'load') this[k] = jieba[k];
         })
     };
 }
@@ -1085,5 +1082,5 @@ module.exports = {
     cv: cv,
     Store: Store,
     Deeplab: Deeplab,
-    Jieba:Jieba
+    Jieba: Jieba
 };
