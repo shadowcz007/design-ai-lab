@@ -15,7 +15,8 @@ remote.getCurrentWindow().on('focus', e => {
 });
 
 
-const path = require('path');
+const path = require('path'),
+    fs = require('fs');
 const tf = require('@tensorflow/tfjs');
 const knnClassifier = require('@tensorflow-models/knn-classifier');
 const humanseg = require('./humanseg');
@@ -200,7 +201,7 @@ class FlexLayout {
 class GIF {
     constructor() {
             this.gif = new _GIF({
-                workers: 2,
+                workers: 4,
                 quality: 10,
                 background: 'rgba(0,0,0,0)',
                 transparent: 'rgba(0,0,0,0)',
@@ -208,18 +209,36 @@ class GIF {
             });
         }
         // canvasElement imageElement
-    add(elt, fps) {
+    add(elt, fps = 10) {
         this.gif.addFrame(elt, {
             delay: 1000 / fps
         });
     }
-    init() {
-        // // or a canvas element
-        // gif.addFrame(canvasElement, { delay: 200 });
 
-        // // or copy the pixels from a canvas context
-        // gif.addFrame(ctx, { copy: true });
+    createImage(url) {
+        return new Promise((resolve, reject) => {
+            let _img = new Image();
+            _img.src = url;
+            _img.className = 'opacity-background';
+            _img.onload = function() {
+                resolve(_img);
+            }
+            _img.onerror = function() {
+                resolve(null);
+            }
+        })
+    }
 
+    // 从文件夹创建 gif
+    async addFromDir(fileDir, fps = 10) {
+        let files = fs.readdirSync(fileDir);
+
+        for (const f of files) {
+            let im = await this.createImage(path.join(fileDir, f));
+            if (im && im.complete) this.add(im, fps);
+        };
+
+        return
     }
     render() {
         return new Promise((resolve, reject) => {
@@ -576,11 +595,13 @@ class Base {
         return arr.sort(randomsort);
     }
 
+
+
     //随机来张图片
-    randomPic(w = 200, h = 200, isAdd = false) {
+    randomPic(w = 200, h = 200) {
             this.randomPicNum++;
             let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-            return this.createImage(url, isAdd);
+            return url
         }
         //随机来一句话
     randomText() {}

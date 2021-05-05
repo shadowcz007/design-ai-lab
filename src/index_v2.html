@@ -10,11 +10,14 @@
     <link rel="stylesheet" href="../node_modules/fomantic-ui/dist/semantic.min.css">
     <script>
         if (typeof module === 'object') {
-            window.module = module; module = undefined;
+            window.module = module;
+            module = undefined;
         }
     </script>
     <script src="../node_modules/fomantic-ui/examples/assets/library/jquery.min.js"></script>
-    <script>if (window.module) module = window.module;</script>
+    <script>
+        if (window.module) module = window.module;
+    </script>
     <script src="../node_modules/fomantic-ui/dist/semantic.min.js"></script>
 
     <link rel="stylesheet" href="./style.css">
@@ -25,19 +28,18 @@
     <div class="ui left demo vertical inverted sidebar labeled icon menu" style='padding-top: 32px;'>
 
         <a class="item">
-            <i class="gamepad icon"></i>
-            PIPELINE
+            <i class="gamepad icon"></i> PIPELINE
         </a>
 
         <a class="item" id='my-course-btn'>
-            <i class="video camera icon"></i>
-            APP
+            <i class="video camera icon"></i> APP
         </a>
         <a class="item" id='recent-btn'>
-            <i class="video play icon"></i>
-            HISTORY
+            <i class="video play icon"></i> HISTORY
         </a>
-
+        <a class="item" id='setup-btn'>
+            <i class="video play icon"></i> SETUP
+        </a>
     </div>
 
     <div class="grid">
@@ -94,9 +96,7 @@
         </div> -->
     </div>
 
-
-    <main id="blank-pannel">
-
+    <div id="setup-pannel">
         <div class='head'>
             <div class="info">
                 <h1>HELLO AI WORLD!</h1>
@@ -107,39 +107,39 @@
             padding: 8px;
             align-items: center;'>
                 <p id="info">-</p>
-                <button id="setup" class="button-light"><i class="fas fa-cog"></i></button>
+                <button id="setup-example-file-path" class="large ui button">
+                    设置
+                </button>
             </div>
         </div>
 
-        <div class="ui animated blue tertiary button" id="open-files" style='position: fixed;margin-top: 32px !important;
-       margin-left: 32px !important;'>
-            <div class="visible content"><i class="left th icon"></i></div>
-            <div class="hidden content">菜单</div>
-        </div>
+    </div>
 
+    <div class="ui animated blue tertiary button" id="open-files" style='
+    position: fixed;
+    margin-top: 32px !important;
+    margin-left: 32px !important;
+    z-index: 999;
+    top: 0;
+    left: 0;'>
+        <div class="visible content"><i class="left th icon"></i></div>
+        <div class="hidden content">菜单</div>
+    </div>
 
-        <div class="ui placeholder padded segment" 
-        style='height: 100vh;margin: 0;
+    <main id="blank-pannel">
+        <div class="ui placeholder padded segment" style='height: 100vh;margin: 0;
         flex-direction: row;'>
             <div class="ui one column doubling stackable grid container">
 
                 <div class="middle aligned column">
-
-                      <div class="ui buttons inverted segment" >
-                        <button class="ui labeled icon inverted button" id="pre-page-btn">
-                            <i class="left chevron icon"></i>
-                            上一页
+                    <div class="ui basic buttons segment">
+                        <button class="large ui button">
+                        打开
                         </button>
-                        <button class="ui compact icon inverted disabled button" id="page-num-info">
-                            共99
-                        </button>
-                        <button class="ui right labeled icon inverted button" id="next-page-btn">
-                            下一页
-                            <i class="right chevron icon"></i>
+                        <button class="large ui button">
+                        新建
                         </button>
                     </div>
-                    
-
                     <div class="ui cards" id="recent-files">
 
                         <!--
@@ -166,7 +166,20 @@
 
                     </div>
 
-                  
+                    <div class="ui basic buttons segment">
+                        <button class="ui labeled icon button" id="pre-page-btn">
+                            <i class="left chevron icon"></i>
+                            上一页
+                        </button>
+                        <button class="ui compact icon disabled button" id="page-num-info">
+                            共99
+                        </button>
+                        <button class="ui right labeled icon button" id="next-page-btn">
+                            下一页
+                            <i class="right chevron icon"></i>
+                        </button>
+                    </div>
+
 
                 </div>
             </div>
@@ -184,7 +197,6 @@
     $('#open-files').click(() => {
         $('.ui.labeled.icon.sidebar').sidebar('toggle');
     });
-
 </script>
 
 <script src="./renderer.js"></script>

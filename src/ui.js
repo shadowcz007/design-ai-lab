@@ -551,6 +551,51 @@ class UI {
         return g;
     }
 
+    createVideoRange(min = 0, max = 100) {
+        var select = document.createElement('input');
+        select.setAttribute('type', 'number');
+
+        var html5Slider = document.createElement('div');
+
+        noUiSlider.create(html5Slider, {
+            start: [min, max],
+            connect: true,
+            range: {
+                'min': min,
+                'max': max
+            }
+        });
+
+        var inputNumber = document.createElement('input');
+        inputNumber.setAttribute('type', 'number');
+        // console.log(html5Slider.noUiSlider)
+        html5Slider.noUiSlider.on('update', function(values, handle) {
+
+            var value = values[handle];
+
+            if (handle) {
+                inputNumber.value = value;
+            } else {
+                select.value = value;
+            }
+        });
+
+        select.addEventListener('change', function() {
+            html5Slider.noUiSlider.set([this.value, null]);
+        });
+
+        inputNumber.addEventListener('change', function() {
+            html5Slider.noUiSlider.set([null, this.value]);
+        });
+
+        let div = document.createElement('div');
+        div.appendChild(select)
+        div.appendChild(inputNumber)
+        div.appendChild(html5Slider);
+
+        return div
+    }
+
     //TODO 多文件的支持 当文件过大的时候，opencv需要提示
     //isMultiple=false
     // 支持缓存 cache
@@ -674,10 +719,32 @@ class UI {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = encodeURI(url);
+            _img.className = 'opacity-background';
             _img.onload = function() {
                 if (isAdd) this.add(_img);
                 resolve(_img);
             }
+            _img.onerror = function() {
+                resolve(null);
+            }
+        })
+    }
+
+    createImageAndDownload(url, isAdd = false) {
+        return new Promise((resolve, reject) => {
+            let a = document.createElement('a');
+            a.href = encodeURI(url);
+            a.setAttribute('name', 'design-ai');
+            a.setAttribute('download', encodeURI(url));
+            this.createImage(url, false).then((im) => {
+                if (im) {
+                    a.appendChild(im);
+                    if (isAdd) this.add(a);
+                    resolve(a);
+                } else {
+                    resolve(null);
+                }
+            });
         })
     }
 

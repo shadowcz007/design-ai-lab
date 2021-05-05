@@ -1,4 +1,3 @@
-// const https = require('@small-tech/https')
 let http = require('http');
 let https = require('https');
 let fs = require('fs');
@@ -133,7 +132,7 @@ function doReq(req, res) {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model' + reqUrlBase)));
-    }else if (reqUrlBase === '/posenet/model.json') {
+    } else if (reqUrlBase === '/posenet/model.json') {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/posenet_mobilenet_float075_stride16/model.json')));
@@ -150,7 +149,7 @@ function doReq(req, res) {
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/bodypix/weights.bin')));
     }
-    
+
 }
 
 // const io = require('socket.io')(server);

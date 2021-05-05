@@ -12,16 +12,17 @@
     <script src="../node_modules/@fortawesome/fontawesome-free/js/all.js"></script>
     <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
-  
+    <script src="../node_modules/nouislider/distribute/nouislider.min.js"></script>
+    <link rel="stylesheet" href="../node_modules/nouislider/distribute/nouislider.min.css">
     <!-- <script src="../node_modules/socket.io/client-dist/socket.io.js"></script> -->
     <script src="../node_modules/peerjs/dist/peerjs.min.js"></script>
     <script src="../lib/qrcode.min.js"></script>
     <style>
-        :root {
+         :root {
             --hover-color: #6399ff;
             --box-shadow: 0px 0 14px 7px lightgrey;
         }
-
+        
         body {
             padding: 0;
             margin: 0;
@@ -32,7 +33,7 @@
             justify-content: space-around;
             align-items: center;
         }
-
+        
         #p5 {
             display: flex;
             width: 100%;
@@ -44,18 +45,20 @@
             left: 0;
             top: 0;
         }
-
+        
         #p5 canvas {
             outline: 1px dashed lightgray;
             max-height: 100%;
             width: auto !important;
         }
-
-        .opacity-background{
+        
+        .opacity-background {
+            width: 200px;
             background-position: 0 0, 5px 5px;
             background-size: 10px 10px;
             background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
         }
+        
         #gui-main {
             display: flex;
             position: fixed;
@@ -67,7 +70,7 @@
             align-items: center;
             flex-wrap: wrap;
         }
-
+        
         #gui-main .input-image-default {
             background-position: 0 0, 5px 5px;
             background-size: 10px 10px;
@@ -83,7 +86,7 @@
             color: lightsteelblue;
             margin: 12px;
         }
-
+        
         #gui-main .input-image {
             background-position: center !important;
             background-size: contain !important;
@@ -94,10 +97,9 @@
             cursor: pointer;
             box-shadow: var(--box-shadow);
         }
-
-
+        
         #gui-main .input-more-files:after {
-           content: attr(data-count);
+            content: attr(data-count);
             background-color: #272727;
             width: 12px;
             font-size: 10px;
@@ -107,9 +109,8 @@
             /* position: sticky; */
             color: white;
             border-radius: 100%;
-
         }
-
+        
         #gui-main .input-file {
             height: 32px;
             font-size: 12px;
@@ -121,13 +122,11 @@
             width: 100%;
             margin: 12px 0;
         }
-
-       #gui-main .input-file:hover {
-             
+        
+        #gui-main .input-file:hover {
             outline: 1px solid var(--hover-color);
-            
         }
-
+        
         #gui-main .input-file p {
             overflow: hidden;
             height: 20px;
@@ -139,19 +138,19 @@
             font-family: inherit;
             word-break: break-word;
         }
-
+        
         #gui-main .input-image-default:hover {
             box-shadow: var(--box-shadow) !important;
         }
-
+        
         #gui-main .input-image:hover {
             box-shadow: var(--box-shadow) !important;
         }
-
+        
         #gui-main .input-text {
             width: 100%;
         }
-
+        
         #gui-main .input-text p {
             overflow: hidden;
             height: 20px;
@@ -167,7 +166,7 @@
             word-break: break-word;
             user-select: none;
         }
-
+        
         #gui-main .input-text input {
             border-color: #4c5258;
             border-width: thin;
@@ -182,10 +181,11 @@
             font-size: 16px;
             color: #373a40;
         }
-
-        #gui-main .input-color{
+        
+        #gui-main .input-color {
             width: max-content;
         }
+        
         #gui-main button {
             outline: none;
             cursor: pointer;
@@ -201,16 +201,16 @@
             border-radius: 24px;
             width: max-content;
         }
-
+        
         #gui-main button:hover {
             box-shadow: var(--box-shadow) !important;
         }
-
+        
         #gui-main .button {
             width: 40%;
             margin-top: 32px;
         }
-
+        
         #gui-main select {
             padding: 6px 8px;
             cursor: pointer;
@@ -221,12 +221,12 @@
             border-radius: 24px;
             font-weight: 300;
         }
-
+        
         #gui-main select:hover {
             border-color: var(--hover-color);
             box-shadow: var(--box-shadow);
         }
-
+        
         #gui-main input[type="color"] {
             height: 32px;
             border: 1px solid transparent;
@@ -235,13 +235,13 @@
             outline: none;
             margin: 12px 0;
         }
-
+        
         #gui-main input[type="color"]:hover {
             border: 1px solid gray;
             border-color: var(--hover-color);
             box-shadow: var(--box-shadow);
         }
-
+        
         #gui-main p {
             font-size: 10px;
             padding: 12px;
@@ -251,28 +251,28 @@
             font-family: monospace;
             word-break: break-word;
         }
-
+        
         #gui-main .text_canvas {
             max-width: 100%;
         }
-
+        
         #gui-main .group img {
             width: 45%;
             max-width: fit-content;
         }
-
+        
         #gui-main .video {
             height: 240px;
             outline: none;
             max-width: 100%;
             width: auto;
         }
-
+        
         #gui-main .audio {
             outline: none;
             max-width: 100%;
         }
-
+        
         #gui-main .preview-canvas {
             width: 50% !important;
             height: auto !important;

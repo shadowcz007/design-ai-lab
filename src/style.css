@@ -393,20 +393,26 @@ button:hover {
     flex-direction: column;
 }
 
-#blank-pannel .head {
+#setup-pannel {
+    display: none;
+    height: 100vh;
+    background-color: #eee;
+}
+
+#setup-pannel .head {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
     flex-direction: row;
 }
 
-#blank-pannel p {
+#setup-pannel p {
     margin: 0 12px;
     font-size: 12px;
     color: #9E9E9E;
 }
 
-#blank-pannel h1 {
+#setup-pannel h1 {
     /* color: white; */
     font-size: 1.2em;
     font-weight: 500;
@@ -415,7 +421,7 @@ button:hover {
     font-family: monospace;
 }
 
-#blank-pannel span {
+#setup-pannel span {
     font-size: 10px;
     color: #3794ff;
     background-color: rgb(253 253 220);
@@ -424,7 +430,7 @@ button:hover {
     font-weight: 500;
 }
 
-#blank-pannel .info {
+#setup-pannel .info {
     padding: 1em 6em;
     display: flex;
     justify-content: center;

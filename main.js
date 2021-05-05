@@ -34,7 +34,7 @@ const _BASIC_HTML = path.join(__dirname, 'src/basic.html');
 const _READ_HTML = path.join(__dirname, 'src/read.html');
 // const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
-
+// const _BASIC_PRELOAD_JS = path.join(__dirname, 'src/ffmpeg_server.js');
 
 // console.log(url.format({
 //     pathname: _PRE_HTML,
@@ -48,16 +48,17 @@ global._DEBUG_PORT = 3000;
 app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
 app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
 
+// app.commandLine.appendSwitch('enable-webassembly');
+
 // 忽略证书错误
 app.commandLine.appendSwitch('ignore-certificate-errors', true);
 // https://stackoverflow.com/questions/57476284/cant-connect-to-web-socket-from-electron-when-using-self-signed-cert
 
 
-
 // app.commandLine.appendSwitch(
-// 	"js-flags",
-// 	// WebAssembly flags
-// 	"--experimental-wasm-threads --experimental-wasm-bulk-memory"
+//     "js-flags",
+//     // WebAssembly flags
+//     "--experimental-wasm-threads --experimental-wasm-bulk-memory"
 // );
 // app.allowRendererProcessReuse = true; // https://github.com/electron/electron/issues/18397
 
@@ -73,6 +74,7 @@ const config = {
         show: true,
         closable: true,
         resizable: true,
+        nodeIntegration: true,
         // titleBarStyle: "default",
         titleBarStyle: "hidden",
         html: _INDEX_HTML
@@ -88,6 +90,7 @@ const config = {
         alwaysOnTop: true,
         closable: false,
         resizable: true,
+        nodeIntegration: true,
         titleBarStyle: "default",
         html: _PRE_HTML,
         preload: _PRELOAD_JS
@@ -102,8 +105,10 @@ const config = {
         show: false,
         closable: false,
         resizable: false,
+        nodeIntegration: true,
         titleBarStyle: "hidden",
         html: _BASIC_HTML,
+        // preload: _BASIC_PRELOAD_JS,
         executeJavaScript: fs.readFileSync(
             path.join(__dirname, 'src/serverModel.js')
         )
@@ -124,6 +129,7 @@ const config = {
 }
 
 function createWindow(key, opts, workAreaSize) {
+    // console.log(opts.nodeIntegration)
     // 创建GUI窗口
     const win = new BrowserWindow({
         width: opts.width,
@@ -142,13 +148,19 @@ function createWindow(key, opts, workAreaSize) {
         webPreferences: {
             preload: opts.preload,
             //开启nodejs支持
-            nodeIntegration: true,
+            nodeIntegration: opts.nodeIntegration,
+            // webSecurity: !opts.nodeIntegration,
+            // contextIsolation: !opts.nodeIntegration,
             //开启AI功能
             experimentalFeatures: true,
             //开启渲染进程调用remote
             enableRemoteModule: true,
+            //
+            nodeIntegrationInWorker: opts.nodeIntegration,
             webviewTag: true,
-            devTools: true
+            devTools: true,
+            //sandbox: true,
+            //allowRunningInsecureContent: false
         }
     });
 

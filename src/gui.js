@@ -120,9 +120,9 @@ class GUI {
         /**
          * 欢迎页面
          */
-        this.setupBtn = document.querySelector("#setup");
         this.myCourseBtn = document.querySelector("#my-course-btn");
         this.recentBtn = document.querySelector("#recent-btn");
+        this.setupBtn = document.querySelector('#setup-btn');
         this.nextPageBtn = document.querySelector('#next-page-btn');
         this.prePageBtn = document.querySelector('#pre-page-btn');
         this.pageNumInfo = document.querySelector('#page-num-info');
@@ -130,6 +130,9 @@ class GUI {
         // 记录是app =0 还是历史= 1
         this.currentCardsFrom = 0;
         this.currentPage = 1;
+
+        // 设置页
+        this.setupExampleFilePathBtn = document.querySelector("#setup-example-file-path");
 
         /**
          * editor面板中的窗口resize功能
@@ -161,8 +164,25 @@ class GUI {
         //         // this.devOpen = false;
         //     }
         // });
+
+        // 设置
+        this.addClickEventListener(this.setupBtn, () => {
+            document.querySelector('#setup-pannel').style.display = 'flex';
+            document.querySelector('#blank-pannel').style.display = 'none';
+            //读取版本信息等
+            let keywords = document.createElement('p');
+            keywords.innerHTML = `关键词:${Array.from(_package.keywords, k => '<span>' + k + '</span>').join('')}`
+            let version = document.createElement('p');
+            version.innerText = `版本 ${_package.version}`;
+
+            document.querySelector("#setup-pannel .info").innerHTML = '<h1>HELLO AI WORLD!</h1>';
+            document.querySelector("#setup-pannel .info").appendChild(keywords);
+            document.querySelector("#setup-pannel .info").appendChild(version);
+            $('.ui.labeled.icon.sidebar').sidebar('toggle');
+        });
+
         //设置路径
-        this.addClickEventListener(this.setupBtn, () => this.setupExampleFilePath());
+        this.addClickEventListener(this.setupExampleFilePathBtn, () => this.setupExampleFilePath());
 
         //APP
         this.addClickEventListener(this.myCourseBtn, e => {
@@ -170,6 +190,8 @@ class GUI {
             this.currentCardsFrom = 0;
             this.currentPage = 1;
             this.exampleFiles().then(() => {
+                document.querySelector('#setup-pannel').style.display = 'none';
+                document.querySelector('#blank-pannel').style.display = 'flex';
                 $('.ui.labeled.icon.sidebar').sidebar('toggle');
             });
 
@@ -180,6 +202,8 @@ class GUI {
             this.currentCardsFrom = 1;
             this.currentPage = 1;
             this.recentFiles();
+            document.querySelector('#setup-pannel').style.display = 'none';
+            document.querySelector('#blank-pannel').style.display = 'flex';
             $('.ui.labeled.icon.sidebar').sidebar('toggle');
         });
 
@@ -593,15 +617,7 @@ class GUI {
         document.querySelector(".grid").style.display = "none";
         document.getElementById("blank-pannel").style.display = "flex";
 
-        //读取版本信息等
-        let keywords = document.createElement('p');
-        keywords.innerHTML = `关键词:${Array.from(_package.keywords, k => '<span>' + k + '</span>').join('')}`
-        let version = document.createElement('p');
-        version.innerText = `版本 ${_package.version}`;
 
-        document.querySelector("#blank-pannel .info").innerHTML = '<h1>HELLO AI WORLD!</h1>';
-        document.querySelector("#blank-pannel .info").appendChild(keywords);
-        document.querySelector("#blank-pannel .info").appendChild(version);
 
         //Win.showWinControl(true,false);
 
