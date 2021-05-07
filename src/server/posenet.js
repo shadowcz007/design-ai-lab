@@ -6,7 +6,7 @@ require('@tensorflow/tfjs-backend-webgl');
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
 
-const utils = require('./utils');
+const utils = require('../utils');
 
 const _KEYPOINTS = { "nose": 0, "leftEye": 2, "rightEye": 4, "leftEar": 6, "rightEar": 8, "leftShoulder": 10, "rightShoulder": 12, "leftElbow": 14, "rightElbow": 16, "leftWrist": 18, "rightWrist": 20, "leftHip": 22, "rightHip": 24, "leftKnee": 26, "rightKnee": 28, "leftAnkle": 30, "rightAnkle": 32 };
 
@@ -38,7 +38,7 @@ class Posenet {
 
             let model = posenet.load(opts);
 
-            model.then(async (net) => {
+            model.then(async(net) => {
                 this.model = net;
                 let c = document.createElement('canvas');
                 c.width = 1;
@@ -129,10 +129,11 @@ class Posenet {
         let feature = [];
         // 裁切
         let xs = Array.from(keypoints, p => {
-            return p.position.x
-        }), ys = Array.from(keypoints, p => {
-            return p.position.y
-        });
+                return p.position.x
+            }),
+            ys = Array.from(keypoints, p => {
+                return p.position.y
+            });
         let xMin = Math.min(...xs),
             yMin = Math.min(...ys);
 
@@ -170,7 +171,7 @@ class Posenet {
         const adjacentKeyPoints =
             posenet.getAdjacentKeyPoints(keypoints, minConfidence);
 
-        const toTuple = function ({ y, x }) {
+        const toTuple = function({ y, x }) {
             return [y, x];
         };
 

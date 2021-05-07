@@ -5,7 +5,7 @@ require('@tensorflow/tfjs-backend-webgl');
 
 const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
-const utils = require('./utils');
+const utils = require('../utils');
 //
 class Bodypix {
 
@@ -32,7 +32,7 @@ class Bodypix {
                 this.model = net;
             });
 
-            model.then(async (net) => {
+            model.then(async(net) => {
                 this.model = net;
                 let c = document.createElement('canvas');
                 c.width = 1;
@@ -53,13 +53,13 @@ class Bodypix {
 
     }
 
-     
+
     async segmentPerson(img) {
         const segmentation = await this.model.segmentPerson(img);
         // Convert the segmentation into a mask to darken the background.
-        const foregroundColor = {r: 0, g: 0, b: 0, a: 0};
-        const backgroundColor = {r: 0, g: 255, b: 0, a: 255}; 
-        const coloredPartImage = bodyPix.toMask(segmentation,foregroundColor, backgroundColor);
+        const foregroundColor = { r: 0, g: 0, b: 0, a: 0 };
+        const backgroundColor = { r: 0, g: 255, b: 0, a: 255 };
+        const coloredPartImage = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
         const opacity = 1;
         const flipHorizontal = false;
         const maskBlurAmount = 0;
@@ -69,19 +69,19 @@ class Bodypix {
             flipHorizontal);
 
         const canvas = document.createElement('canvas');
-        canvas.width=canvasMask.width;
-        canvas.height=canvasMask.height;
-        let ctx=canvas.getContext('2d');
-        ctx.drawImage(img,0,0,canvasMask.width,canvasMask.height);
-        let imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        canvas.width = canvasMask.width;
+        canvas.height = canvasMask.height;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvasMask.width, canvasMask.height);
+        let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        let imgMaskData=canvasMask.getContext('2d').getImageData(0,0,canvas.width,canvas.height);
+        let imgMaskData = canvasMask.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
 
         for (let index = 0; index < (imgData.width * imgData.height * 4); index += 4) {
-            imgData.data[index + 3] = (imgMaskData.data[index + 1]==255&&imgMaskData.data[index + 0]==0)?0:255;
+            imgData.data[index + 3] = (imgMaskData.data[index + 1] == 255 && imgMaskData.data[index + 0] == 0) ? 0 : 255;
         };
 
-        ctx.putImageData(imgData,0,0);
+        ctx.putImageData(imgData, 0, 0);
 
         return canvas
     }

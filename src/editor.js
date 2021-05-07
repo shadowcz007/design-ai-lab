@@ -136,6 +136,7 @@ class Editor {
 
                 monaco.languages.registerCompletionItemProvider('javascript', {
                     provideCompletionItems: () => {
+                        // console.log('provideCompletionItems');
                         return { suggestions: createSuggestions() };
                     }
                 });
