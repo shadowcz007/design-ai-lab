@@ -23,17 +23,6 @@ body {
     user-select: none;
 }
 
-
-/* 课程代码提示的样式 */
-
-code {
-    background-color: rgba(255, 0, 0, 0.2);
-    color: orange;
-    padding: 1px;
-    border-radius: 12px;
-    padding-left: 8px;
-}
-
 header {
     background-color: #333333;
     display: flex;
@@ -244,6 +233,7 @@ button:hover {
 /* 布局--end---- */
 
 #knowledge-pannel {
+    display: none;
     min-height: 480px;
     height: calc(100vh - 24px);
     width: calc(50% - 10px);
@@ -258,74 +248,6 @@ button:hover {
     min-width: 240px;
     display: flex;
     flex-direction: column;
-}
-
-#knowledge-pannel .btns {
-    background-color: #1e1f26;
-}
-
-#readme {
-    min-height: 88px;
-    padding: 14px;
-    color: lemonchiffon;
-    border-bottom: 1px dashed rgba(204, 204, 204, 0.2);
-}
-
-#readme,
-#course {
-    outline: none
-}
-
-.readme-show {
-    padding: 12px;
-    /* min-height: auto!important; */
-    font-size: 18px;
-    font-weight: 500;
-    color: lemonchiffon;
-    /* background-color: lemonchiffon!important; */
-}
-
-.readme-show>div {
-    padding: 2px;
-    font-size: 14px;
-    font-weight: 300;
-}
-
-.readme-show>p {
-    padding: 2px;
-    font-size: 14px;
-    font-weight: 300;
-}
-
-.pannel-large #course {
-    /* height: 100%; */
-}
-
-#course {
-    min-height: 300px;
-    /* background: white; */
-    padding: 12px;
-    color: white
-}
-
-.course-show {
-    font-size: 14px;
-    font-weight: 400;
-    color: white
-}
-
-.course-show>div {
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 300;
-    color: #333333
-}
-
-.course-show>p {
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 300;
-    color: white
 }
 
 #frame {

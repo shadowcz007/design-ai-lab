@@ -19,6 +19,7 @@ const video = require('./video');
 const DataGenerator = require('./datagenerator');
 const FlexLayout = require('./flexlayout');
 const Canvas = require('./canvas');
+const Image = require('./image');
 const Color = require('./Color');
 const Clipboard = require('./clipboard');
 const GIF = require('./gif');
@@ -30,6 +31,7 @@ const Jieba = require('./segment');
 const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 
+
 module.exports = {
     base: new Base(),
     ui: new UI(),
@@ -39,6 +41,7 @@ module.exports = {
     DataGenerator: DataGenerator,
     FlexLayout: FlexLayout,
     Canvas: Canvas,
+    Image: new Image(),
     Color: Color,
     DimensionsDb: DimensionsDb,
     clipboard: new Clipboard(),

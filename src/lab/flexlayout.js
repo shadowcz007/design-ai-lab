@@ -1,7 +1,7 @@
 // flex布局计算
 const path = require('path');
 const Yoga = require('yoga-layout-wasm');
-const wasmFilePath = path.join(__dirname, '../node_modules/yoga-layout-wasm/dist/yoga.wasm')
+const wasmFilePath = path.join(__dirname, '../../node_modules/yoga-layout-wasm/dist/yoga.wasm')
 
 
 class FlexLayout {

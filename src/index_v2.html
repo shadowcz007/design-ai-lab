@@ -18,8 +18,7 @@
     <script>
         if (window.module) module = window.module;
     </script>
-    <script src="../node_modules/fomantic-ui/dist/semantic.min.js"></script> 
-
+    <script src="../node_modules/fomantic-ui/dist/semantic.min.js"></script>
     <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -42,58 +41,40 @@
         </a>
     </div>
 
-    <div class="grid">
-        <div class="pannel" data-id="1" id="knowledge-pannel">
 
+
+    <div class="ui modal" id="knowledge-pannel">
+        <div class="header">
             <div class="btns">
-                <button id="edit-file"><i class="tools icon"></i></button>
+                <button id="edit-file"><i class="edit icon"></i></button>
             </div>
-
-            <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
-                <div id="readme">智能设计</div>
-                <div id="course">
-                    <p>- 工具箱</p>
-                </div>
-                <br><br><br>
-            </div>
-
+            <div id="readme">智能设计</div>
         </div>
 
-        <div class="pannel" data-id="2" id="editor-pannel">
-
-            <div id="frame">
-                <div id="editor-container">
-                    <div class="btns">
-                        <button id="server-url"><i class="fas fa-cog"></i></button>
-                        <button id="open-btn"><i class="code icon"></i></button>
-                        <!-- <div id="qrcode"></div> <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
-                        <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
-                        <button id="practice-btn" sync-stop='1'><i class="sync icon"></i></button>
-                    </div>
-                    <div id="editor"></div>
-                </div>
-            </div>
-
-            <!--<webview id="devtools" src="about:blank"></webview> -->
-            <!-- <div id="log">
-                    <div class="btns">
-                        <button id="log-btn"><i class="fas fa-ban"></i></button>
-                        
-                    </div>
-                    
-                    <div class="content"></div>
-                </div> -->
-
-
+        <div id="course" class="scrolling content">
+            <p>- 工具箱</p>
         </div>
-
-        <!-- <div class="pannel" data-id="3" >
-                
-            </div> -->
-
-        <!-- <div class="pannel" data-id="4">
-          <div class="pannel-content">4</div>
+        <!-- <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
+            <br><br><br>
         </div> -->
+
+    </div>
+
+    <div class="pannel pannel-large" id="editor-pannel">
+
+        <div id="frame">
+            <div id="editor-container">
+                <div class="btns">
+                    <button id="setup-code-btn"><i class="tools icon"></i></button>
+                    <!-- <button id="open-btn"><i class="code icon"></i></button> -->
+                    <!-- <div id="qrcode"></div> <button id="devtool-btn"><i class="fab fa-dev"></i></button> -->
+                    <!-- <button id="reload-btn"><i class="fas fa-redo"></i></button> -->
+                    <button id="practice-btn" sync-stop='1'><i class="sync
+                                icon"></i></button>
+                </div>
+                <div id="editor"></div>
+            </div>
+        </div>
     </div>
 
     <div id="setup-pannel">
@@ -102,43 +83,44 @@
                 <h1>HELLO AI WORLD!</h1>
             </div>
             <div style='display: flex;
-            height: 32px;
-            justify-content: center;
-            padding: 8px;
-            align-items: center;'>
+                    height: 32px;
+                    justify-content: center;
+                    padding: 8px;
+                    align-items: center;'>
                 <p id="info">-</p>
-                <button id="setup-example-file-path" class="large ui button">
-                    设置
-                </button>
+                <button id="setup-example-file-path" class="large ui
+                        button">
+                        设置
+                    </button>
             </div>
         </div>
 
     </div>
 
     <div class="ui animated blue tertiary button" id="open-files" style='
-    position: fixed;
-    margin-top: 32px !important;
-    margin-left: 32px !important;
-    z-index: 999;
-    top: 0;
-    left: 0;'>
+            position: fixed;
+            margin-top: 32px !important;
+            margin-left: 32px !important;
+            z-index: 999;
+            top: 0;
+            left: 0;'>
         <div class="visible content"><i class="left th icon"></i></div>
         <div class="hidden content">菜单</div>
     </div>
 
     <main id="blank-pannel">
-        <div class="ui placeholder padded segment" style='height: 100vh;margin: 0;
-        flex-direction: row;'>
+        <div class="ui placeholder padded segment" style='height:
+                100vh;margin: 0;
+                flex-direction: row;'>
             <div class="ui one column doubling stackable grid container">
-
                 <div class="middle aligned column">
                     <div class="ui basic buttons segment">
                         <button class="large ui button">
-                        打开
-                        </button>
+                                打开
+                            </button>
                         <button class="large ui button">
-                        新建
-                        </button>
+                                新建
+                            </button>
                     </div>
                     <div class="ui cards" id="recent-files">
 
@@ -163,21 +145,20 @@
                                 </div>
                             </div>
                         </div> -->
-
                     </div>
 
                     <div class="ui basic buttons segment">
                         <button class="ui labeled icon button" id="pre-page-btn">
-                            <i class="left chevron icon"></i>
-                            上一页
-                        </button>
+                                <i class="left chevron icon"></i>
+                                上一页
+                            </button>
                         <button class="ui compact icon disabled button" id="page-num-info">
-                            共99
-                        </button>
+                                共99
+                            </button>
                         <button class="ui right labeled icon button" id="next-page-btn">
-                            下一页
-                            <i class="right chevron icon"></i>
-                        </button>
+                                下一页
+                                <i class="right chevron icon"></i>
+                            </button>
                     </div>
 
 
