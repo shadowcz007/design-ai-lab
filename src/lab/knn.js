@@ -118,6 +118,9 @@ class Knn {
         let store = new Store(key);
         store.clear();
     }
+    clear() {
+        this.knn.clearAllClasses();
+    }
 }
 
 module.exports = Knn;
