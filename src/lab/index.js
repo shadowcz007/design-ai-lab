@@ -42,7 +42,7 @@ module.exports = {
     FlexLayout: FlexLayout,
     Canvas: Canvas,
     Image: new Image(),
-    Color: Color,
+    Color: new Color(),
     DimensionsDb: DimensionsDb,
     clipboard: new Clipboard(),
     // gif功能

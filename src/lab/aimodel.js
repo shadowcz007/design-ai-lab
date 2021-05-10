@@ -85,6 +85,17 @@ class AI {
 
     }
 
+    createImage(url) {
+        return new Promise((resolve, reject) => {
+            let _img = new Image();
+            _img.src = url;
+            _img.className = 'opacity-background';
+            _img.onload = function() {
+                resolve(_img);
+            }
+        })
+    }
+
     createCanvas(width, height) {
         let canvas = document.createElement("canvas");
         canvas.width = width;

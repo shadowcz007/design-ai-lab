@@ -1,5 +1,6 @@
 // 形态分类
 // 三角形、方形、圆形、倒三角、
+const cv = require('opencvjs-dist/build/opencv');
 
 const Store = require('./store');
 
