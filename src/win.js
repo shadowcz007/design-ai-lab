@@ -45,6 +45,8 @@ class Win {
             this.previewWindow.webContents.executeJavaScript(this.code, false).then(() => {
                     this.codeFinish = true;
                     this.statusSuccess();
+                }).catch(e => {
+                    console.log(e)
                 })
                 // }
         });

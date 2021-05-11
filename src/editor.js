@@ -23,15 +23,14 @@ class Editor {
 
     runCode() {
         let id = runtime.hash(this.getCode());
+        // console.log('runCode', id)
         let now = window.performance.now();
-        if (id !== this.codeId) {
+        if (id && id !== this.codeId) {
             this.execute(id);
-            // if(now-this.now>500){
-            // this.onDidChangeModelContent?this.onDidChangeModelContent():this.execute();
             this.codeId = id;
             this.now = now;
-            // }
         };
+
     }
 
     initMonaco() {
@@ -54,8 +53,6 @@ class Editor {
 
             // workaround monaco-css not understanding the environment
             self.module = undefined;
-
-
 
             amdRequire(['vs/editor/editor.main'], () => {
                 //自定义主题
@@ -133,10 +130,8 @@ class Editor {
 
 
                 // this.editor.getAction(['editor.action.formatDocument']).run();
-
                 monaco.languages.registerCompletionItemProvider('javascript', {
                     provideCompletionItems: () => {
-                        // console.log('provideCompletionItems');
                         return { suggestions: createSuggestions() };
                     }
                 });

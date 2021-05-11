@@ -226,7 +226,6 @@ button:hover {
     margin: 0!important;
     left: 0 !important;
     background-color: #1e1f26!important;
-    /* overflow-y: scroll; */
 }
 
 
@@ -251,7 +250,6 @@ button:hover {
 }
 
 #frame {
-    min-height: 50vh;
     height: 100%;
 }
 

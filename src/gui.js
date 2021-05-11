@@ -248,6 +248,10 @@ class GUI {
     loadWindowStatus() {
         storage.get('app', function(error, data) {
             console.log('storage', data)
+            Win.resize(data.size, 1);
+            if (data.status === 1 && data.mainWindow.show) {
+                Win.resize([data.mainWindow.bound.width, data.mainWindow.bound.height], 0);
+            }
         })
     }
 

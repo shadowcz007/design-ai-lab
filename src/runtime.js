@@ -13,7 +13,7 @@ class Runtime {
         this.p5Fn = ['preload', 'setup', 'draw'];
     }
     parse(code) {
-            let ast;
+            let ast = null;
             // console.trace()
             // obj={...obj} 不支持
             try {
@@ -28,7 +28,7 @@ class Runtime {
         //计算代码量
     countCodeLines(code) {
         //去掉 EmptyStatement 
-        let ast = this.parse(code.trim()) || {};
+        let ast = this.parse(code.trim());
         if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
         ast = this.countType(ast);
         return ast
@@ -37,8 +37,8 @@ class Runtime {
     countType(ast) {
         let ts = [];
         // console.log(ast)
-        if (ast.type !== "Program") ts.push(ast);
-        if (ast.body) {
+        if (ast && ast.type !== "Program") ts.push(ast);
+        if (ast && ast.body) {
             let body = ast.body;
             if (!(body instanceof Array)) body = body.body;
             let children = Array.from(body, b => this.countType(b));
@@ -50,10 +50,11 @@ class Runtime {
 
     hash(code) {
         //去掉 EmptyStatement 
-        let ast = this.parse(code.trim()) || "";
+        let ast = this.parse(code.trim());
         if (ast && ast.body) ast.body = ast.body.filter(b => b.type != 'EmptyStatement');
-        // console.log(hash(ast))
-        return hash(ast);
+        let id;
+        if (ast) id = hash(ast);
+        return id
     }
 
     isP5Function(code) {
