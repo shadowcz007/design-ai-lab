@@ -1,13 +1,14 @@
 //主要完成html的一些基本的操作
+// 文件存储
 
 
 const hash = require('object-hash');
+const fs=require('fs'),path=require('path');
+const nativeImage=require('electron').nativeImage;
+
 
 class Base {
     constructor() {
-
-
-
     }
 
 
@@ -46,6 +47,42 @@ class Base {
         });
     }
 
+    // arraybuffer转buffer
+    arrayBuffer2Buffer(ab) {
+        var buf = new Buffer(ab.byteLength);
+        var view = new Uint8Array(ab);
+        for (var i = 0; i < buf.length; ++i) {
+            buf[i] = view[i];
+        }
+        return buf;
+    };
+
+
+    // 直接保存base64 为本地文件
+    saveBase64(base64, filepath = null) {
+        if (filepath) {
+            let img = nativeImage.createFromDataURL(base64);
+            let extname = path.extname(filepath);
+            // console.log(filepath, extname)
+            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+                fs.writeFileSync(filepath, img.toJPEG(80));
+            } else {
+                fs.writeFileSync(filepath, img.toPNG());
+            };
+        }
+    }
+    // 直接保存json 为本地文件
+    saveJson(json, filepath = null) {
+        if (filepath) {
+            json = JSON.stringify(json);
+            try {
+                fs.writeFile(filepath, json, e => console.log(e));
+            } catch (error) {
+                console.log(error)
+            }
+        };
+    }
+
 }
 
-module.exports = Base;
+module.exports = new Base();

@@ -11,7 +11,7 @@ remote.getCurrentWindow().on('focus', e => {
     };
 });
 
-const Base = require('./base');
+const base = require('./base');
 const UI = require('./ui');
 const AI = require('./aimodel');
 const Knn = require('./knn');
@@ -33,7 +33,7 @@ const cv = require('opencvjs-dist/build/opencv');
 
 
 module.exports = {
-    base: new Base(),
+    base: base,
     ui: new UI(),
     ai: new AI(),
     knn: new Knn(),

@@ -45,19 +45,29 @@
 
     <div class="ui modal" id="knowledge-pannel">
         <div class="header">
-            <div class="btns">
-                <button id="edit-file"><i class="edit icon"></i></button>
+            <div class="ui form">
+                <div class="inline field">
+                    <label>标题</label>
+                     <input type="text" placeholder="标题" id="readme">
+                </div>
+                <div class="inline field">
+                    <label>作者</label>
+                     <input type="text" placeholder="作者" id="author">
+                </div>
+                <div class="inline field">
+                    <label>版本</label>
+                    <input type="text" placeholder="版本" id="version">
+                </div>
             </div>
-            <div id="readme">智能设计</div>
+            
+            <!-- <div id="readme">智能设计</div> <div id="author"></div><div id="version"></div>-->
+          
         </div>
-
-        <div id="course" class="scrolling content">
+        <div id="course" class="ui segment" style="outline: none;
+    box-shadow: none;
+    border: none;">
             <p>- 工具箱</p>
         </div>
-        <!-- <div style="overflow-y: scroll;height: 100%;" spellcheck="false">
-            <br><br><br>
-        </div> -->
-
     </div>
 
     <div class="pannel-large" id="editor-pannel">
@@ -65,11 +75,15 @@
         <div id="frame">
             <div id="editor-container">
                 <div class="btns">
+                    <button id="build-code-btn"><i class="store icon"></i></button>
                     <button id="setup-code-btn"><i class="tools icon"></i></button>
+                    <button id="run-code-btn"><i class="play icon"></i></button>
                     <button id="practice-btn" sync-stop='1'><i class="sync
                                 icon"></i></button>
                 </div>
-                <div id="editor"></div>
+                <div id="editor" class="ui cards">
+                    <div></div>
+                </div>
             </div>
         </div>
     </div>
@@ -112,11 +126,11 @@
             <div class="ui one column doubling stackable grid container">
                 <div class="middle aligned column">
                     <div class="ui basic buttons segment">
-                        <button class="large ui button">
-                                打开
+                        <button class="large ui button" id="import-folder-btn">
+                                导入
                             </button>
-                        <button class="large ui button">
-                                新建
+                        <button class="large ui button" id="dev-folder-btn">
+                                开发
                             </button>
                     </div>
                     <div class="ui cards" id="recent-files">

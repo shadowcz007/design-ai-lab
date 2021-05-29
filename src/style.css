@@ -259,7 +259,7 @@ button:hover {
 
 #editor {
     /* width: calc(50% - 4px);*/
-    height: 100%;
+    padding: 6em;
 }
 
 .resizer {

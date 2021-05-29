@@ -1,10 +1,11 @@
 const smartcrop = require('smartcrop');
-
+const base = require('./base');
 
 class Image {
     constructor() {
         //随机获取，累计
         this.randomPicNum = 0;
+        this.nativeImage = require('electron').nativeImage;
     }
 
     createCanvas(width, height) {
@@ -27,32 +28,32 @@ class Image {
     }
 
     createImage(url) {
-            return new Promise((resolve, reject) => {
-                let _img = new Image();
-                _img.src = url;
-                _img.className = 'opacity-background';
-                _img.onload = function() {
-                    resolve(_img);
-                }
-            })
-        }
-        //随机来张图片
+        return new Promise((resolve, reject) => {
+            let _img = new Image();
+            _img.src = url;
+            _img.className = 'opacity-background';
+            _img.onload = function () {
+                resolve(_img);
+            }
+        })
+    }
+    //随机来张图片
     randomPic(w = 200, h = 200) {
-            this.randomPicNum++;
-            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-            return url
-        }
-        // 裁切p5的画布，用于下载
+        this.randomPicNum++;
+        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+        return url
+    }
+    // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
-            let scale = _canvas.canvas.width / _canvas.width;
-            let canvas = document.createElement("canvas");
-            canvas.width = w * scale;
-            canvas.height = h * scale;
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(_canvas.canvas, x * scale, y * scale, w * scale, h * scale, 0, 0, w * scale, h * scale);
-            return canvas
-        }
-        // 返回canvas
+        let scale = _canvas.canvas.width / _canvas.width;
+        let canvas = document.createElement("canvas");
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(_canvas.canvas, x * scale, y * scale, w * scale, h * scale, 0, 0, w * scale, h * scale);
+        return canvas
+    }
+    // 返回canvas
     smartCrop(image, width, height) {
         let canvas = this.createCanvasFromImage(image);
 
@@ -100,6 +101,38 @@ class Image {
         M.delete();
 
     }
+
+
+    getNativeImageFromWebview(url) {
+        if(!url) return
+        return new Promise((resolve, reject) => {
+            let webview = document.createElement('webview');
+            webview.src = url;
+            webview.style.display = 'none';
+            document.body.appendChild(webview);
+            webview.addEventListener('did-finish-load', async () => {
+                await base.sleep(500);
+                let res = await webview.executeJavaScript(`
+                    function downloadImage(img){
+                        var c=document.createElement('canvas');
+                        c.width=img.naturalWidth;
+                        c.height=img.naturalHeight;
+                        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+                        return c.toDataURL();
+                    };
+                    downloadImage(document.images[0]);
+            `);
+                webview.remove();
+                resolve(res);
+            });
+        });
+    }
+
+
+
 }
 
 module.exports = Image;
+
+
+

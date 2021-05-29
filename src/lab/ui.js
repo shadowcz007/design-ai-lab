@@ -3,7 +3,7 @@ const md5 = require('md5');
 
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
-
+const base=require('./base');
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -231,12 +231,9 @@ class UI {
     }
 
     createButton(text, eventListener, isAdd = true) {
-        let div = document.createElement('div');
-        div.className = 'button';
         let btn = document.createElement('button');
         btn.innerText = text;
-        div.appendChild(btn);
-        if (isAdd) this.add(div);
+        if (isAdd) this.add(btn);
         if (eventListener) btn.addEventListener('click', eventListener);
         return btn
     }
@@ -843,24 +840,45 @@ class UI {
         return res.length > 0 ? res : null;
     }
 
-    // 直接保存base64 为本地文件
-    saveBase64(base64, filePath = null) {
-        if (filePath) {
-            let img = nativeImage.createFromDataURL(base64);
-            let extname = path.extname(filePath);
-            // console.log(filepath, extname)
-            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
-                fs.writeFileSync(filePath, img.toJPEG(80));
-            } else {
-                fs.writeFileSync(filePath, img.toPNG());
-            };
-        }
-    }
+    // // 直接保存base64 为本地文件
+    // saveBase64(base64, filepath = null) {
+    //     if (filepath) {
+    //         let img = nativeImage.createFromDataURL(base64);
+    //         let extname = path.extname(filepath);
+    //         // console.log(filepath, extname)
+    //         if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+    //             fs.writeFileSync(filepath, img.toJPEG(80));
+    //         } else {
+    //             fs.writeFileSync(filepath, img.toPNG());
+    //         };
+    //     }
+    // }
+    // // 直接保存json 为本地文件
+    // saveJson(json, filepath = null) {
+    //     if (filepath) {
+    //         json = JSON.stringify(json);
+    //         try {
+    //             fs.writeFile(filepath, json, e => console.log(e));
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     };
+    // }
 
     // 保存base64为本地的图片文件
     saveBase64Dialog(base64, title = "保存", fileName = "图片") {
-        let img = nativeImage.createFromDataURL(base64);
-        this.saveNativeImageDialog(img, title, fileName);
+        // let img = nativeImage.createFromDataURL(base64);
+        let filepath = dialog.showSaveDialogSync({
+            title: title,
+            defaultPath: fileName,
+            filters: [
+                { name: 'Image', extensions: ['png', 'jpg'] },
+            ]
+        });
+        if (filepath) {
+            base.saveBase64(base64,filpath);
+        }
+        // this.saveNativeImageDialog(img, title, fileName);
     };
 
     // 
@@ -907,13 +925,7 @@ class UI {
                 ]
             });
             if (filepath) {
-                json = JSON.stringify(json);
-                try {
-                    fs.writeFile(filepath, json, e => console.log(e));
-                } catch (error) {
-                    console.log(error)
-                }
-
+                base.saveJson(json,filepath);
             };
         }
         // 读取
