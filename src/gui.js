@@ -59,12 +59,6 @@ class GUI {
             // .then((result) => this.onPreviewWindowError())
             // .catch((err) => this.onPreviewWindowError())
         );
-        //鼠标按键抬起
-        // Editor.onMouseUp = () => console.log("onMouseUp");
-        //鼠标按键按下
-        //Editor.onMouseDown = () => this.onPreviewWindowError();
-
-
 
         /**
          * dev tool
@@ -100,9 +94,6 @@ class GUI {
     }
 
     init() {
-
-
-
 
         /**
          * editor面板
@@ -144,19 +135,17 @@ class GUI {
         // 打开设置页
         this.addClickEventListener(this.setupCodeBtn, () => {
             $('#knowledge-pannel').modal({
-                onHidden: async () => {
-                    let res=await this.getSaveFileContent();
-                    // console.log(res)
+                onHidden: async() => {
+                    let res = await this.getSaveFileContent();
                     // let readme = $('#knowledge-pannel #readme').val(),
                     //     course = $('#knowledge-pannel #course').text(),
                     //     author= $('#knowledge-pannel #author').val(),
                     //     version= $('#knowledge-pannel #version').val();
                     // App.saveConfig(null, course, readme,author,version);
-                    let card=this.createConfigCard(res);
+                    let card = this.createConfigCard(res);
                     Editor.updateCard(card);
                 }
             }).modal('show');
-
         });
 
         // 导入代码文件夹 - 转成 插件
@@ -166,7 +155,7 @@ class GUI {
 
         // 打开代码文件夹
         // TODO 扩展参数
-        this.addClickEventListener(this.devFolderBtn, async () => {
+        this.addClickEventListener(this.devFolderBtn, async() => {
             let res = await App.dev();
             if (res) {
                 let { code, poster, knowledge } = res;
@@ -273,12 +262,12 @@ class GUI {
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function (error) {
+        storage.set('app', obj, function(error) {
             if (error) throw error;
         });
     }
     loadWindowStatus() {
-        storage.get('app', function (error, data) {
+        storage.get('app', function(error, data) {
             console.log('storage', data)
             Win.resize(data.size, 1);
             if (data.status === 1 && data.mainWindow.show) {
@@ -353,12 +342,12 @@ class GUI {
                     extname: _package.build.fileAssociations[0].ext,
                     //版本
                     version: knowledgeJson.version,
-                    package_version:_package.version,
+                    package_version: _package.version,
                     //依赖id、用来标记版本等
                     package_id: fileDb.id(_package),
                     // 依赖包等
-                    dependencies:_package.dependencies,
-                    author:knowledgeJson.author,
+                    dependencies: _package.dependencies,
+                    author: knowledgeJson.author,
                     //创建时间
                     create_time: (new Date()).getTime()
                 })
@@ -525,13 +514,13 @@ class GUI {
     }
 
     previewStatus() {
-        //预览状态
-        // console.log("预览状态")
-        // this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-        // Layout.init();
-    }
-    //编辑状态切换
+            //预览状态
+            // console.log("预览状态")
+            // this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+            // Layout.init();
+        }
+        //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -605,7 +594,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -726,21 +715,21 @@ class GUI {
     // }
 
     closeEditorWin() {
-        document.getElementById("knowledge-pannel").style.display = "block";
-        document.getElementById("editor-pannel").classList.remove("pannel-large");
-        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-        document.body.querySelector('#frame').style.height = "100%";
-        // Layout.reset();
-        // this.openBtn.classList.remove('button-active');
-    }
-    // 放大编程页面
-    // toggleEditorWin() {
-    //     if (this.openBtn.classList.contains('button-active')) {
-    //         this.openEditorWin();
-    //     } else {
-    //         this.closeEditorWin();
-    //     }
-    // }
+            document.getElementById("knowledge-pannel").style.display = "block";
+            document.getElementById("editor-pannel").classList.remove("pannel-large");
+            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+            document.body.querySelector('#frame').style.height = "100%";
+            // Layout.reset();
+            // this.openBtn.classList.remove('button-active');
+        }
+        // 放大编程页面
+        // toggleEditorWin() {
+        //     if (this.openBtn.classList.contains('button-active')) {
+        //         this.openEditorWin();
+        //     } else {
+        //         this.closeEditorWin();
+        //     }
+        // }
 
     //编程，UI状态关闭
     closePracticeHtml() {
@@ -839,10 +828,10 @@ class GUI {
 
     // 创建基础卡片
     createBaseCard(data) {
-        let readme = this.createElement('', 'h5');
-        readme.innerHTML = Knowledge.marked(data.knowledge.readme);
-        readme.innerText = readme.innerText;
-        let html = `<div class="content">
+            let readme = this.createElement('', 'h5');
+            readme.innerHTML = Knowledge.marked(data.knowledge.readme);
+            readme.innerText = readme.innerText;
+            let html = `<div class="content">
                                 <img class="right floated mini ui image" src="${URL.createObjectURL(this.base64ToBlob(data.poster))}">
                                 <div class="header">
                                     ${readme.innerText}
