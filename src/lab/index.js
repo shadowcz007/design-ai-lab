@@ -27,10 +27,10 @@ const Shape = require('./shape');
 const screenpoint = require('./screenpoint')
 const DimensionsDb = require('./dimensionsdb');
 const Store = require('./store');
-const Jieba = require('./segment');
+const nlp = require('./nlp');
 const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
-
+const excel=require('./excel');
 
 module.exports = {
     base: base,
@@ -46,12 +46,13 @@ module.exports = {
     DimensionsDb: DimensionsDb,
     clipboard: new Clipboard(),
     // gif功能
-    GIF: GIF,
+    GIF:GIF,
     screenpoint: screenpoint,
     // 轮廓
     shape: new Shape(),
     cv: cv,
     Store: Store,
     Deeplab: Deeplab,
-    Jieba: new Jieba()
+    nlp: nlp,
+    excel:excel
 };

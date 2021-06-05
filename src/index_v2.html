@@ -33,9 +33,9 @@
         <a class="item" id='my-course-btn'>
             <i class="video camera icon"></i> APP
         </a>
-        <a class="item" id='recent-btn'>
+        <!--<a class="item" id='recent-btn'>
             <i class="video play icon"></i> HISTORY
-        </a>
+        </a>-->
         <a class="item" id='setup-btn'>
             <i class="video play icon"></i> SETUP
         </a>
@@ -74,15 +74,16 @@
 
         <div id="frame">
             <div id="editor-container">
-                <div class="btns">
-                    <button id="build-code-btn"><i class="store icon"></i></button>
-                    <button id="setup-code-btn"><i class="tools icon"></i></button>
-                    <button id="run-code-btn"><i class="play icon"></i></button>
-                    <button id="practice-btn" sync-stop='1'><i class="sync
-                                icon"></i></button>
-                </div>
                 <div id="editor" class="ui cards">
                     <div></div>
+                </div>
+                <div class="ui inverted segment">
+                    <button id="build-code-btn" class="ui inverted yellow button medium"><i class="store icon"></i>打包</button>
+                    <button id="setup-code-btn" class="ui inverted pink button medium"><i class="tools icon"></i>设置</button>
+                    <button id="run-code-btn" class="ui inverted primary button medium"><i class="play icon"></i>运行</button>
+                     <button id="dev-tool-btn" class="ui inverted green button medium"><i class="play icon"></i>调试</button>
+                    <!-- <button id="practice-btn" sync-stop='1' class="ui inverted button"><i class="sync
+                                icon"></i></button> -->
                 </div>
             </div>
         </div>

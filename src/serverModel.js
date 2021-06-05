@@ -33,9 +33,9 @@ async function mobilenetClassify(base64) {
     let im = await createImage(base64);
     return mobilenet.classify(im);
 }
-async function mobilenetInfer(base64) {
+async function mobilenetInfer(base64,embedding=true) {
     let im = await createImage(base64);
-    return mobilenet.infer(im);
+    return mobilenet.infer(im,embedding);
 }
 
 async function estimatePose(base64) {

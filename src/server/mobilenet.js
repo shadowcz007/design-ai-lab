@@ -63,10 +63,14 @@ class Mobilenet {
          */
     infer(img = tf.zeros(
         [1, this.IMAGE_SIZE, this.IMAGE_SIZE, 3]), embedding = true) {
-        if (this.mobilenetModel) return this.mobilenetModel.infer(
-            img,
-            embedding
-        )
+        if (this.mobilenetModel) {
+           let res= this.mobilenetModel.infer(
+                img,
+                embedding
+            );
+            return res.dataSync();
+        }
+         
     }
 
 }

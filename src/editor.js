@@ -29,6 +29,10 @@ class Editor {
         };
     }
 
+    updateStatus(text){
+        if(this.card)this.card.querySelector('.meta').innerText=text;
+    }
+
     runCode() {
         let id = runtime.hash(this.getCode());
         // console.log('runCode', id)

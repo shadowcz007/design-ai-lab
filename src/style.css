@@ -233,9 +233,9 @@ button:hover {
 
 #knowledge-pannel {
     display: none;
-    min-height: 480px;
-    height: calc(100vh - 24px);
-    width: calc(50% - 10px);
+    min-height: 200px;
+    height: calc(90vh - 24px);
+    width: 70%;
     min-width: 240px;
     /* background-color: white; */
 }
@@ -255,11 +255,15 @@ button:hover {
 
 #editor-container {
     height: calc(100% - 30px) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 #editor {
     /* width: calc(50% - 4px);*/
-    padding: 6em;
+    /* padding: 6em; */
 }
 
 .resizer {

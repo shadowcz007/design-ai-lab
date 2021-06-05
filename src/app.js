@@ -107,10 +107,12 @@ class App {
         let knowledge = res.knowledge;
         let author = res.author;
         let version = res.version;
+        let size=res.size||[600,600];
         let course = knowledge ? knowledge.course : '', readme = knowledge ? knowledge.readme : '';
         return {
             code,
             poster,
+            size,
             knowledge: {
                 course, readme, author,
                 version

@@ -876,7 +876,7 @@ class UI {
             ]
         });
         if (filepath) {
-            base.saveBase64(base64,filpath);
+            base.saveBase64(base64,filepath);
         }
         // this.saveNativeImageDialog(img, title, fileName);
     };

@@ -13,7 +13,7 @@ const humanseg = require('./humanseg');
 class AI {
     constructor() {
         // 预训练模型
-        this.Mobilenet = {
+        this.mobilenet = {
             classify: async(im) => {
                 let base64 = this.im2base64(im);
                 let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
@@ -21,11 +21,11 @@ class AI {
                     `, true);
                 return res
             },
-            infer: async(im) => {
+            infer: async(im,embedding=true) => {
                 let base64 = this.im2base64(im);
                 let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
                 mobilenetInfer('${base64}');
-                    `, true);
+                    `, embedding);
                 return res
             }
         };

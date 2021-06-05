@@ -8,7 +8,7 @@ class GIF {
                 quality: 10,
                 background: 'rgba(0,0,0,0)',
                 transparent: 'rgba(0,0,0,0)',
-                workerScript: path.join(__dirname, '../node_modules/gif.js/dist/gif.worker.js')
+                workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
             });
         }
         // canvasElement imageElement
@@ -30,6 +30,15 @@ class GIF {
                 resolve(null);
             }
         })
+    }
+
+   async createGifFromUrls(urls=[]){
+        for (const url of urls) {
+           let im= await this.createImage(url);
+           this.gif.addFrame(im);
+        };
+        let res=await this.render(); 
+        return res;
     }
 
     // 从文件夹创建 gif

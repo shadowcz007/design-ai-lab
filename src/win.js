@@ -59,6 +59,9 @@ class Win {
             console.log('unresponsive', event, details);
         });
 
+
+        this.callback=null;
+
     }
 
     edit() {
@@ -77,7 +80,7 @@ class Win {
         let win = this.get(whichWin);
         // res.size
         if (size) {
-            this.show(1, true);
+            this.show(whichWin, true);
             win.setSize(...size);
         };
     }
@@ -138,14 +141,17 @@ class Win {
     statusSuccess() {
         this.get(1).setTitle("更新成功");
         console.log('#JS:完成')
+        if(this.callback)this.callback('#JS:完成');
     }
     statusChecking() {
         this.get(1).setTitle("输入ing");
         console.log('#JS:检查中')
+        if(this.callback)this.callback('#JS:检查中');
     }
     statusInjecting() {
         this.get(1).setTitle("更新ing");
         console.log('#JS:注入中');
+        if(this.callback)this.callback('#JS:注入中');
     }
 
     // 检查间隔时间

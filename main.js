@@ -196,7 +196,7 @@ function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
     if (config.mainWindow) {
         config.mainWindow.height = workAreaSize.height;
-        config.mainWindow.width = workAreaSize.width - config.previewWindow.width - 20;
+        config.mainWindow.width = parseInt(workAreaSize.width/2);
     };
 
     storage.get('app', function(error, data) {
@@ -205,9 +205,14 @@ function initWindow() {
         //是否发布，发布了，主窗口将隐藏
         //  0 主窗口 1 主窗口 预览窗口 2 预览窗口
         if (data && (data.status === 2 || data.status === 1)) {
-            if (config.mainWindow) config.mainWindow.show = (data.status === 1);
+            if (config.mainWindow) {
+                config.mainWindow.show = (data.status === 1);
+                config.mainWindow.width=data.mainWindow.bound.width;
+                config.mainWindow.height=data.mainWindow.bound.height;
+            };
             if (config.previewWindow) {
                 config.previewWindow.show = !!data.executeJavaScript;
+                // config.previewWindow.show=true;
                 config.previewWindow.closable = true;
                 config.previewWindow.executeJavaScript = data.executeJavaScript;
                 config.previewWindow.width = data.size[0];
@@ -217,12 +222,15 @@ function initWindow() {
                 config.previewWindow.alwaysOnTop = true;
                 config.previewWindow.title = '';
             };
-        } else if (data && data.status === 0) {
+        } else {
+            //  if (data && data.status === 0) 
             //主窗口显示在欢迎界面
             //初始状态在 欢迎界面
-            if (config.mainWindow) config.mainWindow.executeJavaScript = `window.addEventListener('load',GUI.closeFn);`;
+            // TODO 调试下，没有运行
+            if (config.mainWindow) config.mainWindow.executeJavaScript = `GUI.closeFn();`;
         };
         for (const key in config) {
+            // console.log(config[key])
             if (!global._WINS[key]) createWindow(key, config[key], workAreaSize);
         }
     });
@@ -429,11 +437,6 @@ app.whenReady().then(() => {
     app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
         // TODO 待细化,当wifi环境变化的时候
-        // Https.updateHost();
-        // serverModel.updateHost();
-        // global._MHOST=Https.host;
-        // global._MURL=Https.url;
-        // global._AIURL=serverModel.url;
     });
 
     app.on('web-contents-created', (event, webContents) => {

@@ -60,6 +60,11 @@ class GUI {
             // .catch((err) => this.onPreviewWindowError())
         );
 
+        Win.callback=(t)=>{
+            // console.log(t);
+            Editor.updateStatus(t);
+        };
+
         /**
          * dev tool
          */
@@ -95,11 +100,14 @@ class GUI {
 
     init() {
 
+        // 主页
+        this.openFilesBtn = document.querySelector("#open-files");
+
         /**
          * editor面板
          */
         this.buildAppBtn = document.querySelector('#build-code-btn');
-        this.practiceBtn = document.querySelector("#practice-btn");
+        this.devToolBtn = document.querySelector("#dev-tool-btn");
         this.setupCodeBtn = document.querySelector("#setup-code-btn");
         this.runBtn = document.querySelector("#run-code-btn");
 
@@ -108,7 +116,6 @@ class GUI {
          * 欢迎页面
          */
         this.myCourseBtn = document.querySelector("#my-course-btn");
-        this.recentBtn = document.querySelector("#recent-btn");
         this.setupBtn = document.querySelector('#setup-btn');
         this.nextPageBtn = document.querySelector('#next-page-btn');
         this.prePageBtn = document.querySelector('#pre-page-btn');
@@ -129,21 +136,17 @@ class GUI {
         //
         this.addClickEventListener(this.buildAppBtn, () => this.saveFileFn());
 
-        //实时编辑代码
-        this.addClickEventListener(this.practiceBtn, () => this.practiceFn());
+        //调试代码
+        this.addClickEventListener(this.devToolBtn, () => {
+            // 打开调试窗口
+            this.openPreviewDev();
+        });
 
         // 打开设置页
         this.addClickEventListener(this.setupCodeBtn, () => {
             $('#knowledge-pannel').modal({
-                onHidden: async() => {
-                    let res = await this.getSaveFileContent();
-                    // let readme = $('#knowledge-pannel #readme').val(),
-                    //     course = $('#knowledge-pannel #course').text(),
-                    //     author= $('#knowledge-pannel #author').val(),
-                    //     version= $('#knowledge-pannel #version').val();
-                    // App.saveConfig(null, course, readme,author,version);
-                    let card = this.createConfigCard(res);
-                    Editor.updateCard(card);
+                onHidden:async ()=>{
+                    await this.updateDevCard();
                 }
             }).modal('show');
         });
@@ -155,16 +158,18 @@ class GUI {
 
         // 打开代码文件夹
         // TODO 扩展参数
-        this.addClickEventListener(this.devFolderBtn, async() => {
+        this.addClickEventListener(this.devFolderBtn, async () => {
             let res = await App.dev();
             if (res) {
-                let { code, poster, knowledge } = res;
+                let { code, poster, knowledge,size } = res;
                 // console.log(res)
                 this.openFile({
                     code,
                     knowledge,
-                    size: [600, 600]
-                })
+                    size: size
+                });
+                this.openFilesBtn.style.display='none';
+                this.updateDevCard();
             }
         });
 
@@ -212,15 +217,15 @@ class GUI {
 
         });
         //历史
-        this.addClickEventListener(this.recentBtn, e => {
-            e.stopPropagation();
-            this.currentCardsFrom = 1;
-            this.currentPage = 1;
-            this.recentFiles();
-            document.querySelector('#setup-pannel').style.display = 'none';
-            document.querySelector('#blank-pannel').style.display = 'flex';
-            $('.ui.labeled.icon.sidebar').sidebar('toggle');
-        });
+        // this.addClickEventListener(this.recentBtn, e => {
+        //     e.stopPropagation();
+        //     this.currentCardsFrom = 1;
+        //     this.currentPage = 1;
+        //     this.recentFiles();
+        //     document.querySelector('#setup-pannel').style.display = 'none';
+        //     document.querySelector('#blank-pannel').style.display = 'flex';
+        //     $('.ui.labeled.icon.sidebar').sidebar('toggle');
+        // });
 
         // 下一页
         this.addClickEventListener(this.nextPageBtn, e => {
@@ -229,7 +234,7 @@ class GUI {
             if (this.currentCardsFrom === 0) {
                 this.exampleFiles(this.currentPage);
             } else if (this.currentCardsFrom === 1) {
-                this.recentFiles(this.currentPage);
+                // this.recentFiles(this.currentPage);
             }
         });
         // 上一页
@@ -239,7 +244,7 @@ class GUI {
             if (this.currentCardsFrom === 0) {
                 this.exampleFiles(this.currentPage);
             } else if (this.currentCardsFrom === 1) {
-                this.recentFiles(this.currentPage);
+                // this.recentFiles(this.currentPage);
             }
         });
 
@@ -257,17 +262,17 @@ class GUI {
     // 0 主窗口 1 主窗口 预览窗口 2 预览窗口
     saveWindowsStatus(status = 0) {
         let obj = Win.getWindowStatus(status);
-        if (status === 2) {
+        if (status === 2 || status === 1) {
             obj.executeJavaScript = this.createExecuteJs(Editor.getCode().trim());
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
         };
-        storage.set('app', obj, function(error) {
+        storage.set('app', obj, function (error) {
             if (error) throw error;
         });
     }
     loadWindowStatus() {
-        storage.get('app', function(error, data) {
+        storage.get('app', function (error, data) {
             console.log('storage', data)
             Win.resize(data.size, 1);
             if (data.status === 1 && data.mainWindow.show) {
@@ -353,6 +358,18 @@ class GUI {
                 })
             });
         });
+    }
+
+    async updateDevCard() {
+        let res = await this.getSaveFileContent();
+        // let readme = $('#knowledge-pannel #readme').val(),
+        //     course = $('#knowledge-pannel #course').text(),
+        //     author= $('#knowledge-pannel #author').val(),
+        //     version= $('#knowledge-pannel #version').val();
+        // App.saveConfig(null, course, readme,author,version);
+        let card = this.createConfigCard(res);
+        Editor.updateCard(card);
+        // window.Editor=Editor;
     }
 
     /**
@@ -444,7 +461,7 @@ class GUI {
         });
         if (filePath) {
 
-            this.backup();
+            // this.backup();
             // let mainWindow = this.get(0);
             let res = fs.readFileSync(filePath[0], 'utf-8');
             res = JSON.parse(res);
@@ -464,6 +481,9 @@ class GUI {
         Knowledge.set(res.knowledge);
         Editor.setCode(res.code);
 
+        // 主窗口尺寸更新
+        Win.resize([300,300],0);
+
         //预览窗口的尺寸更新
         Win.resize(res.size, 1);
         Win.move();
@@ -480,12 +500,7 @@ class GUI {
         document.getElementById("editor-pannel").style.display = "block";
         document.getElementById("blank-pannel").style.display = "none";
 
-        // Editor.toggle(true);
-        // Knowledge.toggle(true);
-        // this.closePracticeHtml();
-
-        // 预览状态
-        // this.previewStatus();
+        this.saveWindowsStatus(1);
     }
 
     // 热更新模式
@@ -496,11 +511,11 @@ class GUI {
         // console.log('编程模式', this.practiceBtn.getAttribute('sync-stop'))
         if (!this.practiceBtn.getAttribute('sync-stop')) {
             Win.stopExecuteJavaScript2Preview();
-            this.closePracticeHtml();
+            // this.closePracticeHtml();
         } else {
             //编程模式
             Win.startExecuteJavaScript2Preview();
-            this.openPracticeHtml();
+            // this.openPracticeHtml();
             this.openPracticeFn(false);
         };
     };
@@ -514,13 +529,13 @@ class GUI {
     }
 
     previewStatus() {
-            //预览状态
-            // console.log("预览状态")
-            // this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-            document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-            // Layout.init();
-        }
-        //编辑状态切换
+        //预览状态
+        // console.log("预览状态")
+        // this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
+        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
+        // Layout.init();
+    }
+    //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
         //code编辑器只读
@@ -546,23 +561,23 @@ class GUI {
         };
     }
 
-    backup() {
-        this.getSaveFileContent().then(res => {
-            fileDb.fileAdd(res);
-            this.info.innerText = '已备份';
-            // remote.dialog.showMessageBox({
-            //     type: 'info',
-            //     message: '已备份',
-            //     buttons: ['好的']
-            // });
-        });
-    }
+    // backup() {
+    //     this.getSaveFileContent().then(res => {
+    //         fileDb.fileAdd(res);
+    //         this.info.innerText = '已备份';
+    //         // remote.dialog.showMessageBox({
+    //         //     type: 'info',
+    //         //     message: '已备份',
+    //         //     buttons: ['好的']
+    //         // });
+    //     });
+    // }
 
 
     //新建文件
     newFileFn() {
         //新建的时候先保存上次的编辑的内容
-        this.backup();
+        // this.backup();
 
         document.querySelector(".grid").style.display = "block";
         document.getElementById("blank-pannel").style.display = "none";
@@ -594,7 +609,7 @@ class GUI {
             });
             if (filePath) {
                 res.title = path.basename;
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -619,15 +634,16 @@ class GUI {
     }
 
     closeFn() {
+        // console.log("-----closeFn----")
         //TODO 确定关闭？未保存将丢失
-        this.backup();
+        // this.backup();
 
         //code编辑器只读
         // Editor.toggle(true);
         Knowledge.toggle(true);
 
         // this.closeEditorWin();
-        this.closePracticeHtml();
+        // this.closePracticeHtml();
 
         this.previewStatus();
         // console.log('closeFn')
@@ -636,6 +652,8 @@ class GUI {
 
         document.getElementById("editor-pannel").style.display = "none";
         document.getElementById("blank-pannel").style.display = "flex";
+
+        this.openFilesBtn.style.display='block';
 
         //Win.showWinControl(true,false);
 
@@ -648,6 +666,11 @@ class GUI {
             label: '新建',
             click: this.newFileFn
         }]);
+
+        // 主窗口尺寸变换
+        Win.resize([parseInt(Win.workAreaSize.width/2),Win.workAreaSize.height],0);
+
+        this.saveWindowsStatus(0);
 
     }
 
@@ -679,11 +702,11 @@ class GUI {
     }
 
     //最近打开的卡片
-    recentFiles(pageNum = 1, pageSize = 9) {
-        let data = fileDb.fileGetAll();
-        this.getCardsByPage(data, pageNum, pageSize, true);
-        // this.createCards(fileDb.fileGetAll(), true);
-    }
+    // recentFiles(pageNum = 1, pageSize = 9) {
+    //     let data = fileDb.fileGetAll();
+    //     this.getCardsByPage(data, pageNum, pageSize, true);
+    //     // this.createCards(fileDb.fileGetAll(), true);
+    // }
 
     getCardsByPage(data = [], pageNum = 1, pageSize = 9, isCanClose = false) {
         this.pageNumInfo.innerText = `${pageNum} / 共${~~(data.length / pageSize) + 1}`;
@@ -715,32 +738,32 @@ class GUI {
     // }
 
     closeEditorWin() {
-            document.getElementById("knowledge-pannel").style.display = "block";
-            document.getElementById("editor-pannel").classList.remove("pannel-large");
-            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-            document.body.querySelector('#frame').style.height = "100%";
-            // Layout.reset();
-            // this.openBtn.classList.remove('button-active');
-        }
-        // 放大编程页面
-        // toggleEditorWin() {
-        //     if (this.openBtn.classList.contains('button-active')) {
-        //         this.openEditorWin();
-        //     } else {
-        //         this.closeEditorWin();
-        //     }
-        // }
+        document.getElementById("knowledge-pannel").style.display = "block";
+        document.getElementById("editor-pannel").classList.remove("pannel-large");
+        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+        document.body.querySelector('#frame').style.height = "100%";
+        // Layout.reset();
+        // this.openBtn.classList.remove('button-active');
+    }
+    // 放大编程页面
+    // toggleEditorWin() {
+    //     if (this.openBtn.classList.contains('button-active')) {
+    //         this.openEditorWin();
+    //     } else {
+    //         this.closeEditorWin();
+    //     }
+    // }
 
     //编程，UI状态关闭
-    closePracticeHtml() {
-        // document.getElementById("knowledge-pannel").style.display = "block";
-        // document.getElementById("editor-pannel").classList.remove("pannel-large");
-        this.practiceBtn.innerHTML = `<i class="sync icon"></i>`;
-        // console.log(Editor)
-        // Editor.toggle(false);
-        this.practiceBtn.setAttribute('sync-stop', 1);
-        // this.closeDevTool();
-    };
+    // closePracticeHtml() {
+    //     // document.getElementById("knowledge-pannel").style.display = "block";
+    //     // document.getElementById("editor-pannel").classList.remove("pannel-large");
+    //     this.practiceBtn.innerHTML = `<i class="sync icon"></i>`;
+    //     // console.log(Editor)
+    //     // Editor.toggle(false);
+    //     this.practiceBtn.setAttribute('sync-stop', 1);
+    //     // this.closeDevTool();
+    // };
 
     //编程，UI状态
     openPracticeHtml() {
@@ -760,6 +783,7 @@ class GUI {
     //编程功能，按钮
     openPracticeFn(shouldReload = true) {
         this.openPractice(true, true, shouldReload);
+        this.saveWindowsStatus(1);
     };
 
     //打开编程功能
@@ -790,7 +814,7 @@ class GUI {
     pubilcFn() {
         //code编辑器状态设为只读
         // Editor.toggle(true);
-        this.closePracticeHtml();
+        // this.closePracticeHtml();
 
         Win.showWinControl(false, true);
 
@@ -811,8 +835,9 @@ class GUI {
         code = this.createExecuteJs(code || Editor.getCode());
         //Win.startExecuteJavaScript2Preview();
         // 自动更新
-        console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'), forceRun)
-        if (!this.practiceBtn.getAttribute('sync-stop') || forceRun) {
+        // console.log('自动更新', !this.practiceBtn.getAttribute('sync-stop'), forceRun)
+        // !this.practiceBtn.getAttribute('sync-stop') || 
+        if (forceRun) {
             Win.executeJavaScript2Preview(code, forceRun);
         } else {
             // 关闭自动更新
@@ -828,10 +853,10 @@ class GUI {
 
     // 创建基础卡片
     createBaseCard(data) {
-            let readme = this.createElement('', 'h5');
-            readme.innerHTML = Knowledge.marked(data.knowledge.readme);
-            readme.innerText = readme.innerText;
-            let html = `<div class="content">
+        let readme = this.createElement('', 'h5');
+        readme.innerHTML = Knowledge.marked(data.knowledge.readme);
+        readme.innerText = readme.innerText;
+        let html = `<div class="content">
                                 <img class="right floated mini ui image" src="${URL.createObjectURL(this.base64ToBlob(data.poster))}">
                                 <div class="header">
                                     ${readme.innerText}
@@ -901,7 +926,7 @@ class GUI {
             this.addClickEventListener(closeBtn, e => {
                 e.stopPropagation();
                 div.remove();
-                fileDb.fileRemoveById(data.id);
+                // fileDb.fileRemoveById(data.id);
                 // setTimeout(()=>{
                 //     this.recentFiles(this.currentPage);
                 // },1000);
