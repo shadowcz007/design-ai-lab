@@ -60,8 +60,9 @@ class GUI {
             // .catch((err) => this.onPreviewWindowError())
         );
 
-        Win.callback=(t)=>{
+        Win.callback=async (t)=>{
             // console.log(t);
+            await this.updateDevCard();
             Editor.updateStatus(t);
         };
 

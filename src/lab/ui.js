@@ -3,7 +3,7 @@ const md5 = require('md5');
 
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
-const base=require('./base');
+const base = require('./base');
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -105,33 +105,33 @@ class Layout {
 class UI {
 
     constructor() {
-            this.isDisplay();
-        }
-        // 取id
+        this.isDisplay();
+    }
+    // 取id
     md5(str = "") {
-            return md5(str)
-        }
-        //手动隐藏,显示p5.js
+        return md5(str)
+    }
+    //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-            if (document.querySelector("#p5")) {
-                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-                // if (isShow == false && p5.instance) p5.instance.remove();
-            };
-            if (document.querySelector('#gui-main')) {
-                document.querySelector('#gui-main').style.top = '0';
-                document.querySelector('#gui-main').style.height = '100vh';
-            }
+        if (document.querySelector("#p5")) {
+            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            // if (isShow == false && p5.instance) p5.instance.remove();
+        };
+        if (document.querySelector('#gui-main')) {
+            document.querySelector('#gui-main').style.top = '0';
+            document.querySelector('#gui-main').style.height = '100vh';
         }
-        // GUI布局
+    }
+    // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-            document.querySelector("#gui-main").innerHTML = "";
-        }
-        //当没有子元素的时候，隐藏，有则开启
+        document.querySelector("#gui-main").innerHTML = "";
+    }
+    //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -143,6 +143,55 @@ class UI {
                 document.querySelector("#p5").style.height = '40vh';
             }
         }
+    }
+
+    // 创建list
+    createList(list = []) {
+        let div = document.createElement('div');
+        div.className = 'ui relaxed divided list';
+        div.innerHTML = Array.from(list, t => `<div class="item">${t}</div>`).join('');
+        return div;
+    };
+    // 模态框
+    createModel(header,content){
+        let div = document.createElement('div');
+        div.className='ui modal';
+        div.innerHTML=`
+            <div class="header">${header}</div>
+            <div class="content">${content}
+            </div>`;
+        return div
+    }
+    // 标签集
+    createTags(tags=[]){
+        let div = document.createElement('div');
+        div.className='ui divided selection list';
+        
+        div.innerHTML=Array.from(tags,t=>`<a class="item">
+            <div class="ui red horizontal label">${t}</div>
+        </a>`).join('');
+
+        return div
+    }
+
+    // 创建折叠菜单
+    createAccordion(items=[]){
+        let div = document.createElement('div');
+        div.className='ui vertical accordion menu';
+        div.innerHTML=Array.from(items,i=>{
+           return `<div class="item">
+                        <a class="${i.active?'active':''} title"><i class="dropdown icon"></i>${i.title}</a>
+                        <div class="${i.active?'active':''} content">
+                            <div class="ui form">
+                                <div class="grouped fields">
+                                ${Array.from(i.data,t=>`<div class="field">${t}</div>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+        }).join('');
+        $(div).accordion();
+        return div
     }
 
     // 创建组
@@ -158,32 +207,35 @@ class UI {
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
     add(dom) {
-            if (document.querySelector("#gui-main")) {
-                document.querySelector("#gui-main").appendChild(dom);
-                this.isDisplay();
-            }
+        if (document.querySelector("#gui-main")) {
+            document.querySelector("#gui-main").appendChild(dom);
+            this.isDisplay();
         }
-        // toast
+    }
+    // toast
     toast(text) {
-            Swal.fire(text);
-        }
-        // loading
+        Swal.fire(text);
+    }
+    // loading
     loading(n = 0) {
         if (!this.loadingElement) {
             this.loadingElement = document.createElement('div');
+            this.loadingElement.className='ui active slow black double inverted loader';
             this.add(this.loadingElement);
         };
         if (n < 100) {
-            this.loadingElement.style.top = 0;
-            this.loadingElement.style.left = 0;
-            this.loadingElement.style.backgroundColor = `rgb(0 0 0 / 70%)`;
-            this.loadingElement.style.display = 'block';
-            this.loadingElement.style.width = '100%';
-            this.loadingElement.style.height = '100vh';
-            this.loadingElement.style.position = 'fixed';
-            this.loadingElement.style.zIndex = 999999;
+            this.loadingElement.classList.remove('disabled');
+            // this.loadingElement.style.top = 0;
+            // this.loadingElement.style.left = 0;
+            // this.loadingElement.style.backgroundColor = `rgb(0 0 0 / 70%)`;
+            // this.loadingElement.style.display = 'block';
+            // this.loadingElement.style.width = '100%';
+            // this.loadingElement.style.height = '100vh';
+            // this.loadingElement.style.position = 'fixed';
+            // this.loadingElement.style.zIndex = 999999;
         } else {
-            this.loadingElement.style.display = 'none';
+            this.loadingElement.classList.add('disabled');
+            // this.loadingElement.style.display = 'none';
         }
     }
 
@@ -232,6 +284,7 @@ class UI {
 
     createButton(text, eventListener, isAdd = true) {
         let btn = document.createElement('button');
+        btn.className='ui button';
         btn.innerText = text;
         if (isAdd) this.add(btn);
         if (eventListener) btn.addEventListener('click', eventListener);
@@ -241,7 +294,7 @@ class UI {
     // 粘贴组件，开启后旋转，监听页面的粘贴事件
     createPasteIcon(eventListener, isAdd = true) {
 
-        const pasteFn = function(e) {
+        const pasteFn = function (e) {
             // console.log(e)
             let img = clipboard.readImage();
             // console.log(e,img)
@@ -373,53 +426,53 @@ class UI {
 
     // 图片上传
     createImgInput(text, isMultiple = false, key, eventListener = null) {
-            let setPlaceholder = function(value) {
-                if (!value || !(value && value[0])) return
-                this.classList.add('input-image');
-                this.style.backgroundImage = `url(${encodeURI(value[0])})`;
-            };
+        let setPlaceholder = function (value) {
+            if (!value || !(value && value[0])) return
+            this.classList.add('input-image');
+            this.style.backgroundImage = `url(${encodeURI(value[0])})`;
+        };
 
-            let div = this.createBaseInput("file", text, isMultiple, key, eventListener, setPlaceholder);
+        let div = this.createBaseInput("file", text, isMultiple, key, eventListener, setPlaceholder);
 
-            div.p.style.display = "none";
-            div.input.style.display = "none";
-            div.input.setAttribute('accept', "image/*");
+        div.p.style.display = "none";
+        div.input.style.display = "none";
+        div.input.setAttribute('accept', "image/*");
 
-            //如果是图片，则多一个图片预览
-            div.classList.add('input-image-default');
+        //如果是图片，则多一个图片预览
+        div.classList.add('input-image-default');
 
-            return div
-        }
-        // 文本输入
+        return div
+    }
+    // 文本输入
     createTextInput(text, key, eventListener = null) {
-            let setPlaceholder = function(value) {
-                // console.log(isMultiple, value)
-                if (!value || !(value && value[0])) return
-                this.input.value = value[0];
-            };
-            let div = this.createBaseInput('text', text, false, key, eventListener, setPlaceholder);
-            div.classList.add('input-text');
+        let setPlaceholder = function (value) {
+            // console.log(isMultiple, value)
+            if (!value || !(value && value[0])) return
+            this.input.value = value[0];
+        };
+        let div = this.createBaseInput('text', text, false, key, eventListener, setPlaceholder);
+        div.classList.add('input-text');
 
-            return div
-        }
-        // 文件上传
+        return div
+    }
+    // 文件上传
     createFileInput(text, isMultiple = false, key, eventListener = null) {
-            let setPlaceholder = function(value) {
-                // console.log(isMultiple, value)
-                if (!value || !(value && value[0])) return
-                this.p.innerText = path.basename(value[0]);
-            };
+        let setPlaceholder = function (value) {
+            // console.log(isMultiple, value)
+            if (!value || !(value && value[0])) return
+            this.p.innerText = path.basename(value[0]);
+        };
 
-            let div = this.createBaseInput('file', text, isMultiple, key, eventListener, setPlaceholder);
-            div.input.style.display = "none";
-            //div.classList.add('input-image-default');
-            div.classList.add('input-file');
+        let div = this.createBaseInput('file', text, isMultiple, key, eventListener, setPlaceholder);
+        div.input.style.display = "none";
+        //div.classList.add('input-image-default');
+        div.classList.add('input-file');
 
-            return div
-        }
-        // 颜色输入
+        return div
+    }
+    // 颜色输入
     createColorInput(text, key, eventListener = null) {
-        let setPlaceholder = function(value) {
+        let setPlaceholder = function (value) {
             if (!value || !(value && value[0])) return
             this.input.value = value[0];
         };
@@ -431,7 +484,7 @@ class UI {
 
     // 滑块输入
     createRangeInput(text, key, eventListener = null) {
-        let setPlaceholder = function(value) {
+        let setPlaceholder = function (value) {
             if (!value || !(value && value.length > 0)) return
             this.input.value = value[0];
         };
@@ -445,7 +498,7 @@ class UI {
 
     // check输入控件
     createCheckInput(text, key, eventListener = null) {
-        let setPlaceholder = function(value) {
+        let setPlaceholder = function (value) {
             if (!value || !(value && value.length > 0)) return
             this.input.value = value[0];
             div.style.background = value[0] ? 'red' : 'none';
@@ -484,7 +537,7 @@ class UI {
         var qrcode = this.createGroup();
         qrcode.style = `width: 220px;height: 220px;`;
         var g = this.createGroup(video, qrcode);
-        new PeerPC(async(id, stream) => {
+        new PeerPC(async (id, stream) => {
             let v = await this.createVideo(stream, false);
             v.style = `outline: none;
             width: 100%;
@@ -514,7 +567,7 @@ class UI {
                     },
                     audio: false,
                 })
-                .then(async(stream) => {
+                .then(async (stream) => {
                     let v = await this.createVideo(stream, false);
                     v.style = `outline: none;
                 width: 100%;
@@ -541,7 +594,7 @@ class UI {
             });
         };
 
-        g.stop = function() {
+        g.stop = function () {
             video.querySelector('video').srcObject.stop();
         }
 
@@ -566,7 +619,7 @@ class UI {
         var inputNumber = document.createElement('input');
         inputNumber.setAttribute('type', 'number');
         // console.log(html5Slider.noUiSlider)
-        html5Slider.noUiSlider.on('update', function(values, handle) {
+        html5Slider.noUiSlider.on('update', function (values, handle) {
 
             var value = values[handle];
 
@@ -577,11 +630,11 @@ class UI {
             }
         });
 
-        select.addEventListener('change', function() {
+        select.addEventListener('change', function () {
             html5Slider.noUiSlider.set([this.value, null]);
         });
 
-        inputNumber.addEventListener('change', function() {
+        inputNumber.addEventListener('change', function () {
             html5Slider.noUiSlider.set([null, this.value]);
         });
 
@@ -660,68 +713,68 @@ class UI {
      * @param {*} isAdd 
      */
     createTextCanvas(txt, style, isAdd = true) {
-            let canvas = document.createElement('canvas'),
-                ctx = canvas.getContext('2d');
-            canvas.className = 'text_canvas';
+        let canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
+        canvas.className = 'text_canvas';
 
-            let { fontSize, color, fontFamily } = style || {
-                fontSize: 12,
-                color: 'black',
-                fontFamily: 'monospace'
+        let { fontSize, color, fontFamily } = style || {
+            fontSize: 12,
+            color: 'black',
+            fontFamily: 'monospace'
+        };
+        fontSize = fontSize || 12;
+        color = color || 'black';
+        fontFamily = fontFamily || 'monospace';
+
+        // 导出图片
+        canvas.toDataURL = function (width = 300) {
+            let base64, height;
+            if (canvas.width > width) {
+                let nc = document.createElement('canvas'),
+                    nctx = nc.getContext('2d');
+                nc.width = width;
+                nc.height = parseInt(canvas.height * width / canvas.width) + 1;
+                nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
+                base64 = nc.toDataURL('image/png');
+                height = nc.height;
+            } else {
+                base64 = canvas.toDataURL('image/png');
+                height = canvas.height;
             };
-            fontSize = fontSize || 12;
-            color = color || 'black';
-            fontFamily = fontFamily || 'monospace';
-
-            // 导出图片
-            canvas.toDataURL = function(width = 300) {
-                let base64, height;
-                if (canvas.width > width) {
-                    let nc = document.createElement('canvas'),
-                        nctx = nc.getContext('2d');
-                    nc.width = width;
-                    nc.height = parseInt(canvas.height * width / canvas.width) + 1;
-                    nctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, nc.height);
-                    base64 = nc.toDataURL('image/png');
-                    height = nc.height;
-                } else {
-                    base64 = canvas.toDataURL('image/png');
-                    height = canvas.height;
-                };
-                return base64
-            }
-            canvas.update = function(textNew) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let x = 2;
-                ctx.font = `${fontSize * x}px ${fontFamily}`;
-                let font = ctx.measureText(textNew);
-                canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
-                canvas.width = (font.width) + 10;
-
-                ctx.fillStyle = color;
-                ctx.textAlign = "start";
-                ctx.textBaseline = "top";
-                ctx.font = `${fontSize * x}px ${fontFamily}`;
-                ctx.fillText(textNew, 5, 10);
-            };
-
-            canvas.update(txt);
-
-            if (isAdd) this.add(canvas);
-
-            return canvas
+            return base64
         }
-        //创建图片，根据url返回图片dom
+        canvas.update = function (textNew) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let x = 2;
+            ctx.font = `${fontSize * x}px ${fontFamily}`;
+            let font = ctx.measureText(textNew);
+            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 12;
+            canvas.width = (font.width) + 10;
+
+            ctx.fillStyle = color;
+            ctx.textAlign = "start";
+            ctx.textBaseline = "top";
+            ctx.font = `${fontSize * x}px ${fontFamily}`;
+            ctx.fillText(textNew, 5, 10);
+        };
+
+        canvas.update(txt);
+
+        if (isAdd) this.add(canvas);
+
+        return canvas
+    }
+    //创建图片，根据url返回图片dom
     createImage(url, isAdd = false) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
             _img.src = encodeURI(url);
             _img.className = 'opacity-background';
-            _img.onload = function() {
+            _img.onload = function () {
                 if (isAdd) this.add(_img);
                 resolve(_img);
             }
-            _img.onerror = function() {
+            _img.onerror = function () {
                 resolve(null);
             }
         })
@@ -810,7 +863,7 @@ class UI {
             title: "打开……",
             properties: ['openFile', 'multiSelections'],
             filters: [
-                { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'mp4', 'mp3', 'jpeg', 'jpg', 'webp', 'png', 'gif'] }
+                { name: '视频、音频', extensions: ['mov', 'mkv', 'm4v', 'avi', 'webm', 'mp4', 'mp3', 'jpeg', 'jpg', 'webp', 'png', 'gif'] }
             ]
         });
 
@@ -822,7 +875,7 @@ class UI {
                 // console.log(url)
                 let type = null;
                 let urlNew = url.toLowerCase();
-                var count = Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => urlNew.match(t) ? 1 : null).filter(f => f);
+                var count = Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4', 'webm'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                 if (count.length > 0) type = "video";
                 count = Array.from(['mp3'], t => urlNew.match(t) ? 1 : null).filter(f => f);
                 if (count.length > 0) type = "audio";
@@ -876,59 +929,59 @@ class UI {
             ]
         });
         if (filepath) {
-            base.saveBase64(base64,filepath);
+            base.saveBase64(base64, filepath);
         }
         // this.saveNativeImageDialog(img, title, fileName);
     };
 
     // 
     saveNativeImageDialog(img, title = "保存", fileName = "图片") {
-            // const fs = require('fs');
-            let filepath = dialog.showSaveDialogSync({
-                title: title,
-                defaultPath: fileName,
-                filters: [
-                    { name: 'Image', extensions: ['png', 'jpg'] },
-                ]
-            });
-            if (filepath) {
-                let extname = path.extname(filepath);
-                console.log(filepath, extname)
-                if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
-                    fs.writeFileSync(filepath, img.toJPEG(80));
-                } else {
-                    fs.writeFileSync(filepath, img.toPNG());
-                };
-                // fs.copyFile(file, filepath, e => e ? console.log(e) : null)
+        // const fs = require('fs');
+        let filepath = dialog.showSaveDialogSync({
+            title: title,
+            defaultPath: fileName,
+            filters: [
+                { name: 'Image', extensions: ['png', 'jpg'] },
+            ]
+        });
+        if (filepath) {
+            let extname = path.extname(filepath);
+            console.log(filepath, extname)
+            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+                fs.writeFileSync(filepath, img.toJPEG(80));
+            } else {
+                fs.writeFileSync(filepath, img.toPNG());
             };
-        }
-        // save
+            // fs.copyFile(file, filepath, e => e ? console.log(e) : null)
+        };
+    }
+    // save
     saveDialog(file, title = "保存") {
-            file = file.replace("file://", "");
-            // const fs = require('fs');
-            let filepath = dialog.showSaveDialogSync({
-                title: title,
-                filters: [
-                    { name: 'Movies', extensions: ['mp4'] },
-                ]
-            });
-            if (filepath) {
-                fs.copyFile(file, filepath, e => e ? console.log(e) : null)
-            };
-        }
-        // save
+        file = file.replace("file://", "");
+        // const fs = require('fs');
+        let filepath = dialog.showSaveDialogSync({
+            title: title,
+            filters: [
+                { name: 'Movies', extensions: ['mp4'] },
+            ]
+        });
+        if (filepath) {
+            fs.copyFile(file, filepath, e => e ? console.log(e) : null)
+        };
+    }
+    // save
     saveJsonDialog(json, title = "保存") {
-            let filepath = dialog.showSaveDialogSync({
-                title: title,
-                filters: [
-                    { name: 'json', extensions: ['json'] },
-                ]
-            });
-            if (filepath) {
-                base.saveJson(json,filepath);
-            };
-        }
-        // 读取
+        let filepath = dialog.showSaveDialogSync({
+            title: title,
+            filters: [
+                { name: 'json', extensions: ['json'] },
+            ]
+        });
+        if (filepath) {
+            base.saveJson(json, filepath);
+        };
+    }
+    // 读取
     openJsonDialog() {
         let filepath = this.getFilePath(1, '读取');
         if (filepath) {

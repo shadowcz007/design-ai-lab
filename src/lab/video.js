@@ -96,7 +96,7 @@ class FF {
         if (formatName === null) return;
         if (formatName.match("webp")) return 'webp';
         if (formatName.match("image") || formatName.match('png')) return 'img';
-        if (Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
+        if (Array.from(['mov', 'm4v', 'avi', 'mkv', 'mp4','webm'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "video";
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
         if (Array.from(['gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "gif";
     }
@@ -114,7 +114,7 @@ class FF {
                     }).filter(s => s)[0] || metadata.streams[0];
                     resolve({
                         // 秒
-                        duration: metadata.format.duration,
+                        duration: metadata.format.duration==='N/A'?null:metadata.format.duration,
                         type: t,
                         width: stream.width,
                         height: stream.height,
@@ -468,7 +468,7 @@ class FF {
         return new Promise((resolve, reject) => {
 
             this.getMediaDurationAndType(filePath).then(info => {
-                let duration = info.duration;
+                let duration = info.duration||10;
                 ffmpeg(filePath)
                     .videoCodec(this.videoCodec)
                     .setStartTime(startTime)
