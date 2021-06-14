@@ -31,8 +31,92 @@
         if (window.module) module = window.module;
     </script>
     <script src="../node_modules/fomantic-ui/dist/semantic.min.js"></script>
-   
+
     <style>
+        #gui-main .input-image-default {
+            background-position: 0 0, 5px 5px;
+            background-size: 10px 10px;
+            background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            color: lightsteelblue;
+            margin: 12px;
+        }
+        
+        #gui-main .input-image {
+            background-position: center !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+        }
+        
+        #gui-main .input-more-files:after {
+            content: attr(data-count);
+            background-color: #272727;
+            width: 12px;
+            font-size: 10px;
+            height: 12px;
+            text-align: center;
+            line-height: 12px;
+            /* position: sticky; */
+            color: white;
+            border-radius: 100%;
+        }
+        
+        #gui-main .input-file {
+            height: 32px;
+            font-size: 12px;
+            outline: 1px solid gray;
+            line-height: 4px;
+            padding: 4px;
+            display: flex;
+            cursor: pointer;
+            width: 100%;
+            margin: 12px 0;
+        }
+        
+        #gui-main .input-file:hover {
+            outline: 1px solid var(--hover-color);
+        }
+        
+        #gui-main .input-file p {
+            overflow: hidden;
+            height: 20px;
+            font-size: inherit;
+            padding: inherit;
+            background-color: transparent;
+            line-height: inherit;
+            min-width: inherit;
+            font-family: inherit;
+            word-break: break-word;
+        }
+        
+        #gui-main .input-image-default:hover {
+            box-shadow: var(--box-shadow) !important;
+        }
+        
+        #gui-main .input-image:hover {
+            box-shadow: var(--box-shadow) !important;
+        }
+        
+        .opacity-background {
+            width: 200px;
+            background-position: 0 0, 5px 5px;
+            background-size: 10px 10px;
+            background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, 0.05) 0);
+        }
+    </style>
+    <!-- <style>
          :root {
             --hover-color: #6399ff;
             --box-shadow: 0px 0 14px 7px lightgrey;
@@ -67,8 +151,6 @@
             width: auto !important;
         }
         
-        
-        
         #gui-main {
             display: flex;
             position: fixed;
@@ -80,8 +162,6 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        
-       
         
         #gui-main .input-text {
             width: 100%;
@@ -217,14 +297,15 @@
             /* left: 0px; */
             outline: 1px solid gray;
         }
-        #gui-main webview{
+        
+        #gui-main webview {
             background: #eee;
             outline: 1px solid #c7c7c7;
             margin: 1em;
             width: 100%;
             height: calc( 100vh - 2em);
         }
-    </style>
+    </style> -->
     <script src="../lib/qrcode.min.js"></script>
 </head>
 
