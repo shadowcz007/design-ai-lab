@@ -105,33 +105,33 @@ class Layout {
 class UI {
 
     constructor() {
-        this.isDisplay();
-    }
-    // 取id
-    md5(str = "") {
-        return md5(str)
-    }
-    //手动隐藏,显示p5.js
-    p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-            // if (isShow == false && p5.instance) p5.instance.remove();
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
+            this.isDisplay();
         }
-    }
-    // GUI布局
+        // 取id
+    md5(str = "") {
+            return md5(str)
+        }
+        //手动隐藏,显示p5.js
+    p5Show(isShow = true) {
+            if (document.querySelector("#p5")) {
+                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+                // if (isShow == false && p5.instance) p5.instance.remove();
+            };
+            if (document.querySelector('#gui-main')) {
+                document.querySelector('#gui-main').style.top = '0';
+                document.querySelector('#gui-main').style.height = '100vh';
+            }
+        }
+        // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-        document.querySelector("#gui-main").innerHTML = "";
-    }
-    //当没有子元素的时候，隐藏，有则开启
+            document.querySelector("#gui-main").innerHTML = "";
+        }
+        //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -153,21 +153,21 @@ class UI {
         return div;
     };
     // 模态框
-    createModel(header,content){
-        let div = document.createElement('div');
-        div.className='ui modal';
-        div.innerHTML=`
+    createModel(header, content) {
+            let div = document.createElement('div');
+            div.className = 'ui modal';
+            div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-        return div
-    }
-    // 标签集
-    createTags(tags=[]){
+            return div
+        }
+        // 标签集
+    createTags(tags = []) {
         let div = document.createElement('div');
-        div.className='ui divided selection list';
-        
-        div.innerHTML=Array.from(tags,t=>`<a class="item">
+        div.className = 'ui divided selection list';
+
+        div.innerHTML = Array.from(tags, t => `<a class="item">
             <div class="ui red horizontal label">${t}</div>
         </a>`).join('');
 
@@ -175,11 +175,11 @@ class UI {
     }
 
     // 创建折叠菜单
-    createAccordion(items=[]){
-        let div = document.createElement('div');
-        div.className='ui vertical accordion menu';
-        div.innerHTML=Array.from(items,i=>{
-           return `<div class="item">
+    createAccordion(items = []) {
+            let div = document.createElement('div');
+            div.className = 'ui vertical accordion menu';
+            div.innerHTML = Array.from(items, i => {
+                        return `<div class="item">
                         <a class="${i.active?'active':''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active?'active':''} content">
                             <div class="ui form">
@@ -194,6 +194,20 @@ class UI {
         return div
     }
 
+    // 创建开关
+    createToggle(item){
+        let div = document.createElement('div');
+            div.className = 'ui toggle checkbox';
+        div.innerHTML=`<input type="checkbox" name="${item.name}">
+                        <label>${item.label}</label>`;
+        if(item.changeFn){
+            div.querySelector('input').addEventListener('change',e=>{
+                item.changeFn(e.target.checked);
+            });
+        };
+        return div
+    }
+
     // 创建组
     createGroup() {
         let isDev = false;
@@ -202,6 +216,7 @@ class UI {
         Array.from(arguments, g => g instanceof HTMLElement ? div.appendChild(g) : (typeof g === 'boolean' ? isDev = g : null));
         let ly = new Layout(div, isDev);
         div.layout = (type, isDev) => ly.start(type, isDev);
+        div.add = div.appendChild;
         return div;
     }
 
@@ -263,6 +278,7 @@ class UI {
             'play': `<i class="fas fa-caret-right"></i>`,
             'fan': '<i class="fas fa-fan"></i>',
             'clear': '<i class="far fa-trash-alt"></i>',
+            'paste': '<i class="fas fa-plus"></i>',
             'plus': '<i class="fas fa-plus"></i>',
             'minus': '<i class="fas fa-minus"></i>',
             'light': '<i class="far fa-lightbulb"></i>',
@@ -273,12 +289,14 @@ class UI {
             'save': '<i class="fas fa-save"></i>',
             'copy': '<i class="fas fa-copy"></i>',
             'setup': '<i class="fas fa-cog"></i>',
+            'settings':'<i class="icon settings"></i>',
             'thumbtack': '<i class="fas fa-thumbtack"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
         let btn = this.createButton(key, eventListener, isAdd);
         btn.innerHTML = html;
+        btn.className = 'circular ui icon button';
         return btn
     }
 
