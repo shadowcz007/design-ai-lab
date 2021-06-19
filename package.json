@@ -85,7 +85,8 @@
         "sweetalert2": "^10.15.7",
         "timeago.js": "^4.0.2",
         "wordcloud": "^1.2.2",
-        "yoga-layout-wasm": "^1.9.3-alpha.7"
+        "yoga-layout-wasm": "^1.9.3-alpha.7",
+        "zdog": "^1.1.2"
     },
     "build": {
         "appId": "mixlab.designailab",

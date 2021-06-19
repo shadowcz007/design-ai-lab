@@ -17,7 +17,7 @@ class Layout {
             this.element.style.backgroud = 'rgba(255,0,0,0.1)'
         }
     }
-    start(type = 'default', isDev = false) {
+    start(type = 'container', isDev = false) {
 
         if (isDev === true) {
             this.element.style.outline = `1px solid red`;
@@ -25,113 +25,54 @@ class Layout {
         }
 
         let typeDict = {
-            // 行-自动换行-居中
-            'default': 0,
-            'h': 0,
-            // 列-左对齐
-            'lv': 1,
-            // 列-居中
-            'cv': 2,
-            // 列-右对齐
-            'rv': 3,
-            // 9宫格
-            'g9': 4,
-            // 网格布局 3:7
-            'g37': 5,
-            // 行  - 居左
-            'lh': 6,
-            // 行 - 居右
-            'rh': 7
+            'container': 'ui container',
+            'grid':'ui grid',
+            'two':'ui two column centered grid',
+            'three': 'ui three column divided grid',
+            'equalwidth': 'ui equal width grid',
+            'cards': 'ui cards',
+            'card': 'card',
+            'row': 'row',
+            'column': 'column'
         }
 
         if (typeof type === 'string') type = typeDict[type.toLowerCase()];
 
-        let g = this.element;
-        g.style.display = 'flex';
+        this.element.className = type;
 
-        if (type === 0) {
-            g.style.flexWrap = 'wrap';
-            g.style.flexDirection = 'row';
-            g.style.justifyContent = 'space-around';
-            g.style.alignItems = 'center';
-            g.style.width = '100%';
-            g.style.padding = '1em';
-        } else if (type === 1) {
-            g.style.width = '100%';
-            g.style.flexDirection = 'column';
-            g.style.justifyContent = 'flex-start';
-            g.style.alignItems = 'flex-start';
-        } else if (type === 2) {
-            g.style.width = '100%';
-            g.style.justifyContent = 'space-around';
-            g.style.alignItems = 'center';
-            g.style.flexDirection = 'column';
-        } else if (type === 3) {
-            g.style.width = '100%';
-            g.style.flexDirection = 'column';
-            g.style.justifyContent = 'flex-end';
-            g.style.alignItems = 'flex-end';
-        } else if (type === 4) {
-            g.style.display = 'grid';
-            g.style.gridTemplate = '33% 33% 33% / 33% 33% 33%';
-            g.style.gap = '1%';
-            g.style.width = '90vw';
-            g.style.height = '90vw';
-        } else if (type === 5) {
-            g.style.display = 'grid';
-            g.style.gridTemplateColumns = '70% 30%';
-            g.style.gap = '1em';
-        } else if (type === 6) {
-            g.style.flexWrap = 'wrap';
-            g.style.flexDirection = 'row';
-            g.style.justifyContent = 'flex-start';
-            g.style.alignItems = 'center';
-            g.style.width = '100%';
-            g.style.padding = '1em';
-        } else if (type === 7) {
-            g.style.flexWrap = 'wrap';
-            g.style.flexDirection = 'row';
-            g.style.justifyContent = 'flex-end';
-            g.style.alignItems = 'center';
-            g.style.width = '100%';
-            g.style.height = '100%';
-            g.style.padding = '1em';
-
-        }
     }
-
 }
 
 class UI {
 
     constructor() {
-            this.isDisplay();
-        }
-        // 取id
+        this.isDisplay();
+    }
+    // 取id
     md5(str = "") {
-            return md5(str)
-        }
-        //手动隐藏,显示p5.js
+        return md5(str)
+    }
+    //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-            if (document.querySelector("#p5")) {
-                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-                // if (isShow == false && p5.instance) p5.instance.remove();
-            };
-            if (document.querySelector('#gui-main')) {
-                document.querySelector('#gui-main').style.top = '0';
-                document.querySelector('#gui-main').style.height = '100vh';
-            }
+        if (document.querySelector("#p5")) {
+            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            // if (isShow == false && p5.instance) p5.instance.remove();
+        };
+        if (document.querySelector('#gui-main')) {
+            document.querySelector('#gui-main').style.top = '0';
+            document.querySelector('#gui-main').style.height = '100vh';
         }
-        // GUI布局
+    }
+    // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-            document.querySelector("#gui-main").innerHTML = "";
-        }
-        //当没有子元素的时候，隐藏，有则开启
+        document.querySelector("#gui-main").innerHTML = "";
+    }
+    //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -153,16 +94,32 @@ class UI {
         return div;
     };
     // 模态框
-    createModel(header, content) {
-            let div = document.createElement('div');
-            div.className = 'ui modal';
-            div.innerHTML = `
+    createModel(header = '', content = '') {
+        let div = document.createElement('div');
+        div.className = 'ui modal';
+        div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-            return div
-        }
-        // 标签集
+        div.add = function (child, type = 'content') {
+            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+        };
+        div.show = function () {
+            $(div).modal('show');
+        };
+        div.hide = function () {
+            $(div).modal('hide');
+        };
+        return div
+    }
+    // 标签
+    createTag(text, color = 'red') {
+        let div = document.createElement('a');
+        div.className = `ui ${color} tag label`;
+        div.innerHTML = text;
+        return div
+    }
+    // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
@@ -176,15 +133,15 @@ class UI {
 
     // 创建折叠菜单
     createAccordion(items = []) {
-            let div = document.createElement('div');
-            div.className = 'ui vertical accordion menu';
-            div.innerHTML = Array.from(items, i => {
-                        return `<div class="item">
-                        <a class="${i.active?'active':''} title"><i class="dropdown icon"></i>${i.title}</a>
-                        <div class="${i.active?'active':''} content">
+        let div = document.createElement('div');
+        div.className = 'ui vertical accordion menu';
+        div.innerHTML = Array.from(items, i => {
+            return `<div class="item">
+                        <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
+                        <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
                                 <div class="grouped fields">
-                                ${Array.from(i.data,t=>`<div class="field">${t}</div>`).join('')}
+                                ${Array.from(i.data, t => `<div class="field">${t}</div>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -195,27 +152,73 @@ class UI {
     }
 
     // 创建开关
-    createToggle(item){
+    createToggle(item) {
         let div = document.createElement('div');
-            div.className = 'ui toggle checkbox';
-        div.innerHTML=`<input type="checkbox" name="${item.name}">
+        div.className = 'ui toggle checkbox';
+        div.innerHTML = `<input type="checkbox" name="${item.name}">
                         <label>${item.label}</label>`;
-        if(item.changeFn){
-            div.querySelector('input').addEventListener('change',e=>{
+        if (item.changeFn) {
+            div.querySelector('input').addEventListener('change', e => {
                 item.changeFn(e.target.checked);
             });
         };
         return div
     }
 
+    createInputForPosition(eventListener = null) {
+        let div = document.createElement('div');
+        div.className = 'ui horizontal list';
+        div.style = 'padding-left: 12px;';
+        div.innerHTML = `
+        <div class="ui item mini right labeled input">
+            <input type="number" placeholder="0" class='x' step='1'>
+            <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">X</div>
+        </div>
+        <div class="ui item mini right labeled input">
+            <input type="number" placeholder="0" class='y' step='1'>
+            <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">Y</div>
+        </div>
+        <div class="ui item mini right labeled input">
+            <input type="number" placeholder="0" class='w' step='1' min="0">
+            <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">W</div>
+        </div>
+        <div class="ui item mini right labeled input">
+            <input type="number" placeholder="0" class='h' step='1' min="0">
+            <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">H</div>
+        </div>`;
+        let inx = div.querySelector('.x'),
+            iny = div.querySelector('.y'),
+            inw = div.querySelector('.w'),
+            inh = div.querySelector('.h');
+        div.setValue = function (arr = []) {
+            let [x, y, w, h] = arr;
+            inx.value = parseInt(x);
+            iny.value = parseInt(y);
+            inw.value = parseInt(w);
+            inh.value = parseInt(h);
+        };
+        div.getValue = function () {
+            return Array.from([inx, iny, inw, inh], s => parseInt(s.value.trim()));
+        };
+
+        Array.from([inx, iny, inw, inh], s => {
+            s.oninput= e => {
+                if (eventListener) eventListener(div.getValue())
+            };
+        });
+
+        return div
+    }
+
     // 创建组
-    createGroup() {
+    createGroup(type = 'container') {
         let isDev = false;
         let div = document.createElement('div');
         div.className = 'group';
         Array.from(arguments, g => g instanceof HTMLElement ? div.appendChild(g) : (typeof g === 'boolean' ? isDev = g : null));
         let ly = new Layout(div, isDev);
         div.layout = (type, isDev) => ly.start(type, isDev);
+        if (type) div.layout(type);
         div.add = div.appendChild;
         return div;
     }
@@ -235,7 +238,7 @@ class UI {
     loading(n = 0) {
         if (!this.loadingElement) {
             this.loadingElement = document.createElement('div');
-            this.loadingElement.className='ui active slow black double inverted loader';
+            this.loadingElement.className = 'ui active slow black double inverted loader';
             this.add(this.loadingElement);
         };
         if (n < 100) {
@@ -289,7 +292,7 @@ class UI {
             'save': '<i class="fas fa-save"></i>',
             'copy': '<i class="fas fa-copy"></i>',
             'setup': '<i class="fas fa-cog"></i>',
-            'settings':'<i class="icon settings"></i>',
+            'settings': '<i class="icon settings"></i>',
             'thumbtack': '<i class="fas fa-thumbtack"></i>'
         };
         let html = icons[key];
@@ -302,7 +305,7 @@ class UI {
 
     createButton(text, eventListener, isAdd = true) {
         let btn = document.createElement('button');
-        btn.className='ui button';
+        btn.className = 'ui button';
         btn.innerText = text;
         if (isAdd) this.add(btn);
         if (eventListener) btn.addEventListener('click', eventListener);

@@ -148,9 +148,20 @@ class Canvas {
             })
 
             this.canvas.on('mouse:dblclick', opt => {
-                if (this.dblclick) this.dblclick(opt);
+                if (this.onDbclick) this.onDbclick(opt);
                 // console.log(opt)
             })
+
+            this.canvas.on('mouse:down', opt => {
+                if (this.onClick) this.onClick(opt);
+                // console.log(opt)
+            })
+
+            this.canvas.on('object:removed',opt => {
+                if (this.onRemoved) this.onRemoved(opt);
+                // console.log(opt)
+            });
+
         };
 
         // 扩充的方法 
@@ -281,6 +292,10 @@ class Canvas {
             ctx.restore();
         }
 
+    }
+    setActiveObject(obj){
+        this.canvas.setActiveObject(obj);
+        this.render();
     }
     toggleDragMode(dragMode) {
         this.canvas.toggleDragMode(dragMode || !this.dragMode);
