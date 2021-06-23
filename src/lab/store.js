@@ -21,7 +21,13 @@ class Store {
                 resolve(true);
             });
         });
-
+    }
+    get(id){
+        return new Promise((resolve, reject) => {
+            this.db.get(id).then(res=>{
+                resolve(res);
+            })
+        });
     }
     getJson() {
         return new Promise((resolve, reject) => {

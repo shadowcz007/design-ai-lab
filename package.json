@@ -30,7 +30,7 @@
         "@ffprobe-installer/ffprobe": "^1.1.0",
         "@fortawesome/fontawesome-free": "^5.15.3",
         "@hapi/hapi": "^20.1.2",
-        "@node-rs/jieba": "^1.1.0",
+        "@node-rs/jieba": "^1.2.0",
         "@paddlejs-models/humanseg": "0.0.5",
         "@tensorflow-models/body-pix": "^2.1.0",
         "@tensorflow-models/deeplab": "^0.2.1",

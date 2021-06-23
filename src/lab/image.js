@@ -104,7 +104,7 @@ class Image {
 
 
     getNativeImageFromWebview(url) {
-        if(!url) return
+        if (!url) return
         return new Promise((resolve, reject) => {
             let webview = document.createElement('webview');
             webview.src = url;
@@ -128,6 +128,31 @@ class Image {
         });
     }
 
+    getNativeImageFromWebview2(url) {
+        const arrayBuffer2Base64 = function (buffer) {
+            var binary = '';
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        };
+
+        return new Promise((resolve, reject) => {
+            fetch(url).then(async r => {
+                return {
+                    type: r.headers.get('content-type'),
+                    data: await r.arrayBuffer()
+                }
+            }).then(r => {
+                console.log(r)
+                let res = arrayBuffer2Base64(r.data);
+                res = `data:${r.type};base64,${res}`;
+                resolve(res);
+            });
+        });
+    }
 
 
 }

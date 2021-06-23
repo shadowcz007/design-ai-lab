@@ -8,17 +8,20 @@ class Nlp {
     //     return Jieba.instance;
     // }
     constructor() {
+        
+        // Object.keys(jieba).forEach(k => {
+        //     if (k != 'load') this[k] = jieba[k];
+        // });
+        
         try {
             jieba.load();
         } catch (error) {
             console.log(error);
         };
-        // Object.keys(jieba).forEach(k => {
-        //     if (k != 'load') this[k] = jieba[k];
-        // });
-        this.jieba=jieba;
-    };
 
+        this.jieba=jieba;
+
+    };
 
     //随机来一句话
     randomText() {}

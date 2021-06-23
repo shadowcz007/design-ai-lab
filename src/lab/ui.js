@@ -165,6 +165,18 @@ class UI {
         return div
     }
 
+
+    // 带按钮的输入框
+    createActionInput(){
+        let div = document.createElement('div');
+        div.className = 'ui action input';
+        div.innerHTML = `
+        <input type="text" placeholder="Search...">
+        <button class="ui button">Search</button>
+            `;
+        return div;
+    }
+
     createInputForPosition(eventListener = null) {
         let div = document.createElement('div');
         div.className = 'ui horizontal list';
@@ -813,6 +825,8 @@ class UI {
             _img.className = 'opacity-background';
             _img.onload = function () {
                 if (isAdd) this.add(_img);
+                // _img.width=_img.naturalWidth;
+                // _img.height=_img.naturalHeight;
                 resolve(_img);
             }
             _img.onerror = function () {
