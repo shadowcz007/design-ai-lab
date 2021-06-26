@@ -46,33 +46,33 @@ class Layout {
 class UI {
 
     constructor() {
-        this.isDisplay();
-    }
-    // 取id
-    md5(str = "") {
-        return md5(str)
-    }
-    //手动隐藏,显示p5.js
-    p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-            // if (isShow == false && p5.instance) p5.instance.remove();
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
+            this.isDisplay();
         }
-    }
-    // GUI布局
+        // 取id
+    md5(str = "") {
+            return md5(str)
+        }
+        //手动隐藏,显示p5.js
+    p5Show(isShow = true) {
+            if (document.querySelector("#p5")) {
+                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+                // if (isShow == false && p5.instance) p5.instance.remove();
+            };
+            if (document.querySelector('#gui-main')) {
+                document.querySelector('#gui-main').style.top = '0';
+                document.querySelector('#gui-main').style.height = '100vh';
+            }
+        }
+        // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-        document.querySelector("#gui-main").innerHTML = "";
-    }
-    //当没有子元素的时候，隐藏，有则开启
+            document.querySelector("#gui-main").innerHTML = "";
+        }
+        //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -95,31 +95,31 @@ class UI {
     };
     // 模态框
     createModel(header = '', content = '') {
-        let div = document.createElement('div');
-        div.className = 'ui modal';
-        div.innerHTML = `
+            let div = document.createElement('div');
+            div.className = 'ui modal';
+            div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-        div.add = function (child, type = 'content') {
-            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
-        };
-        div.show = function () {
-            $(div).modal('show');
-        };
-        div.hide = function () {
-            $(div).modal('hide');
-        };
-        return div
-    }
-    // 标签
+            div.add = function(child, type = 'content') {
+                if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+            };
+            div.show = function() {
+                $(div).modal('show');
+            };
+            div.hide = function() {
+                $(div).modal('hide');
+            };
+            return div
+        }
+        // 标签
     createTag(text, color = 'red') {
-        let div = document.createElement('a');
-        div.className = `ui ${color} tag label`;
-        div.innerHTML = text;
-        return div
-    }
-    // 标签集
+            let div = document.createElement('a');
+            div.className = `ui ${color} tag label`;
+            div.innerHTML = text;
+            return div
+        }
+        // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
@@ -135,10 +135,10 @@ class UI {
 
     // 创建折叠菜单
     createAccordion(items = []) {
-        let div = document.createElement('div');
-        div.className = 'ui vertical accordion menu';
-        div.innerHTML = Array.from(items, i => {
-            return `<div class="item">
+            let div = document.createElement('div');
+            div.className = 'ui vertical accordion menu';
+            div.innerHTML = Array.from(items, i => {
+                        return `<div class="item">
                         <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
@@ -311,23 +311,23 @@ class UI {
     createIcon(key, eventListener, isAdd = true) {
         let icons = {
             'refresh': `<i class="icon sync alternate"></i>`,
-            'download': `<i class="fas fa-download"></i>`,
+            'download': `<i class="icon download"></i>`,
             'play': `<i class="icon caret right"></i>`,
             'fan': '<i class="icon fan"></i>',
-            'clear': '<i class="far fa-trash-alt"></i>',
+            'clear': '<i class="icon trash alt"></i>',
             'paste': '<i class="icon plus"></i>',
-            'plus': '<i class="fas fa-plus"></i>',
-            'minus': '<i class="fas fa-minus"></i>',
+            'plus': '<i class="icon plus"></i>',
+            'minus': '<i class="icon minus"></i>',
             'light': '<i class="icon lightbulb"></i>',
             'square': '<i class="icon vector square"></i>',
-            'link': '<i class="fas fa-link"></i>',
-            'comment': '<i class="far fa-comment-dots"></i>',
-            'music': '<i class="fas fa-music"></i>',
+            'link': '<i class="icon link"></i>',
+            'comment': '<i class="icon comment dots"></i>',
+            'music': '<i class="icon music"></i>',
             'save': '<i class="icon save"></i>',
             'copy': '<i class="icon copy"></i>',
-            'setup': '<i class="fas fa-cog"></i>',
+            'setup': '<i class="icon cog"></i>',
             'settings': '<i class="icon settings"></i>',
-            'thumbtack': '<i class="fas fa-thumbtack"></i>'
+            'thumbtack': '<i class="icon thumbtack"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
