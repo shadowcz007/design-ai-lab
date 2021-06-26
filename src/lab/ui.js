@@ -46,33 +46,33 @@ class Layout {
 class UI {
 
     constructor() {
-            this.isDisplay();
-        }
-        // 取id
+        this.isDisplay();
+    }
+    // 取id
     md5(str = "") {
-            return md5(str)
-        }
-        //手动隐藏,显示p5.js
+        return md5(str)
+    }
+    //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-            if (document.querySelector("#p5")) {
-                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-                // if (isShow == false && p5.instance) p5.instance.remove();
-            };
-            if (document.querySelector('#gui-main')) {
-                document.querySelector('#gui-main').style.top = '0';
-                document.querySelector('#gui-main').style.height = '100vh';
-            }
+        if (document.querySelector("#p5")) {
+            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            // if (isShow == false && p5.instance) p5.instance.remove();
+        };
+        if (document.querySelector('#gui-main')) {
+            document.querySelector('#gui-main').style.top = '0';
+            document.querySelector('#gui-main').style.height = '100vh';
         }
-        // GUI布局
+    }
+    // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-            document.querySelector("#gui-main").innerHTML = "";
-        }
-        //当没有子元素的时候，隐藏，有则开启
+        document.querySelector("#gui-main").innerHTML = "";
+    }
+    //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -95,48 +95,50 @@ class UI {
     };
     // 模态框
     createModel(header = '', content = '') {
-            let div = document.createElement('div');
-            div.className = 'ui modal';
-            div.innerHTML = `
+        let div = document.createElement('div');
+        div.className = 'ui modal';
+        div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-            div.add = function(child, type = 'content') {
-                if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
-            };
-            div.show = function() {
-                $(div).modal('show');
-            };
-            div.hide = function() {
-                $(div).modal('hide');
-            };
-            return div
-        }
-        // 标签
+        div.add = function (child, type = 'content') {
+            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+        };
+        div.show = function () {
+            $(div).modal('show');
+        };
+        div.hide = function () {
+            $(div).modal('hide');
+        };
+        return div
+    }
+    // 标签
     createTag(text, color = 'red') {
-            let div = document.createElement('a');
-            div.className = `ui ${color} tag label`;
-            div.innerHTML = text;
-            return div
-        }
-        // 标签集
+        let div = document.createElement('a');
+        div.className = `ui ${color} tag label`;
+        div.innerHTML = text;
+        return div
+    }
+    // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
 
         div.innerHTML = Array.from(tags, t => `<a class="item">
-            <div class="ui red horizontal label">${t}</div>
+            <div class="ui red horizontal label" data-id='${t.id || ''}'>${t.label ? t.label : t}</div>
         </a>`).join('');
+
+        // div.items=Array.from(div.querySelectorAll('.item'),i=>i);
 
         return div
     }
 
     // 创建折叠菜单
     createAccordion(items = []) {
-            let div = document.createElement('div');
-            div.className = 'ui vertical accordion menu';
-            div.innerHTML = Array.from(items, i => {
-                        return `<div class="item">
+        let div = document.createElement('div');
+        div.className = 'ui vertical accordion menu';
+        div.innerHTML = Array.from(items, i => {
+            return `<div class="item">
                         <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
@@ -167,7 +169,7 @@ class UI {
 
 
     // 带按钮的输入框
-    createActionInput(){
+    createActionInput() {
         let div = document.createElement('div');
         div.className = 'ui action input';
         div.innerHTML = `
@@ -214,7 +216,7 @@ class UI {
         };
 
         Array.from([inx, iny, inw, inh], s => {
-            s.oninput= e => {
+            s.oninput = e => {
                 if (eventListener) eventListener(div.getValue())
             };
         });
@@ -223,11 +225,11 @@ class UI {
     }
 
     // webview
-    createWebview(src,isMobile=false){
+    createWebview(src, isMobile = false) {
         let webview = document.createElement('webview');
         webview.style = `width:100%;height:100vh`;
-        if(isMobile)  webview.setAttribute('useragent',
-        `Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Mobile Safari/537.36`);
+        if (isMobile) webview.setAttribute('useragent',
+            `Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Mobile Safari/537.36`);
 
         webview.src = src;
         // 不一定会更新标题
@@ -308,21 +310,21 @@ class UI {
     // 封装的控件
     createIcon(key, eventListener, isAdd = true) {
         let icons = {
-            'refresh': `<i class="fas fa-sync-alt"></i>`,
+            'refresh': `<i class="icon sync alternate"></i>`,
             'download': `<i class="fas fa-download"></i>`,
-            'play': `<i class="fas fa-caret-right"></i>`,
-            'fan': '<i class="fas fa-fan"></i>',
+            'play': `<i class="icon caret right"></i>`,
+            'fan': '<i class="icon fan"></i>',
             'clear': '<i class="far fa-trash-alt"></i>',
-            'paste': '<i class="fas fa-plus"></i>',
+            'paste': '<i class="icon plus"></i>',
             'plus': '<i class="fas fa-plus"></i>',
             'minus': '<i class="fas fa-minus"></i>',
-            'light': '<i class="far fa-lightbulb"></i>',
-            'square': '<i class="fas fa-vector-square"></i>',
+            'light': '<i class="icon lightbulb"></i>',
+            'square': '<i class="icon vector square"></i>',
             'link': '<i class="fas fa-link"></i>',
             'comment': '<i class="far fa-comment-dots"></i>',
             'music': '<i class="fas fa-music"></i>',
-            'save': '<i class="fas fa-save"></i>',
-            'copy': '<i class="fas fa-copy"></i>',
+            'save': '<i class="icon save"></i>',
+            'copy': '<i class="icon copy"></i>',
             'setup': '<i class="fas fa-cog"></i>',
             'settings': '<i class="icon settings"></i>',
             'thumbtack': '<i class="fas fa-thumbtack"></i>'
@@ -585,22 +587,25 @@ class UI {
     }
 
     createMobileCameraInput() {
-        var video = this.createGroup();
+        var video = this.createGroup('card');
         video.style = `outline:1px solid black;width:300px;height:300px`;
-        var qrcode = this.createGroup();
+        var qrcode = this.createGroup('card');
         qrcode.style = `width: 220px;height: 220px;`;
-        var g = this.createGroup(video, qrcode);
+        var g = this.createGroup('column');
+        g.add(video);
+        g.add(qrcode);
+
         new PeerPC(async (id, stream) => {
             let v = await this.createVideo(stream, false);
             v.style = `outline: none;
             width: 100%;
             height: 100%;`;
             video.innerHTML = '';
-            video.appendChild(v);
+            video.add(v);
         }, url => {
             let { img } = createQRCode(url);
             qrcode.innerHTML = '';
-            qrcode.appendChild(img);
+            qrcode.add(img);
         });
         return g;
     }
@@ -835,22 +840,42 @@ class UI {
         })
     }
 
-    createImageAndDownload(url, isAdd = false) {
-        return new Promise((resolve, reject) => {
-            let a = document.createElement('a');
-            a.href = encodeURI(url);
-            a.setAttribute('name', 'design-ai');
-            a.setAttribute('download', encodeURI(url));
-            this.createImage(url, false).then((im) => {
-                if (im) {
-                    a.appendChild(im);
-                    if (isAdd) this.add(a);
-                    resolve(a);
-                } else {
-                    resolve(null);
-                }
-            });
-        })
+    // 创建图片预览，并且提供下载按钮
+    createImageAndDownload(url) {
+        let u = encodeURI(url);
+        let div = document.createElement('div');
+        div.className = "ui special cards";
+        div.innerHTML = `<div class="card" style='height: fit-content;'>
+                <div class="blurring dimmable image">
+                    <div class="ui dimmer">
+                    <div class="content">
+                        <div class="center">
+                            <a class="ui inverted button" href='${u}' name='design-ai' download='design-ai'>下载</a>
+                        </div>
+                    </div>
+                    </div>
+                    <img src="${url}">
+                </div>
+            </div>`;
+        div.init=()=>$('.special.cards .image').dimmer({
+            on: 'hover'
+        });
+        return div
+        // return new Promise((resolve, reject) => {
+        //     let a = document.createElement('a');
+        //     a.href = encodeURI(url);
+        //     a.setAttribute('name', 'design-ai');
+        //     a.setAttribute('download', encodeURI(url));
+        //     this.createImage(url, false).then((im) => {
+        //         if (im) {
+        //             a.appendChild(im);
+        //             if (isAdd) this.add(a);
+        //             resolve(a);
+        //         } else {
+        //             resolve(null);
+        //         }
+        //     });
+        // })
     }
 
     /**

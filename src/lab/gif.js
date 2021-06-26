@@ -1,4 +1,5 @@
 const _GIF = require('gif.js/dist/gif');
+const fs=require('fs');
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
