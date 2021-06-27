@@ -4,6 +4,7 @@ const md5 = require('md5');
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
+const image = new(require('./image'));
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -823,21 +824,8 @@ class UI {
         return canvas
     }
     //创建图片，根据url返回图片dom
-    createImage(url, isAdd = false) {
-        return new Promise((resolve, reject) => {
-            let _img = new Image();
-            _img.src = encodeURI(url);
-            _img.className = 'opacity-background';
-            _img.onload = function () {
-                if (isAdd) this.add(_img);
-                // _img.width=_img.naturalWidth;
-                // _img.height=_img.naturalHeight;
-                resolve(_img);
-            }
-            _img.onerror = function () {
-                resolve(null);
-            }
-        })
+    createImage(url) {
+        return image.createImage(url);
     }
 
     // 创建图片预览，并且提供下载按钮

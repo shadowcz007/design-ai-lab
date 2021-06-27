@@ -3,13 +3,13 @@
 
 
 const hash = require('object-hash');
-const fs=require('fs'),path=require('path');
-const nativeImage=require('electron').nativeImage;
+const fs = require('fs'),
+    path = require('path');
+const nativeImage = require('electron').nativeImage;
 
 
 class Base {
-    constructor() {
-    }
+    constructor() {}
 
 
     hash(obj = {}) {
@@ -60,18 +60,18 @@ class Base {
 
     // 直接保存base64 为本地文件
     saveBase64(base64, filepath = null) {
-        if (filepath) {
-            let img = nativeImage.createFromDataURL(base64);
-            let extname = path.extname(filepath);
-            // console.log(filepath, extname)
-            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
-                fs.writeFileSync(filepath, img.toJPEG(80));
-            } else {
-                fs.writeFileSync(filepath, img.toPNG());
-            };
+            if (filepath) {
+                let img = nativeImage.createFromDataURL(base64);
+                let extname = path.extname(filepath);
+                // console.log(filepath, extname)
+                if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+                    fs.writeFileSync(filepath, img.toJPEG(80));
+                } else {
+                    fs.writeFileSync(filepath, img.toPNG());
+                };
+            }
         }
-    }
-    // 直接保存json 为本地文件
+        // 直接保存json 为本地文件
     saveJson(json, filepath = null) {
         if (filepath) {
             json = JSON.stringify(json);
@@ -83,6 +83,10 @@ class Base {
         };
     }
 
+    readdirSync(fileDir) {
+        let files = fs.readdirSync(fileDir);
+        return Array.from(files, f => path.join(fileDir, f));
+    }
 }
 
 module.exports = new Base();

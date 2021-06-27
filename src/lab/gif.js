@@ -1,5 +1,8 @@
 const _GIF = require('gif.js/dist/gif');
-const fs=require('fs');
+// const fs = require('fs');
+const base = require('./base');
+const image = new(require('./image'));
+
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
@@ -15,42 +18,39 @@ class GIF {
         // canvasElement imageElement
     add(elt, fps = 10) {
         this.gif.addFrame(elt, {
-            delay: 1000 / fps
+            delay: 1000 / fps,
+            copy: true
         });
     }
 
-    createImage(url) {
-        return new Promise((resolve, reject) => {
-            let _img = new Image();
-            _img.src = url;
-            _img.className = 'opacity-background';
-            _img.onload = function() {
-                resolve(_img);
-            }
-            _img.onerror = function() {
-                resolve(null);
-            }
-        })
-    }
-
-   async createGifFromUrls(urls=[]){
+    async createGifFromUrls(urls = []) {
         for (const url of urls) {
-           let im= await this.createImage(url);
-           this.gif.addFrame(im);
+            let im = await image.createImage(url);
+            this.gif.addFrame(im);
         };
-        let res=await this.render(); 
+        let res = await this.render();
         return res;
     }
 
     // 从文件夹创建 gif
-    async addFromDir(fileDir, fps = 10) {
-        let files = fs.readdirSync(fileDir);
+    async addFromDir(fileDir, scaleSeed = 1, fps = 10) {
+        let files = base.readdirSync(fileDir);
+        let tempCanvas, tempCtx;
 
         for (const f of files) {
-            let im = await this.createImage(path.join(fileDir, f));
-            if (im && im.complete) this.add(im, fps);
-        };
+            let im = await image.scaleImage(f, scaleSeed);
 
+            if (im && im.complete) {
+                if (!tempCanvas) {
+                    tempCanvas = image.createCanvasFromImage(im);
+                    tempCtx = tempCanvas.getContext('2d');
+                };
+                tempCtx.drawImage(im, 0, 0);
+                let newIm = await image.createImage(tempCanvas.toDataURL());
+                // gif.addFrame(tempCtx, {copy: true});
+                this.add(newIm, fps);
+            };
+        };
         return
     }
     render() {
@@ -66,8 +66,8 @@ class GIF {
     parseGIF = (url) => {
         return new Promise((resolve, reject) => {
             let tempCanvas = document.createElement('canvas');
-            var tempCtx = tempCanvas.getContext('2d')
-                // full gif canvas
+            var tempCtx = tempCanvas.getContext('2d');
+            // full gif canvas
             var gifCanvas = document.createElement('canvas')
             var gifCtx = gifCanvas.getContext('2d')
 
