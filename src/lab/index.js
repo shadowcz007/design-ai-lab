@@ -32,6 +32,8 @@ const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const excel=require('./excel');
 
+
+
 module.exports = {
     base: base,
     ui: new UI(),

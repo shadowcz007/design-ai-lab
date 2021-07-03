@@ -1,5 +1,6 @@
 const smartcrop = require('smartcrop');
 const base = require('./base');
+const { createApi } = require('unsplash-js');
 
 class ImageTool {
     constructor() {
@@ -35,49 +36,73 @@ class ImageTool {
             _img.src = encodeURI(url);
             // console.log(_img)
             _img.className = 'opacity-background';
-            _img.onload = function() {
+            _img.onload = function () {
                 resolve(_img);
             }
-            _img.onerror = function() {
+            _img.onerror = function () {
                 resolve(null);
             }
         })
     }
 
     scaleImage(url, scaleSeed = 1) {
-            return new Promise(async(resolve, reject) => {
-                let im = await this.createImage(url);
+        return new Promise(async (resolve, reject) => {
+            let im = await this.createImage(url);
 
-                if (im) {
-                    let canvas = this.createCanvasFromImage(im);
-                    let newCanvas = this.createCanvas(im.naturalWidth * scaleSeed, im.naturalHeight * scaleSeed);
-                    newCanvas.getContext('2d').drawImage(canvas, 0, 0, im.naturalWidth, im.naturalHeight, 0, 0, im.naturalWidth * scaleSeed, im.naturalHeight * scaleSeed);
-                    let newIm = await this.createImage(newCanvas.toDataURL());
-                    resolve(newIm);
-                } else {
-                    resolve(null);
+            if (im) {
+                let canvas = this.createCanvasFromImage(im);
+                let newCanvas = this.createCanvas(im.naturalWidth * scaleSeed, im.naturalHeight * scaleSeed);
+                newCanvas.getContext('2d').drawImage(canvas, 0, 0, im.naturalWidth, im.naturalHeight, 0, 0, im.naturalWidth * scaleSeed, im.naturalHeight * scaleSeed);
+                let newIm = await this.createImage(newCanvas.toDataURL());
+                resolve(newIm);
+            } else {
+                resolve(null);
+            }
+
+        });
+
+    }
+    //随机来张图片
+    randomPic(w = 200, h = 200) {
+        this.randomPicNum++;
+        let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
+        return url
+    }
+    // unsplash
+    getUnsplash(accessKey, count= 30) {
+        let unsplash = createApi({
+            accessKey: accessKey,
+        });
+        return new Promise((resolve, reject) => {
+            unsplash.photos.getRandom({
+                count: count,
+            }).then(result => {
+                
+                switch (result.type) {
+                    case 'error':
+                        // console.log('error occurred: ', result.errors[0]);
+                        reject(result.errors[0]);
+                    case 'success':
+                        const photo = result.response;
+                        // console.log(photo);
+                        resolve(photo);
                 }
 
             });
+        });
 
-        }
-        //随机来张图片
-    randomPic(w = 200, h = 200) {
-            this.randomPicNum++;
-            let url = `https://picsum.photos/seed/${this.randomPicNum}/${w}/${h}`;
-            return url
-        }
-        // 裁切p5的画布，用于下载
+    }
+    // 裁切p5的画布，用于下载
     cropCanvas(_canvas, x, y, w, h) {
-            let scale = _canvas.canvas.width / _canvas.width;
-            let canvas = document.createElement("canvas");
-            canvas.width = w * scale;
-            canvas.height = h * scale;
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(_canvas.canvas, x * scale, y * scale, w * scale, h * scale, 0, 0, w * scale, h * scale);
-            return canvas
-        }
-        // 返回canvas
+        let scale = _canvas.canvas.width / _canvas.width;
+        let canvas = document.createElement("canvas");
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(_canvas.canvas, x * scale, y * scale, w * scale, h * scale, 0, 0, w * scale, h * scale);
+        return canvas
+    }
+    // 返回canvas
     smartCrop(image, width, height) {
         let canvas = this.createCanvasFromImage(image);
 
@@ -134,7 +159,7 @@ class ImageTool {
             webview.src = url;
             webview.style.display = 'none';
             document.body.appendChild(webview);
-            webview.addEventListener('did-finish-load', async() => {
+            webview.addEventListener('did-finish-load', async () => {
                 await base.sleep(500);
                 let res = await webview.executeJavaScript(`
                     function downloadImage(img){
@@ -153,7 +178,7 @@ class ImageTool {
     }
 
     getNativeImageFromWebview2(url) {
-        const arrayBuffer2Base64 = function(buffer) {
+        const arrayBuffer2Base64 = function (buffer) {
             var binary = '';
             var bytes = new Uint8Array(buffer);
             var len = bytes.byteLength;

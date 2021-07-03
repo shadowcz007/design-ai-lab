@@ -293,6 +293,9 @@ class Canvas {
         }
 
     }
+    getActiveObject(){
+        return this.canvas.getActiveObject();
+    }
     setActiveObject(obj){
         this.canvas.setActiveObject(obj);
         this.render();

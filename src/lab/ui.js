@@ -193,6 +193,7 @@ class UI {
             <input type="number" placeholder="0" class='y' step='1'>
             <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">Y</div>
         </div>
+        
         <div class="ui item mini right labeled input">
             <input type="number" placeholder="0" class='w' step='1' min="0">
             <div class="ui basic label" style="min-width:3em;text-align: center;color: #9E9E9E;font-weight: 500;">W</div>
@@ -203,12 +204,14 @@ class UI {
         </div>`;
         let inx = div.querySelector('.x'),
             iny = div.querySelector('.y'),
+            // inz = div.querySelector('.z'),
             inw = div.querySelector('.w'),
             inh = div.querySelector('.h');
         div.setValue = function (arr = []) {
             let [x, y, w, h] = arr;
             inx.value = parseInt(x);
             iny.value = parseInt(y);
+            // inz.value = parseInt(z);
             inw.value = parseInt(w);
             inh.value = parseInt(h);
         };
@@ -223,6 +226,15 @@ class UI {
         });
 
         return div
+    }
+
+    createEmojiPicker() {
+        const picker = document.createElement("emoji-picker");
+        picker.className='light';
+        picker.init = (callback) => {
+            picker.addEventListener('emoji-click',callback);
+        }
+        return picker
     }
 
     // webview
@@ -255,6 +267,9 @@ class UI {
         div.layout = (type, isDev) => ly.start(type, isDev);
         if (type) div.layout(type);
         div.add = div.appendChild;
+        div.clear=()=>{
+            div.innerHTML='';
+        };
         return div;
     }
 
@@ -568,9 +583,12 @@ class UI {
     }
 
     createSelect(text = '', key, options = [], eventListener = null) {
+
         let select = document.createElement('select');
         let div = document.createElement('div');
+
         div.appendChild(select);
+        select.className = 'ui compact selection dropdown';
         options = Array.from(options, o => `<option value ="${o.value}">${o.text}</option>`)
         select.innerHTML = options.join('');
         select.addEventListener('change', e => {
@@ -583,6 +601,10 @@ class UI {
                 oe.innerText = o.text;
                 select.appendChild(oe);
             });
+        }
+        div.init = () => {
+            $('.ui.dropdown')
+                .dropdown();
         }
         return div
     }
@@ -708,7 +730,7 @@ class UI {
     //TODO 多文件的支持 当文件过大的时候，opencv需要提示
     //isMultiple=false
     // 支持缓存 cache
-    createInput(type, text = "", eventListener = null, cache = true, isAdd = true) {
+    createInput(type, text = "", eventListener = null, cache = true, isAdd = false) {
         // 用于缓存
         let key = md5(`_${type}_${text}`);
         let defaultValue = localStorage.getItem(key) || '[]';
@@ -771,7 +793,7 @@ class UI {
      * @param {*} style 
      * @param {*} isAdd 
      */
-    createTextCanvas(txt, style, isAdd = true) {
+    createTextCanvas(txt, style, isAdd = false) {
         let canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d');
         canvas.className = 'text_canvas';
@@ -845,7 +867,7 @@ class UI {
                     <img src="${url}">
                 </div>
             </div>`;
-        div.init=()=>$('.special.cards .image').dimmer({
+        div.init = () => $('.special.cards .image').dimmer({
             on: 'hover'
         });
         return div
