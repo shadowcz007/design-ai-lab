@@ -465,6 +465,9 @@ class UI {
 
         };
 
+        div.getValue=()=>{
+            return input.value;
+        };
         div.p = p;
         div.input = input;
         div.appendChild(p);
