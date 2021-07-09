@@ -44,7 +44,8 @@ module.exports = {
     FlexLayout: FlexLayout,
     Canvas: Canvas,
     Image: new Image(),
-    Color: new Color(),
+    Color: Color,
+    Wordcloud:require('wordcloud'),
     DimensionsDb: DimensionsDb,
     clipboard: new Clipboard(),
     // gif功能
@@ -56,5 +57,6 @@ module.exports = {
     Store: Store,
     Deeplab: Deeplab,
     nlp: nlp,
-    excel:excel
+    excel:excel,
+    
 };

@@ -501,6 +501,23 @@ class Canvas {
         return this.canvas.getObjects();
     }
 
+    setActiveObjectStyle(key,value){
+        let t=this.getActiveObject();
+        t.set(key,value);
+        this.render();
+    }
+
+    setActiveObjectFilterOfBlend(color='white',mode='exclusion',alpha=1){
+        let t=this.getActiveObject();
+        // TODO 修复bug
+        t.filters.push(
+            new fabric.Image.filters.BlendColor({
+                color,mode,alpha
+            })
+        );
+        this.render();
+    }
+
     exportJSON() {
         this.canvas.includeDefaultValues = false;
         return this.canvas.toJSON();

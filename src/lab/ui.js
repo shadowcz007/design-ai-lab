@@ -170,13 +170,37 @@ class UI {
 
 
     // 带按钮的输入框
-    createActionInput() {
+    createActionInput(placeholder='Search...',buttonText='Search') {
         let div = document.createElement('div');
         div.className = 'ui action input';
         div.innerHTML = `
-        <input type="text" placeholder="Search...">
-        <button class="ui button">Search</button>
+        <input type="text" placeholder="${placeholder}">
+        <button class="ui button">${buttonText}</button>
             `;
+        return div;
+    }
+
+    createTextareaInput(text,changeFn){
+        let div = document.createElement('div');
+        div.className = 'ui form';
+        div.innerHTML=`<div class="ui icon input">
+            <textarea>${text}</textarea>
+            <i class="search icon"></i>
+        </div>`;
+
+        if (changeFn) {
+            div.querySelector('textarea').addEventListener('change', e => {
+                changeFn(e);
+            });
+        };
+
+        div.getValue=function(){
+            return div.querySelector('textarea').value
+        }
+        div.setValue=function(val){
+            div.querySelector('textarea').value=val;
+        }
+
         return div;
     }
 
