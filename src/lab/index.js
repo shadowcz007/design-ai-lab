@@ -20,6 +20,7 @@ const DataGenerator = require('./datagenerator');
 const FlexLayout = require('./flexlayout');
 const Canvas = require('./canvas');
 const Image = require('./image');
+const Text = require('./text');
 const Color = require('./Color');
 const Clipboard = require('./clipboard');
 const GIF = require('./gif');
@@ -30,7 +31,7 @@ const Store = require('./store');
 const nlp = require('./nlp');
 const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
-const excel=require('./excel');
+const excel = require('./excel');
 
 
 
@@ -44,12 +45,13 @@ module.exports = {
     FlexLayout: FlexLayout,
     Canvas: Canvas,
     Image: new Image(),
+    Text: new Text(),
     Color: Color,
-    Wordcloud:require('wordcloud'),
+    Wordcloud: require('wordcloud'),
     DimensionsDb: DimensionsDb,
     clipboard: new Clipboard(),
     // gif功能
-    GIF:GIF,
+    GIF: GIF,
     screenpoint: screenpoint,
     // 轮廓
     shape: new Shape(),
@@ -57,6 +59,6 @@ module.exports = {
     Store: Store,
     Deeplab: Deeplab,
     nlp: nlp,
-    excel:excel,
-    
+    excel: excel,
+
 };
