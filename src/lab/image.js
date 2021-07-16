@@ -17,9 +17,9 @@ class ImageTool {
     }
 
     createCanvasFromImage(im) {
-        im.width = im.naturalWidth;
-        im.height = im.naturalHeight;
-        let canvas = this.createCanvas(im.width, im.height);
+        // im.width = im.naturalWidth;
+        // im.height = im.naturalHeight;
+        let canvas = this.createCanvas(im.naturalWidth,im.naturalHeight);
         let ctx = canvas.getContext('2d');
         ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
         return canvas
@@ -107,7 +107,7 @@ class ImageTool {
         let canvas = this.createCanvasFromImage(image);
 
         return new Promise((resolve, reject) => {
-            smartcrop.crop(image, { width: width, height: height }).then(result => {
+            smartcrop.crop(canvas, { width: width, height: height }).then(result => {
                 let res = this.createCanvas(width, height);
                 let ctx = res.getContext('2d');
                 ctx.drawImage(canvas,

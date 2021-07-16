@@ -2,7 +2,7 @@
 // 文件存储
 
 
-const hash = require('object-hash');
+const hash = require('object-hash'),md5=require('md5');
 const fs = require('fs'),
     path = require('path');
 const nativeImage = require('electron').nativeImage;
@@ -10,7 +10,9 @@ const nativeImage = require('electron').nativeImage;
 
 class Base {
     constructor() {}
-
+    md5(str){
+        return md5(str)
+    }
 
     hash(obj = {}) {
             return hash(obj);

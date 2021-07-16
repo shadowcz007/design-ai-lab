@@ -4,7 +4,7 @@ const md5 = require('md5');
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
-const image = new(require('./image'));
+const image = new (require('./image'));
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -47,33 +47,33 @@ class Layout {
 class UI {
 
     constructor() {
-            this.isDisplay();
-        }
-        // 取id
+        this.isDisplay();
+    }
+    // 取id
     md5(str = "") {
-            return md5(str)
-        }
-        //手动隐藏,显示p5.js
+        return md5(str)
+    }
+    //手动隐藏,显示p5.js
     p5Show(isShow = true) {
-            if (document.querySelector("#p5")) {
-                document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-                // if (isShow == false && p5.instance) p5.instance.remove();
-            };
-            if (document.querySelector('#gui-main')) {
-                document.querySelector('#gui-main').style.top = '0';
-                document.querySelector('#gui-main').style.height = '100vh';
-            }
+        if (document.querySelector("#p5")) {
+            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+            // if (isShow == false && p5.instance) p5.instance.remove();
+        };
+        if (document.querySelector('#gui-main')) {
+            document.querySelector('#gui-main').style.top = '0';
+            document.querySelector('#gui-main').style.height = '100vh';
         }
-        // GUI布局
+    }
+    // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
 
     clear() {
-            document.querySelector("#gui-main").innerHTML = "";
-        }
-        //当没有子元素的时候，隐藏，有则开启
+        document.querySelector("#gui-main").innerHTML = "";
+    }
+    //当没有子元素的时候，隐藏，有则开启
     isDisplay() {
         if (document.querySelector("#gui-main")) {
             let children = document.querySelector("#gui-main").children;
@@ -96,31 +96,31 @@ class UI {
     };
     // 模态框
     createModel(header = '', content = '') {
-            let div = document.createElement('div');
-            div.className = 'ui modal';
-            div.innerHTML = `
+        let div = document.createElement('div');
+        div.className = 'ui modal';
+        div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-            div.add = function(child, type = 'content') {
-                if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
-            };
-            div.show = function() {
-                $(div).modal('show');
-            };
-            div.hide = function() {
-                $(div).modal('hide');
-            };
-            return div
-        }
-        // 标签
+        div.add = function (child, type = 'content') {
+            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+        };
+        div.show = function () {
+            $(div).modal('show');
+        };
+        div.hide = function () {
+            $(div).modal('hide');
+        };
+        return div
+    }
+    // 标签
     createTag(text, color = 'red') {
-            let div = document.createElement('a');
-            div.className = `ui ${color} tag label`;
-            div.innerHTML = text;
-            return div
-        }
-        // 标签集
+        let div = document.createElement('a');
+        div.className = `ui ${color} tag label`;
+        div.innerHTML = text;
+        return div
+    }
+    // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
@@ -136,10 +136,10 @@ class UI {
 
     // 创建折叠菜单
     createAccordion(items = []) {
-            let div = document.createElement('div');
-            div.className = 'ui vertical accordion menu';
-            div.innerHTML = Array.from(items, i => {
-                        return `<div class="item">
+        let div = document.createElement('div');
+        div.className = 'ui vertical accordion menu';
+        div.innerHTML = Array.from(items, i => {
+            return `<div class="item">
                         <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
@@ -170,7 +170,7 @@ class UI {
 
 
     // 带按钮的输入框
-    createActionInput(placeholder='Search...',buttonText='Search') {
+    createActionInput(placeholder = 'Search...', buttonText = 'Search') {
         let div = document.createElement('div');
         div.className = 'ui action input';
         div.innerHTML = `
@@ -180,10 +180,10 @@ class UI {
         return div;
     }
 
-    createTextareaInput(text,changeFn){
+    createTextareaInput(text, changeFn) {
         let div = document.createElement('div');
         div.className = 'ui form';
-        div.innerHTML=`<div class="ui icon input">
+        div.innerHTML = `<div class="ui icon input">
             <textarea>${text}</textarea>
             <i class="search icon"></i>
         </div>`;
@@ -194,11 +194,11 @@ class UI {
             });
         };
 
-        div.getValue=function(){
+        div.getValue = function () {
             return div.querySelector('textarea').value
         }
-        div.setValue=function(val){
-            div.querySelector('textarea').value=val;
+        div.setValue = function (val) {
+            div.querySelector('textarea').value = val;
         }
 
         return div;
@@ -254,9 +254,9 @@ class UI {
 
     createEmojiPicker() {
         const picker = document.createElement("emoji-picker");
-        picker.className='light';
+        picker.className = 'light';
         picker.init = (callback) => {
-            picker.addEventListener('emoji-click',callback);
+            picker.addEventListener('emoji-click', callback);
         }
         return picker
     }
@@ -291,8 +291,8 @@ class UI {
         div.layout = (type, isDev) => ly.start(type, isDev);
         if (type) div.layout(type);
         div.add = div.appendChild;
-        div.clear=()=>{
-            div.innerHTML='';
+        div.clear = () => {
+            div.innerHTML = '';
         };
         return div;
     }
@@ -337,6 +337,15 @@ class UI {
         canvas.width = width;
         canvas.height = height;
         return canvas
+    }
+
+    createSvg(width, height) {
+        let d = document.createElement('div');
+        d.innerHTML = `<svg width="${width}" height="${height}"></svg>`;
+        // let svg = document.createElement('svg');
+        // svg.setAttribute('width',width);
+        // svg.setAttribute('height',height);
+        return d
     }
 
     // 文本
@@ -489,7 +498,7 @@ class UI {
 
         };
 
-        div.getValue=()=>{
+        div.getValue = () => {
             return input.value;
         };
         div.p = p;
@@ -797,7 +806,7 @@ class UI {
 
 
     //创建canvas，返回canvas
-    createCanvas(width, height, className, id, show = false, isAdd = true) {
+    createCanvas(width, height, className, id, show = false, isAdd = false) {
         let canvas = this.createBaseCanvas(width, height);
         if (className) canvas.className = className;
         if (id) canvas.id = id;

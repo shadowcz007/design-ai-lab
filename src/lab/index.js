@@ -33,7 +33,7 @@ const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
 
-
+// const aframe=require('aframe');
 
 module.exports = {
     base: base,
@@ -60,5 +60,8 @@ module.exports = {
     Deeplab: Deeplab,
     nlp: nlp,
     excel: excel,
-
+    ML:require('ml/lib'),
+    // aframe:aframe,
+    Zdog:require('zdog'),
+    tf:require('@tensorflow/tfjs')
 };

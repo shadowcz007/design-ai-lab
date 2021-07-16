@@ -55,6 +55,7 @@ npm start
 ```
 
 ## TODO
+- 增加缓存管理等基础功能
 - 图像搜索引擎
 - 多模态
 - [face mesh](https://github.com/shadowcz007/FaceMeshFaceGeometry)
@@ -72,6 +73,8 @@ npm start
 ## 感谢以下开源项目
 
 [@tensorflow/tfjs 3.0.0]()
+
+[ml](https://github.com/mljs/ml)
 
 [@fortawesome/fontawesome-free]()
 

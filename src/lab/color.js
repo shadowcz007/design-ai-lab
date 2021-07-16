@@ -14,16 +14,16 @@ class Color extends _Color {
     }
     // 计算主色
     // mainColor
-    getColor(_im) {
+    getColor(_im,quality=10) {
         return new Promise((resolve, reject) => {
             let color;
             try {
                 if (_im.complete) {
-                    color = colorThief.getColor(_im);
+                    color = colorThief.getColor(_im,quality);
                     resolve(color);
                 } else {
                     _im.addEventListener('load', () => {
-                        color = colorThief.getColor(_im);
+                        color = colorThief.getColor(_im,quality);
                         resolve(color);
                     });
                 };
