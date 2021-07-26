@@ -2,7 +2,7 @@
  * 导入
  * 开发
  * 导出
-*/
+ */
 
 const utils = require('./utils');
 const path = require('path');
@@ -17,12 +17,13 @@ class App {
     };
 
     // 导出
-    exportApp(poster, code = "", course = "", readme = "", size, author = "", version = "") {
+    exportApp(poster, code = "", course = "", readme = "", size, author = "", version = "", imports = []) {
         // {
         //     "poster": "demo.png",
         //     "main": "main.js",
         //     "author":"shadow",
-        //     "version":"0.1"
+        //     "version":"0.1",
+        //     "imports":[]
         // }
         let data = {
             filenames: {
@@ -35,7 +36,9 @@ class App {
             code,
             poster,
             knowledge: { course, readme },
-            author, version
+            imports,
+            author,
+            version
         };
 
         remote.dialog.showOpenDialog({
@@ -56,6 +59,7 @@ class App {
                     main: data.filenames.main,
                     knowledge: data.knowledge,
                     size: data.size,
+                    imports: data.imports,
                     author: data.author,
                     version: data.version
                 }, null, 2));
@@ -99,29 +103,33 @@ class App {
         });
     }
     loadConfig() {
-        if (!this.devConfigFile) this.loadConfigFileFromLocal();
-        if (!this.devConfigFile) return
-        let res = utils.readJsonSync(this.devConfigFile.filepath);
-        let code = utils.readFileSync(path.join(this.devConfigFile.dirname, res.main));
-        let poster = utils.readImageToBase64(path.join(this.devConfigFile.dirname, res.poster));
-        let knowledge = res.knowledge;
-        let author = res.author;
-        let version = res.version;
-        let size=res.size||[600,600];
-        let course = knowledge ? knowledge.course : '', readme = knowledge ? knowledge.readme : '';
-        return {
-            code,
-            poster,
-            size,
-            knowledge: {
-                course, readme, author,
-                version
+            if (!this.devConfigFile) this.loadConfigFileFromLocal();
+            if (!this.devConfigFile) return
+            let res = utils.readJsonSync(this.devConfigFile.filepath);
+            let code = utils.readFileSync(path.join(this.devConfigFile.dirname, res.main));
+            let poster = utils.readImageToBase64(path.join(this.devConfigFile.dirname, res.poster));
+            let knowledge = res.knowledge;
+            let author = res.author;
+            let version = res.version;
+            let size = res.size || [600, 600];
+            let course = knowledge ? knowledge.course : '',
+                readme = knowledge ? knowledge.readme : '';
+            return {
+                code,
+                poster,
+                size,
+                config: {
+                    course,
+                    readme,
+                    author,
+                    version,
+                    imports: res.imports || []
+                },
             }
         }
-    }
-    // 保存除了代码以外的信息 例如 poster,knowledge:course,readme
-    saveConfig(poster, course, readme,author,version) {
-        console.log('saveConfig', poster, course, readme,author,version)
+        // 保存除了代码以外的信息 例如 poster,knowledge:course,readme
+    saveConfig(poster, course, readme, author, version) {
+        console.log('saveConfig', poster, course, readme, author, version)
     }
 }
 

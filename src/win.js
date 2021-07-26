@@ -4,7 +4,8 @@
 
 const { remote } = require("electron");
 const runtime = require('./runtime');
-
+const fs = require('fs'),
+    path = require('path');
 
 
 class Win {
@@ -46,7 +47,7 @@ class Win {
                     this.codeFinish = true;
                     this.statusSuccess();
                 }).catch(e => {
-                    console.log(e)
+                    console.log(e, this.code)
                 })
                 // }
         });
@@ -60,7 +61,7 @@ class Win {
         });
 
 
-        this.callback=null;
+        this.callback = null;
 
     }
 
@@ -141,17 +142,17 @@ class Win {
     statusSuccess() {
         this.get(1).setTitle("更新成功");
         console.log('#JS:完成')
-        if(this.callback)this.callback('#JS:完成');
+        if (this.callback) this.callback('#JS:完成');
     }
     statusChecking() {
         this.get(1).setTitle("输入ing");
         console.log('#JS:检查中')
-        if(this.callback)this.callback('#JS:检查中');
+        if (this.callback) this.callback('#JS:检查中');
     }
     statusInjecting() {
         this.get(1).setTitle("更新ing");
         console.log('#JS:注入中');
-        if(this.callback)this.callback('#JS:注入中');
+        if (this.callback) this.callback('#JS:注入中');
     }
 
     // 检查间隔时间
@@ -222,7 +223,11 @@ class Win {
         this.isAuto = true;
     }
 
-
+    resetPreview() {
+        return this.previewWindow.loadFile(
+            path.join(__dirname, '/preview.html')
+        );
+    }
 
 };
 

@@ -10,9 +10,11 @@ const Editor = require("./editor");
 const Win = require("./win");
 const fileDb = require('./fileDb');
 const Log = require('./log');
-const utiles = require('./utils');
+const utils = require('./utils');
 
 const _package = remote.getGlobal('_PACKAGE');
+window.Win = Win;
+window.Knowledge = Knowledge;
 
 /**
  * GUI界面
@@ -34,7 +36,8 @@ class GUI {
             document.querySelector("#readme"),
             document.querySelector("#course"),
             document.querySelector("#author"),
-            document.querySelector("#version")
+            document.querySelector("#version"),
+            document.querySelector('#imports')
         );
 
 
@@ -76,8 +79,60 @@ class GUI {
 
     }
 
+    //  创建临时的preview代码，注入依赖库
+    async createPreviewHtml() {
+        let html = document.createElement('html')
+            // 预览窗口的html
+        html.innerHTML = fs.readFileSync(path.join(__dirname, '/preview.html'), 'utf-8');
+
+        let { imports } = Knowledge.get();
+
+        console.log('创建临时的preview代码，注入依赖库')
+
+        Array.from(imports, p => {
+            if (p.type == 'js') {
+                let script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = p.value;
+                html.querySelector('head').appendChild(script);
+                console.log(p)
+            };
+        });
+
+        fs.writeFileSync(path.join(__dirname, '/preview-temp.html'), html.innerHTML);
+        return new Promise(async(resolve, reject) => {
+            await utils.timeoutPromise(1000);
+            let res = await Win.previewWindow.loadFile(path.join(__dirname, '/preview-temp.html'));
+            console.log(res)
+            resolve();
+        });
+    }
+
     //生成注入的js代码
     createExecuteJs(code) {
+
+
+        // function loadJS(url) {
+        //     return new Promise((resolve, reject) => {
+        //         let isAdd = Array.from(document.querySelectorAll('script'), s => s.src)
+        //             .filter(f => f === url).length > 0;
+        //         if (isAdd <= 0) {
+        //             let script = document.createElement('script');
+        //             script.type = 'text/javascript';
+        //             script.onload = function() {
+        //                 resolve();
+        //             };
+        //             script.src = url;
+        //             document.getElementsByTagName('head')[0].appendChild(script);
+        //         } else {
+        //             resolve();
+        //         }
+        //     });
+        // };
+        // return `console.clear();
+        //     if(p5)new p5(null, 'p5');
+        //     ${code.trim()};
+        //     console.log('createExecuteJs-success');`;
         return `console.clear();
                             if (p5.instance) { p5.instance.remove() };
                             if(!document.querySelector("#p5")){
@@ -86,7 +141,7 @@ class GUI {
                                 document.body.appendChild(div);
                             };
                             document.querySelector("#p5").innerHTML = "";
-                            new p5(null, 'p5');
+                            if(p5&&typeof(p5)=='function')new p5(null, 'p5');
                             ${code.trim()};
                             if(window.gui) {
                                 document.querySelector("#gui-main").innerHTML="";
@@ -96,7 +151,7 @@ class GUI {
                                 Lab.ui.isDisplay();
                             }
                             console.log('createExecuteJs-success')
-                            `
+                            `;
     }
 
     init() {
@@ -155,6 +210,7 @@ class GUI {
         // 导入代码文件夹 - 转成 插件
         this.addClickEventListener(this.importFolderBtn, () => {
             // App.create
+            alert('开发中')
         });
 
         // 打开代码文件夹
@@ -162,14 +218,14 @@ class GUI {
         this.addClickEventListener(this.devFolderBtn, async() => {
             let res = await App.dev();
             if (res) {
-                let { code, poster, knowledge, size } = res;
+                let { code, poster, config, size } = res;
                 // console.log(res)
                 this.openFile({
                     code,
-                    knowledge,
+                    config,
                     size: size
                 });
-                this.openFilesBtn.style.display = 'none';
+                this.openFilesBtn ? this.openFilesBtn.style.display = 'none' : null;
                 this.updateDevCard();
             }
         });
@@ -267,6 +323,8 @@ class GUI {
             obj.executeJavaScript = this.createExecuteJs(Editor.getCode().trim());
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
+            let { imports } = Knowledge.get();
+            obj.imports = imports;
         };
         storage.set('app', obj, function(error) {
             if (error) throw error;
@@ -308,7 +366,7 @@ class GUI {
                 // console.log('storage', data)
                 if (error) throw error;
                 let dirname = data.data || path.join(__dirname, '../examples');
-                utiles.loadDirFiles(dirname).then(files => {
+                utils.loadDirFiles(dirname).then(files => {
                     files = files.filter(f => f.extname.match(_package.build.fileAssociations[0].ext));
                     Promise.all(Array.from(files, f => fs.readFileSync(f.filepath, 'utf-8'))).then((res) => {
                         res = Array.from(res, r => JSON.parse(r));
@@ -472,7 +530,7 @@ class GUI {
             let res = fs.readFileSync(filePath[0], 'utf-8');
             res = JSON.parse(res);
             res.filePath = filePath;
-
+            console.log('!!!!', res);
             this.openFile(res);
             Win.changeAppIcon([{
                 label: '发布',
@@ -484,8 +542,11 @@ class GUI {
 
     openFile(res) {
         // console.log('openFile', res)
-        Knowledge.set(res.knowledge);
+        Knowledge.set(res.config);
         Editor.setCode(res.code);
+
+        // 重设
+        // Win.resetPreview();
 
         // 主窗口尺寸更新
         Win.resize([300, 300], 0);
@@ -494,8 +555,12 @@ class GUI {
         Win.resize(res.size, 1);
         Win.move();
 
-        //预览窗口注入代码
-        this.previewWinExecuteJavaScript(res.code, true);
+        this.createPreviewHtml().then(async() => {
+            // console.log(res, erro)
+            await utils.timeoutPromise(500);
+            //预览窗口注入代码
+            this.previewWinExecuteJavaScript(res.code, true);
+        });
 
         // 关闭自动更新
         setTimeout(Win.stopExecuteJavaScript2Preview(), 1000);
@@ -659,9 +724,10 @@ class GUI {
         document.getElementById("editor-pannel").style.display = "none";
         document.getElementById("blank-pannel").style.display = "flex";
 
-        this.openFilesBtn.style.display = 'block';
+        this.openFilesBtn ? this.openFilesBtn.style.display = 'block' : null;
 
         //Win.showWinControl(true,false);
+        Win.resetPreview();
 
         //从默认路径，读取卡片信息
         this.exampleFiles();
@@ -802,11 +868,14 @@ class GUI {
             mainWindow.focus();
             // TODO 优化，判断是否需要重载 
             if (shouldReload) {
-                previewWindow.webContents.reload();
-                previewWindow.webContents.once('dom-ready', () => {
+                this.createPreviewHtml().then(() => {
+                    //previewWindow.webContents.reload();
+                    // previewWindow.webContents.once('dom-ready', () => {
                     this.previewWinExecuteJavaScript(null, true);
                     Win.edit();
+                    // });
                 });
+
             } else {
                 this.previewWinExecuteJavaScript(null, true);
                 Win.edit();
@@ -837,7 +906,7 @@ class GUI {
 
     // forceRun强制执行
     previewWinExecuteJavaScript(code = null, forceRun = false) {
-        // Editor.format();
+        console.log('previewWinExecuteJavaScript', forceRun)
         code = this.createExecuteJs(code || Editor.getCode());
         //Win.startExecuteJavaScript2Preview();
         // 自动更新
@@ -903,8 +972,13 @@ class GUI {
                 //移动窗口
                 Win.move();
 
-                //注入的js
-                this.previewWinExecuteJavaScript(data.code, true);
+                this.createPreviewHtml().then(async() => {
+                    // console.log(res, erro)
+                    await utils.timeoutPromise(500);
+                    //注入的js
+                    this.previewWinExecuteJavaScript(data.code, true);
+                });
+        
             });
 
         };
@@ -921,7 +995,8 @@ class GUI {
                 data.knowledge.readme,
                 data.size,
                 data.author,
-                data.version
+                data.version,
+                data.knowledge.imports
             )
         });
 

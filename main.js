@@ -30,6 +30,7 @@ global._APPICON = null;
 
 const _INDEX_HTML = path.join(__dirname, 'src/index_v2.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
+const _PRE_TEMP_HTML = path.join(__dirname, 'src/preview-temp.html');
 const _BASIC_HTML = path.join(__dirname, 'src/basic.html');
 const _READ_HTML = path.join(__dirname, 'src/read.html');
 // const _READ_HTML='https://translate.google.cn/?hl=zh-CN&tab=TT&sl=auto&tl=zh-CN&op=docs'
@@ -164,6 +165,11 @@ function createWindow(key, opts, workAreaSize) {
         }
     });
 
+    if (key == 'previewWindow' && opts.imports && opts.imports.length > 0) {
+        // TODO 
+        opts.html = _PRE_TEMP_HTML;
+    }
+
     // 加载xxx.html
     if (opts.html && opts.html.match("https://")) {
         win.loadURL(opts.html);
@@ -196,7 +202,7 @@ function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
     if (config.mainWindow) {
         config.mainWindow.height = workAreaSize.height;
-        config.mainWindow.width = parseInt(workAreaSize.width/2);
+        config.mainWindow.width = parseInt(workAreaSize.width / 2);
     };
 
     storage.get('app', function(error, data) {
@@ -207,14 +213,15 @@ function initWindow() {
         if (data && (data.status === 2 || data.status === 1)) {
             if (config.mainWindow) {
                 config.mainWindow.show = (data.status === 1);
-                config.mainWindow.width=data.mainWindow.bound.width;
-                config.mainWindow.height=data.mainWindow.bound.height;
+                config.mainWindow.width = data.mainWindow.bound.width;
+                config.mainWindow.height = data.mainWindow.bound.height;
             };
             if (config.previewWindow) {
                 config.previewWindow.show = !!data.executeJavaScript;
                 // config.previewWindow.show=true;
                 config.previewWindow.closable = true;
                 config.previewWindow.executeJavaScript = data.executeJavaScript;
+                config.previewWindow.imports = data.imports;
                 config.previewWindow.width = data.size[0];
                 config.previewWindow.height = data.size[1];
                 config.previewWindow.resizable = false;

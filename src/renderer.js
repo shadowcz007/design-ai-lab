@@ -4,7 +4,7 @@ const { ipcRenderer } = require("electron");
 const GUI = require('./gui');
 
 GUI.init();
-
+window.GUI = GUI;
 //打开文件
 ipcRenderer.on("open-file", () => GUI.openFileFn());
 //编辑/预览 切换

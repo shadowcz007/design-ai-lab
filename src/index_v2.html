@@ -48,28 +48,29 @@
             <div class="ui form">
                 <div class="inline field">
                     <label>标题</label>
-                     <input type="text" placeholder="标题" id="readme">
+                    <input type="text" placeholder="标题" id="readme">
                 </div>
                 <div class="inline field">
                     <label>作者</label>
-                     <input type="text" placeholder="作者" id="author">
+                    <input type="text" placeholder="作者" id="author">
                 </div>
                 <div class="inline field">
                     <label>版本</label>
                     <input type="text" placeholder="版本" id="version">
                 </div>
-                 <div class="inline field">
+                <div class="inline field">
                     <label>引用</label>
+                    <input type='text' placeholder="引用"  id='imports'>
                     <div class="ui action input">
-                        <input type="text" placeholder="URL...">
-                        <button class="ui button">添加</button>
+                        <input type="text" placeholder="URL..." id="importValue">
+                        <button class="ui button" id="addImport">添加</button>
                     </div>
                 </div>
-                
+
             </div>
-            
+
             <!-- <div id="readme">智能设计</div> <div id="author"></div><div id="version"></div>-->
-          
+
         </div>
         <div id="course" class="ui segment" style="outline: none;
     box-shadow: none;
@@ -89,7 +90,7 @@
                     <button id="build-code-btn" class="ui inverted yellow button medium"><i class="store icon"></i>打包</button>
                     <button id="setup-code-btn" class="ui inverted pink button medium"><i class="tools icon"></i>设置</button>
                     <button id="run-code-btn" class="ui inverted primary button medium"><i class="play icon"></i>运行</button>
-                     <button id="dev-tool-btn" class="ui inverted green button medium"><i class="play icon"></i>调试</button>
+                    <button id="dev-tool-btn" class="ui inverted green button medium"><i class="play icon"></i>调试</button>
                     <!-- <button id="practice-btn" sync-stop='1' class="ui inverted button"><i class="sync
                                 icon"></i></button> -->
                 </div>
@@ -117,7 +118,7 @@
 
     </div>
 
-    <div class="ui animated blue tertiary button" id="open-files" style='
+    <!-- <div class="ui animated blue tertiary button" id="open-files" style='
             position: fixed;
             margin-top: 32px !important;
             margin-left: 32px !important;
@@ -126,7 +127,7 @@
             left: 0;'>
         <div class="visible content"><i class="left th icon"></i></div>
         <div class="hidden content">菜单</div>
-    </div>
+    </div> -->
 
     <main id="blank-pannel">
         <div class="ui placeholder padded segment" style='height:
@@ -194,11 +195,11 @@
 
 
 </body>
-<script>
+<!-- <script>
     $('#open-files').click(() => {
         $('.ui.labeled.icon.sidebar').sidebar('toggle');
     });
-</script>
+</script> -->
 
 <script src="./renderer.js"></script>
 

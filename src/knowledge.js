@@ -12,13 +12,14 @@ const marked = require("marked");
 
 // console.log(renderer)
 class Knowledge {
-    init(readme, course,author,version) {
+    init(readme, course, author, version, imports) {
         this.readOnly = false;
         this.course = course;
         this.readme = readme;
-        this.author=author;
-        this.version=version;
-        
+        this.author = author;
+        this.version = version;
+        this.imports = imports;
+
         this.initDataAndDom();
         this.toggle(this.readOnly);
 
@@ -29,23 +30,31 @@ class Knowledge {
         this.initDataAndDomByKey('course');
         this.initDataAndDomByKey('author');
         this.initDataAndDomByKey('version');
+        this.initDataAndDomByKey('imports');
     }
 
-    initDataAndDomByKey(key='author'){
+    initDataAndDomByKey(key = 'author') {
         if (this[key] != null) {
             let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
-            this[key].setAttribute('data-md', knowledge[key] || '');
-            if(key==='course'){
+
+            if (key === 'imports') {
+                this[key].setAttribute('data-md', JSON.stringify(knowledge[key]) || '');
+            } else {
+                this[key].setAttribute('data-md', knowledge[key] || '');
+            }
+
+            if (key === 'course') {
                 this[key].innerHTML = marked(this[key].getAttribute('data-md'))
-            }else{
-                this[key].value=this[key].getAttribute('data-md');
+            } else {
+                this[key].value = this[key].getAttribute('data-md');
             };
+
             // 缓存
             this[key].addEventListener("input", e => {
                 e.preventDefault();
-                if(key==='course'){
+                if (key === 'course') {
                     this[key].setAttribute('data-md', this[key].innerText);
-                }else{
+                } else {
                     this[key].setAttribute('data-md', this[key].value);
                 };
                 localStorage.setItem("knowledge", JSON.stringify(this.get()));
@@ -65,7 +74,8 @@ class Knowledge {
             course: this.course.getAttribute('data-md'),
             readme: this.readme.getAttribute('data-md'),
             author: this.author.getAttribute('data-md'),
-            version: this.version.getAttribute('data-md')
+            version: this.version.getAttribute('data-md'),
+            imports: JSON.parse(this.imports.getAttribute('data-md'))
         };
     }
 

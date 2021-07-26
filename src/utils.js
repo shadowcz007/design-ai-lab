@@ -1,4 +1,5 @@
-const fs = require('fs'), path = require('path');
+const fs = require('fs'),
+    path = require('path');
 const mineType = require('mime-types');
 
 
@@ -9,7 +10,7 @@ function loadDirFiles(dirname) {
         fs.readdir(dirname, 'utf-8', (err, files) => {
             files = Array.from(files, f => {
                 return {
-                    dirname:dirname,
+                    dirname: dirname,
                     filepath: path.join(dirname, f),
                     filename: f,
                     extname: path.extname(f)
@@ -34,11 +35,11 @@ function readFileSync(filepath) {
     return fs.readFileSync(filepath, 'utf-8');
 }
 
-function writeFileSync(filepath,data) {
-    return fs.writeFileSync(filepath, data,'utf-8');
+function writeFileSync(filepath, data) {
+    return fs.writeFileSync(filepath, data, 'utf-8');
 }
 
-function mkdirSync(filepath){
+function mkdirSync(filepath) {
     return fs.mkdirSync(filepath)
 }
 
@@ -49,22 +50,23 @@ function readImageToBase64(filePath) {
     return 'data:' + mineType.lookup(filePath) + ';base64,' + data;
 }
 
-function writeImageFromBase64(filePath,base64) {
+function writeImageFromBase64(filePath, base64) {
     let base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
     var dataBuffer = new Buffer(base64Data, 'base64');
     fs.writeFileSync(filePath, dataBuffer);
-    return 
+    return
+}
+
+function timeoutPromise(timeout) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(false);
+        }, timeout);
+    });
 }
 
 function checkURLIsOk(url) {
 
-    let timeoutPromise = (timeout) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(false);
-            }, timeout);
-        });
-    }
     let requestPromise = (url) => {
         return fetch(url);
     };
@@ -91,5 +93,6 @@ module.exports = {
     readImageToBase64,
     writeImageFromBase64,
     mkdirSync,
-    writeFileSync
+    writeFileSync,
+    timeoutPromise
 };
