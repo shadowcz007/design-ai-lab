@@ -284,6 +284,9 @@ button:hover {
     flex: 1;
 }
 
+#editor_card{
+    min-height: 200px;
+}
 
 /* 
 #log .content {

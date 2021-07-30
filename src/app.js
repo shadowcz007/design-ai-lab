@@ -17,7 +17,7 @@ class App {
     };
 
     // 导出
-    exportApp(poster, code = "", course = "", readme = "", size, author = "", version = "", imports = []) {
+    exportApp(poster, code = "", course = "", readme = "", size, author = "", version = "") {
         // {
         //     "poster": "demo.png",
         //     "main": "main.js",
@@ -36,7 +36,7 @@ class App {
             code,
             poster,
             knowledge: { course, readme },
-            imports,
+            // imports,
             author,
             version
         };
@@ -59,7 +59,7 @@ class App {
                     main: data.filenames.main,
                     knowledge: data.knowledge,
                     size: data.size,
-                    imports: data.imports,
+                    // imports: data.imports,
                     author: data.author,
                     version: data.version
                 }, null, 2));

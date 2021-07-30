@@ -31,16 +31,66 @@ class FlexLayout {
                 root.insertChild(node2, 1);
 
                 root.calculateLayout(500, 300, Yoga.DIRECTION_LTR);
-                console.log(root.getComputedLayout());
+                // console.log(root.getComputedLayout());
                 // {left: 0, top: 0, width: 500, height: 300}
-                console.log(node1.getComputedLayout());
+                // console.log(node1.getComputedLayout());
                 // {left: 150, top: 0, width: 100, height: 100}
-                console.log(node2.getComputedLayout());
+                // console.log(node2.getComputedLayout());
                 // {left: 250, top: 0, width: 100, height: 100}
                 resolve();
             });
         });
 
+    }
+
+    createBase(width = 300, height = 300, direction = Yoga.FLEX_DIRECTION_ROW, childrenFlex = [1, 1], marginNum = 4, isMargin = true) {
+        let root = this.Node.create();
+        root.setWidth(width);
+        root.setHeight(height);
+        root.setFlexWrap(Yoga.WRAP_NO_WRAP);
+        root.setFlexDirection(direction);
+
+        let cs = [...childrenFlex];
+        Array.from(cs, (flex, i) => {
+            let node = this.Node.create();
+            node.setFlex(flex);
+
+            if (direction == Yoga.FLEX_DIRECTION_ROW) {
+
+                if (isMargin) {
+                    node.setMargin(Yoga.EDGE_LEFT, i == 0 ? 2 * marginNum : marginNum);
+                    node.setMargin(Yoga.EDGE_RIGHT, (i == (cs.length - 1)) ? 2 * marginNum : marginNum);
+                    node.setMargin(Yoga.EDGE_TOP, 2 * marginNum);
+                    node.setMargin(Yoga.EDGE_BOTTOM, 2 * marginNum);
+                } else {
+                    node.setMargin(Yoga.EDGE_LEFT, i == 0 ? 0 : marginNum);
+                    node.setMargin(Yoga.EDGE_RIGHT, (i == (cs.length - 1)) ? 0 : marginNum);
+                }
+
+            } else if (direction == Yoga.FLEX_DIRECTION_COLUMN) {
+                if (isMargin) {
+                    node.setMargin(Yoga.EDGE_TOP, i == 0 ? 2 * marginNum : marginNum);
+                    node.setMargin(Yoga.EDGE_BOTTOM, (i == (cs.length - 1)) ? 2 * marginNum : marginNum);
+                    node.setMargin(Yoga.EDGE_LEFT, 2 * marginNum);
+                    node.setMargin(Yoga.EDGE_RIGHT, 2 * marginNum);
+                } else {
+                    node.setMargin(Yoga.EDGE_TOP, i == 0 ? 0 : marginNum);
+                    node.setMargin(Yoga.EDGE_BOTTOM, (i == (cs.length - 1)) ? 0 : marginNum);
+                }
+            };
+
+            root.insertChild(node, i);
+        });
+
+        root.calculateLayout(width, height);
+
+        return Array.from(cs, (_, i) => root.getChild(i).getComputedLayout());
+
+    }
+
+    // 0水平 1 垂直
+    createGrid(width = 300, height = 300, type = 0, childrenFlex = [1, 1], marginNum = 4, isMargin = true) {
+        return this.createBase(width, height, type == 0 ? Yoga.FLEX_DIRECTION_ROW : Yoga.FLEX_DIRECTION_COLUMN, childrenFlex, marginNum, isMargin);
     }
 
     // 自动拼图

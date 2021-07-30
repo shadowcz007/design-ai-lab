@@ -47,23 +47,23 @@ class Layout {
 class UI {
 
     constructor() {
-        this.isDisplay();
+        // this.isDisplay();
     }
     // 取id
     md5(str = "") {
         return md5(str)
     }
     //手动隐藏,显示p5.js
-    p5Show(isShow = true) {
-        if (document.querySelector("#p5")) {
-            document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-            // if (isShow == false && p5.instance) p5.instance.remove();
-        };
-        if (document.querySelector('#gui-main')) {
-            document.querySelector('#gui-main').style.top = '0';
-            document.querySelector('#gui-main').style.height = '100vh';
-        }
-    }
+    // p5Show(isShow = true) {
+    //     if (document.querySelector("#p5")) {
+    //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+    //         // if (isShow == false && p5.instance) p5.instance.remove();
+    //     };
+    //     if (document.querySelector('#gui-main')) {
+    //         document.querySelector('#gui-main').style.top = '0';
+    //         document.querySelector('#gui-main').style.height = '100vh';
+    //     }
+    // }
     // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
@@ -74,18 +74,18 @@ class UI {
         document.querySelector("#gui-main").innerHTML = "";
     }
     //当没有子元素的时候，隐藏，有则开启
-    isDisplay() {
-        if (document.querySelector("#gui-main")) {
-            let children = document.querySelector("#gui-main").children;
-            if (children.length == 0) {
-                document.querySelector("#gui-main").style.display = "none";
-                document.querySelector("#p5").style.height = '100vh';
-            } else {
-                document.querySelector("#gui-main").style.display = "flex";
-                document.querySelector("#p5").style.height = '40vh';
-            }
-        }
-    }
+    // isDisplay() {
+    //     if (document.querySelector("#gui-main")) {
+    //         let children = document.querySelector("#gui-main").children;
+    //         if (children.length == 0) {
+    //             document.querySelector("#gui-main").style.display = "none";
+    //             document.querySelector("#p5").style.height = '100vh';
+    //         } else {
+    //             document.querySelector("#gui-main").style.display = "flex";
+    //             document.querySelector("#p5").style.height = '40vh';
+    //         }
+    //     }
+    // }
 
     // 创建list
     createList(list = []) {
@@ -301,7 +301,7 @@ class UI {
     add(dom) {
         if (document.querySelector("#gui-main")) {
             document.querySelector("#gui-main").appendChild(dom);
-            this.isDisplay();
+            // this.isDisplay();
         }
     }
     // toast
@@ -462,7 +462,7 @@ class UI {
             // console.log('e', e)
             if (isInput === true) return;
             isInput = true;
-            let res;
+            let res = [];
 
             if (e.target.files) {
                 res = Array.from(e.target.files, f => f.path);
@@ -478,7 +478,6 @@ class UI {
 
             // 缓存
             localStorage.setItem(key, JSON.stringify(res));
-
             div.setAttribute('data-count', res.length);
             div.setPlaceholder(res);
             if (eventListener) eventListener(res);
@@ -844,6 +843,7 @@ class UI {
         fontFamily = fontFamily || 'monospace';
 
         // 导出图片
+        canvas._toDataURL = canvas.toDataURL;
         canvas.toDataURL = function (width = 300) {
             let base64, height;
             if (canvas.width > width) {
@@ -855,7 +855,7 @@ class UI {
                 base64 = nc.toDataURL('image/png');
                 height = nc.height;
             } else {
-                base64 = canvas.toDataURL('image/png');
+                base64 = canvas._toDataURL('image/png');
                 height = canvas.height;
             };
             return base64

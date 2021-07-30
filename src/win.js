@@ -224,9 +224,7 @@ class Win {
     }
 
     resetPreview() {
-        return this.previewWindow.loadFile(
-            path.join(__dirname, '/preview.html')
-        );
+        return this.previewWindow.reload();
     }
 
 };

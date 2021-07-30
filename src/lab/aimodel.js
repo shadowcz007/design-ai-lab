@@ -9,6 +9,7 @@ const { remote } = require('electron');
 
 const humanseg = require('./humanseg');
 
+const Face=require('./face');
 
 class AI {
     constructor() {
@@ -82,6 +83,8 @@ class AI {
                 return res
             }
         };
+
+        this.face=new Face();
 
     }
 

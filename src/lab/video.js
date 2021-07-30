@@ -100,9 +100,15 @@ class FF {
         if (Array.from(['mp3'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "audio";
         if (Array.from(['gif'], t => formatName.match(t) ? 1 : null).filter(f => f).length > 0) return "gif";
     }
+    // 文件大小
+    getFileSize(filePath){
+        let stats=fs.statSync(filePath);
+        return stats.size
+    }
 
     // get the video duration
     getMediaDurationAndType(filePath) {
+        let size=this.getFileSize(filePath);
         return new Promise((resolve, reject) => {
             ffmpeg.ffprobe(filePath, (_err, metadata) => {
                 if (_err === null) {
@@ -119,7 +125,8 @@ class FF {
                         width: stream.width,
                         height: stream.height,
                         frame_rate: eval(stream.avg_frame_rate),
-                        codec_name: stream.codec_name
+                        codec_name: stream.codec_name,
+                        size
                     });
                 } else {
                     resolve(null);

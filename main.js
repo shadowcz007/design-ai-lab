@@ -165,11 +165,6 @@ function createWindow(key, opts, workAreaSize) {
         }
     });
 
-    if (key == 'previewWindow' && opts.imports && opts.imports.length > 0) {
-        // TODO 
-        opts.html = _PRE_TEMP_HTML;
-    }
-
     // 加载xxx.html
     if (opts.html && opts.html.match("https://")) {
         win.loadURL(opts.html);
@@ -189,10 +184,14 @@ function createWindow(key, opts, workAreaSize) {
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
     });
     win.on("closed", () => {
-        for (const key in global._WINS) {
-            global._WINS[key].destroy()
-        };
-        app.quit();
+        console.log('closed:',key)
+        // if(key=='mainWindow'){
+            for (const key in global._WINS) {
+                // console.log(global._WINS[key])
+                global._WINS[key].destroy()
+            };
+            app.quit();
+        // }
     });
     global._WINS[key] = win;
     return win;
@@ -443,11 +442,12 @@ app.whenReady().then(() => {
     });
     app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
+        console.log('browser-window-focus')
         // TODO 待细化,当wifi环境变化的时候
     });
 
     app.on('web-contents-created', (event, webContents) => {
-
+        console.log('web-contents-created')
     });
 })
 

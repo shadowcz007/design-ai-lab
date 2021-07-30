@@ -1,21 +1,23 @@
 const _GIF = require('gif.js/dist/gif');
 // const fs = require('fs');
 const base = require('./base');
-const image = new(require('./image'));
+const image = new (require('./image'));
 
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
-    constructor() {
-            this.gif = new _GIF({
-                workers: 4,
-                quality: 10,
-                background: 'rgba(0,0,0,0)',
-                transparent: 'rgba(0,0,0,0)',
-                workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
-            });
-        }
-        // canvasElement imageElement
+    constructor(transparent=null) {
+        // transparent hex color, 0x00FF00 = green
+        this.gif = new _GIF({
+            workers: 4,
+            quality: 10,
+            background: 'rgba(0,0,0,0)',
+            transparent: transparent,
+            // dither:'FloydSteinberg',
+            workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
+        });
+    }
+    // canvasElement imageElement
     add(elt, fps = 10) {
         this.gif.addFrame(elt, {
             delay: 1000 / fps,
@@ -23,10 +25,11 @@ class GIF {
         });
     }
 
-    async createGifFromUrls(urls = []) {
+    async createGifFromUrls(urls = [], fps = 12) {
+        // let ctx;
         for (const url of urls) {
             let im = await image.createImage(url);
-            this.gif.addFrame(im);
+            this.add(im,fps);
         };
         let res = await this.render();
         return res;
@@ -55,13 +58,19 @@ class GIF {
     }
     render() {
         return new Promise((resolve, reject) => {
-            this.gif.on('finished', function(blob) {
+            this.gif.on('finished', function (blob) {
                 resolve(URL.createObjectURL(blob));
             });
             this.gif.render();
         });
     }
 
+    download(url,name='design-ai-lab.gif'){
+        let a=document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+    }
 
     parseGIF = (url) => {
         return new Promise((resolve, reject) => {

@@ -12,13 +12,13 @@ const marked = require("marked");
 
 // console.log(renderer)
 class Knowledge {
-    init(readme, course, author, version, imports) {
+    init(readme, course, author, version) {
         this.readOnly = false;
         this.course = course;
         this.readme = readme;
         this.author = author;
         this.version = version;
-        this.imports = imports;
+        // this.imports = imports;
 
         this.initDataAndDom();
         this.toggle(this.readOnly);
@@ -30,18 +30,14 @@ class Knowledge {
         this.initDataAndDomByKey('course');
         this.initDataAndDomByKey('author');
         this.initDataAndDomByKey('version');
-        this.initDataAndDomByKey('imports');
+        // this.initDataAndDomByKey('imports');
     }
 
     initDataAndDomByKey(key = 'author') {
         if (this[key] != null) {
             let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
 
-            if (key === 'imports') {
-                this[key].setAttribute('data-md', JSON.stringify(knowledge[key]) || '');
-            } else {
-                this[key].setAttribute('data-md', knowledge[key] || '');
-            }
+            this[key].setAttribute('data-md', knowledge[key] || '');
 
             if (key === 'course') {
                 this[key].innerHTML = marked(this[key].getAttribute('data-md'))
@@ -75,7 +71,7 @@ class Knowledge {
             readme: this.readme.getAttribute('data-md'),
             author: this.author.getAttribute('data-md'),
             version: this.version.getAttribute('data-md'),
-            imports: JSON.parse(this.imports.getAttribute('data-md'))
+            // imports: JSON.parse(this.imports.getAttribute('data-md'))
         };
     }
 

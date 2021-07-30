@@ -21,6 +21,9 @@ class Editor {
         this.card = card;
         this.container.appendChild(this.card);
     }
+    clearCard(){
+       if(this.card) this.card.innerHTML='';
+    }
     updateCard(card) {
         // console.log(!this.card)
         if (!this.card) { this.initCard(card) } else {
