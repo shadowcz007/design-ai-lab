@@ -33,9 +33,6 @@ mkcert.createCA({
 
 
 // const { remote } = require("electron");
-
-
-
 // 远程的peerjs服务
 const defaultHost = {
     host: 'mixlab.top',

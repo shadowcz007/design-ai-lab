@@ -123,8 +123,8 @@ class GUI {
 
         return `console.clear();
             ${code.trim()};
-                // console.log(window.gui,gui)
-                if(window.gui||gui) {
+                // console.log(window.gui)
+                if(window.gui) {
                     document.querySelector("#gui-main").innerHTML="";
                     // console.log(Object.is(window.Lab,undefined)?3000:100)
                     gui();
