@@ -360,7 +360,7 @@ class GUI {
                 if (error) throw error;
                 let dirname = data.data || path.join(__dirname, '../examples');
                 utils.loadDirFiles(dirname).then(files => {
-                    files = files.filter(f => f.extname.match(_package.build.fileAssociations[0].ext));
+                    files = files.filter(f => f.extname.match(_package.fileAssociations[0].ext));
                     Promise.all(Array.from(files, f => fs.readFileSync(f.filepath, 'utf-8'))).then((res) => {
                         res = Array.from(res, r => JSON.parse(r));
                         resolve(res);
@@ -396,7 +396,7 @@ class GUI {
                     //预览窗口尺寸
                     size: previewWindow.getSize(),
                     //文件类型
-                    extname: _package.build.fileAssociations[0].ext,
+                    extname: _package.fileAssociations[0].ext,
                     //版本
                     version: knowledgeJson.version,
                     package_version: _package.version,
@@ -513,7 +513,7 @@ class GUI {
             title: "打开……",
             properties: ['openFile'],
             filters: [
-                { name: _package.build.fileAssociations[0].name, extensions: ['json', _package.build.fileAssociations[0].ext] }
+                { name: _package.fileAssociations[0].name, extensions: ['json', _package.fileAssociations[0].ext] }
             ]
         });
         if (filePath) {
