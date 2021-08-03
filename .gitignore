@@ -43,6 +43,7 @@ src/renderer.prod.js.map
 # src/style.css.map
 dist
 dll
+out
 
 
 .idea

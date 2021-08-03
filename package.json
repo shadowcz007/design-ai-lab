@@ -4,10 +4,14 @@
     "description": "智能设计实验工具 \nArtificial Intelligence for Design",
     "main": "main.js",
     "scripts": {
-        "start": "electron .",
-        "dev": "NODE_ENV=development electron .",
-        "pack": "electron-builder --dir",
-        "dist": "electron-builder --macos --windows"
+        "start": "electron-forge start",
+        "dev": "NODE_ENV=development electron-forge start",
+        "package": "electron-forge package",
+        "make": "electron-forge make",
+        "make:win32": "electron-forge make --arch x64 --platform win32",
+        "make:darwin": "electron-forge make --arch x64 --platform darwin",
+        "publish": "electron-forge publish",
+        "lint": "echo \"No linting configured\""
     },
     "homepage": "https://github.com/shadowcz007/design-ai-lab/",
     "repository": "https://github.com/shadowcz007/design-ai-lab.git",
@@ -21,14 +25,38 @@
     ],
     "author": "shadow",
     "license": "MIT",
-    "devDependencies": {
-        "electron": "^11.4.1",
-        "electron-builder": "^22.10.5"
-    },
     "engines": {
         "node": ">=14.7"
     },
+    "config": {
+        "forge": {
+            "packagerConfig": {},
+            "makers": [
+                {
+                    "name": "@electron-forge/maker-squirrel",
+                    "config": {
+                        "name": "design_ai_lab_new"
+                    }
+                },
+                {
+                    "name": "@electron-forge/maker-zip",
+                    "platforms": [
+                        "darwin"
+                    ]
+                },
+                {
+                    "name": "@electron-forge/maker-deb",
+                    "config": {}
+                },
+                {
+                    "name": "@electron-forge/maker-rpm",
+                    "config": {}
+                }
+            ]
+        }
+    },
     "dependencies": {
+        "electron-squirrel-startup": "^1.0.0",
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@ffprobe-installer/ffprobe": "^1.1.0",
         "@fortawesome/fontawesome-free": "^5.15.3",
@@ -85,18 +113,13 @@
         "yoga-layout-wasm": "^1.9.3-alpha.7",
         "zdog": "^1.1.2"
     },
-    "build": {
-        "appId": "mixlab.designailab",
-        "mac": {
-            "category": "shadow.app.design.ai.lab"
-        },
-        "win": {
-            "target": [
-                {
-                    "target": "nsis"
-                }
-            ]
-        }
+    "devDependencies": {
+        "@electron-forge/cli": "^6.0.0-beta.59",
+        "@electron-forge/maker-deb": "^6.0.0-beta.59",
+        "@electron-forge/maker-rpm": "^6.0.0-beta.59",
+        "@electron-forge/maker-squirrel": "^6.0.0-beta.59",
+        "@electron-forge/maker-zip": "^6.0.0-beta.59",
+        "electron": "13.1.7"
     },
     "fileAssociations": [
         {

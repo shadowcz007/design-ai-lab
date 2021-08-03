@@ -151,7 +151,7 @@ function createWindow(key, opts, workAreaSize) {
             //开启nodejs支持
             nodeIntegration: opts.nodeIntegration,
             // webSecurity: !opts.nodeIntegration,
-            // contextIsolation: !opts.nodeIntegration,
+            contextIsolation: !opts.nodeIntegration,
             //开启AI功能
             experimentalFeatures: true,
             //开启渲染进程调用remote
@@ -184,13 +184,13 @@ function createWindow(key, opts, workAreaSize) {
         opts.executeJavaScript ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
     });
     win.on("closed", () => {
-        console.log('closed:',key)
-        // if(key=='mainWindow'){
-            for (const key in global._WINS) {
-                // console.log(global._WINS[key])
-                global._WINS[key].destroy()
-            };
-            app.quit();
+        console.log('closed:', key)
+            // if(key=='mainWindow'){
+        for (const key in global._WINS) {
+            // console.log(global._WINS[key])
+            global._WINS[key].destroy()
+        };
+        app.quit();
         // }
     });
     global._WINS[key] = win;
@@ -443,7 +443,7 @@ app.whenReady().then(() => {
     app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
         console.log('browser-window-focus')
-        // TODO 待细化,当wifi环境变化的时候
+            // TODO 待细化,当wifi环境变化的时候
     });
 
     app.on('web-contents-created', (event, webContents) => {
