@@ -23,7 +23,7 @@ function initSprite() {
         spriteIndex: 0,
         frameTime: 50,
 
-        initialize: function (element, options) {
+        initialize: function(element, options) {
             options || (options = {});
 
             this.spriteWidth = this.spriteWidth || this.width;
@@ -37,13 +37,13 @@ function initSprite() {
             this.createSpriteImages();
         },
 
-        createTmpCanvas: function () {
+        createTmpCanvas: function() {
             this.tmpCanvasEl = fabric.util.createCanvasElement();
             this.tmpCanvasEl.width = this.spriteWidth;
             this.tmpCanvasEl.height = this.spriteHeight;
         },
 
-        createSpriteImages: function () {
+        createSpriteImages: function() {
             this.spriteImages = [];
 
             var steps = this._element.width / this.spriteWidth;
@@ -52,7 +52,7 @@ function initSprite() {
             }
         },
 
-        createSpriteImage: function (i) {
+        createSpriteImage: function(i) {
             var tmpCtx = this.tmpCanvasEl.getContext('2d');
             tmpCtx.clearRect(0, 0, this.tmpCanvasEl.width, this.tmpCanvasEl.height);
             tmpCtx.drawImage(this._element, -i * this.spriteWidth, 0);
@@ -65,13 +65,13 @@ function initSprite() {
             this.spriteImages.push(tmpImg);
         },
 
-        _render: function (ctx) {
+        _render: function(ctx) {
             ctx.drawImage(
                 this.spriteImages[this.spriteIndex], -this.width / 2, -this.height / 2
             );
         },
 
-        play: function () {
+        play: function() {
             var _this = this;
             this.animInterval = setInterval(() => {
                 _this.onPlay && _this.onPlay();
@@ -83,13 +83,13 @@ function initSprite() {
             }, this.frameTime);
         },
 
-        stop: function () {
+        stop: function() {
             clearInterval(this.animInterval);
         }
     });
 
-    fabric.Sprite.fromURL = function (url, callback, imgOptions) {
-        fabric.util.loadImage(url, function (img) {
+    fabric.Sprite.fromURL = function(url, callback, imgOptions) {
+        fabric.util.loadImage(url, function(img) {
             imgOptions.spriteWidth = imgOptions.spriteWidth || imgOptions.width;
             imgOptions.spriteHeight = imgOptions.spriteHeight || imgOptions.height;
             let s = new fabric.Sprite(img, imgOptions);
@@ -105,7 +105,7 @@ function initSprite() {
 class Canvas {
     constructor(width = 300, height = 300, isStatic = false, isZoom = false) {
         if (!global.fabric) {
-            const { fabric } = require('fabric');
+            const { fabric } = require('../../lib/fabric.min.js');
             global.fabric = fabric;
             initSprite();
             this.fabric = fabric;
@@ -157,7 +157,7 @@ class Canvas {
                 // console.log(opt)
             })
 
-            this.canvas.on('object:removed',opt => {
+            this.canvas.on('object:removed', opt => {
                 if (this.onRemoved) this.onRemoved(opt);
                 // console.log(opt)
             });
@@ -166,7 +166,7 @@ class Canvas {
 
         // 扩充的方法 
         // 获取缩放后的 坐标及宽高
-        fabric.Rect.prototype.getScaledBound = function () {
+        fabric.Rect.prototype.getScaledBound = function() {
             return {
                 left: this.left,
                 top: this.top,
@@ -175,7 +175,7 @@ class Canvas {
             }
         }
 
-        fabric.Canvas.prototype.toggleDragMode = function (dragMode) {
+        fabric.Canvas.prototype.toggleDragMode = function(dragMode) {
             // Remember the previous X and Y coordinates for delta calculations
             let lastClientX;
             let lastClientY;
@@ -188,7 +188,7 @@ class Canvas {
                 // Set the cursor to 'move'
                 this.defaultCursor = 'move';
                 // Loop over all objects and disable events / selectable. We remember its value in a temp variable stored on each object
-                this.forEachObject(function (object) {
+                this.forEachObject(function(object) {
                     object.prevEvented = object.evented;
                     object.prevSelectable = object.selectable;
                     object.evented = false;
@@ -197,7 +197,7 @@ class Canvas {
                 // Remove selection ability on the canvas
                 this.selection = false;
                 // When MouseUp fires, we set the state to idle
-                this.on('mouse:up', function (e) {
+                this.on('mouse:up', function(e) {
                     state = STATE_IDLE;
                 });
                 // When MouseDown fires, we set the state to panning
@@ -232,7 +232,7 @@ class Canvas {
                 });
             } else {
                 // When we exit dragmode, we restore the previous values on all objects
-                this.forEachObject(function (object) {
+                this.forEachObject(function(object) {
                     object.evented = (object.prevEvented !== undefined) ? object.prevEvented : object.evented;
                     object.selectable = (object.prevSelectable !== undefined) ? object.prevSelectable : object.selectable;
                 });
@@ -293,10 +293,10 @@ class Canvas {
         }
 
     }
-    getActiveObject(){
+    getActiveObject() {
         return this.canvas.getActiveObject();
     }
-    setActiveObject(obj){
+    setActiveObject(obj) {
         this.canvas.setActiveObject(obj);
         this.render();
     }
@@ -338,11 +338,11 @@ class Canvas {
     }
     addImg(imageElement, style, selectable = true, hasControls = false) {
         style = Object.assign({
-            // lockMovementX: true,
-            // lockRotation: true,
-            // lockScalingX: true,
-            // lockScalingY: true,
-        },
+                // lockMovementX: true,
+                // lockRotation: true,
+                // lockScalingX: true,
+                // lockScalingY: true,
+            },
             style || {}
         );
         delete style.type;
@@ -395,7 +395,7 @@ class Canvas {
     }
 
     addAndResizeImage(imageElement, style, type = 0, selectable = true) {
-        style = { ...style };
+        style = {...style };
         let { left, top, width, height } = style;
         // type 类型
         // 宽度缩放对齐
@@ -501,18 +501,20 @@ class Canvas {
         return this.canvas.getObjects();
     }
 
-    setActiveObjectStyle(key,value){
-        let t=this.getActiveObject();
-        t.set(key,value);
+    setActiveObjectStyle(key, value) {
+        let t = this.getActiveObject();
+        t.set(key, value);
         this.render();
     }
 
-    setActiveObjectFilterOfBlend(color='white',mode='exclusion',alpha=1){
-        let t=this.getActiveObject();
+    setActiveObjectFilterOfBlend(color = 'white', mode = 'exclusion', alpha = 1) {
+        let t = this.getActiveObject();
         // TODO 修复bug
         t.filters.push(
             new fabric.Image.filters.BlendColor({
-                color,mode,alpha
+                color,
+                mode,
+                alpha
             })
         );
         this.render();
@@ -524,7 +526,7 @@ class Canvas {
     }
 
     // zoom 会影响截图 
-    toDataURL(bound = { left: 0, top: 0 },multiplier = 2, format = 'png') {
+    toDataURL(bound = { left: 0, top: 0 }, multiplier = 2, format = 'png') {
         let res = this.canvas.toDataURL({
             format: format,
             multiplier: multiplier,
@@ -536,9 +538,9 @@ class Canvas {
         return res
     }
 
-    exportImage(mainBoard,multiplier = 2, format = 'png') {
+    exportImage(mainBoard, multiplier = 2, format = 'png') {
         this.zoomToFitCanvas();
-        return this.toDataURL(mainBoard.getBoundingRect(),multiplier, format);
+        return this.toDataURL(mainBoard.getBoundingRect(), multiplier, format);
     }
 
     reset() {
@@ -598,15 +600,15 @@ class Canvas {
 
     // 动图
     promisedGif(gifURL) {
-        return new Promise((resolve, reject) => {
-            fetch(gifURL)
-                .then(resp => resp.arrayBuffer())
-                .then(buff => parseGIF(buff))
-                .then(gif => decompressFrames(gif, true))
-                .then(resolve);
-        });
-    }
-    // 
+            return new Promise((resolve, reject) => {
+                fetch(gifURL)
+                    .then(resp => resp.arrayBuffer())
+                    .then(buff => parseGIF(buff))
+                    .then(gif => decompressFrames(gif, true))
+                    .then(resolve);
+            });
+        }
+        // 
     imageData2canvas(imageData) {
         let canvas = document.createElement('canvas');
         canvas.width = imageData.width;

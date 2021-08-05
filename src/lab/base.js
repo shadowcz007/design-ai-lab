@@ -1,32 +1,34 @@
 //主要完成html的一些基本的操作
 // 文件存储
 
-
-const hash = require('object-hash'), md5 = require('md5');
+const { spawn } = require('child_process');
+const hash = require('object-hash'),
+    md5 = require('md5');
 const fs = require('fs'),
     path = require('path');
 const nativeImage = require('electron').nativeImage;
+const { resolve } = require('path');
 
 
 class Base {
-    constructor() { }
+    constructor() {}
     md5(str) {
         return md5(str)
     }
 
     hash(obj = {}) {
-        return hash(obj);
-    }
-    // 
+            return hash(obj);
+        }
+        // 
     sleep = m => new Promise(r => setTimeout(r, m));
 
     shuffle(arr) {
         let arrNew = [...arr];
         //用Math.random()函数生成0~1之间的随机数与0.5比较，返回-1或1
-        const randomsort = function (a, b) {
-            return Math.random() > .5 ? -1 : 1;
-        }
-        // var arr = [1, 2, 3, 4, 5];
+        const randomsort = function(a, b) {
+                return Math.random() > .5 ? -1 : 1;
+            }
+            // var arr = [1, 2, 3, 4, 5];
         return arrNew.sort(randomsort);
     }
 
@@ -63,18 +65,18 @@ class Base {
 
     // 直接保存base64 为本地文件
     saveBase64(base64, filepath = null) {
-        if (filepath) {
-            let img = nativeImage.createFromDataURL(base64);
-            let extname = path.extname(filepath);
-            // console.log(filepath, extname)
-            if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
-                fs.writeFileSync(filepath, img.toJPEG(80));
-            } else {
-                fs.writeFileSync(filepath, img.toPNG());
-            };
+            if (filepath) {
+                let img = nativeImage.createFromDataURL(base64);
+                let extname = path.extname(filepath);
+                // console.log(filepath, extname)
+                if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
+                    fs.writeFileSync(filepath, img.toJPEG(80));
+                } else {
+                    fs.writeFileSync(filepath, img.toPNG());
+                };
+            }
         }
-    }
-    // 直接保存json 为本地文件
+        // 直接保存json 为本地文件
     saveJson(json, filepath = null) {
         if (filepath) {
             json = JSON.stringify(json);
@@ -99,7 +101,7 @@ class Base {
      * @return {Boolean}    true / false 成功与否
      * loadFromUrl('js','http://cdn.bootcss.com/jquery/2.1.1/jquery.min.js');
      */
-    loadFromUrl(fileType='js',src) {
+    loadFromUrl(fileType = 'js', src) {
         // 获取head节点
         let head = document.head || document.getElementsByTagName('head')[0];
 
@@ -148,6 +150,38 @@ class Base {
 
 
     }
+
+    // 暂时不推荐使用
+    npmRun(cmd) {
+        let dependencies = (JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))).dependencies;
+        console.log(dependencies);
+
+        return new Promise((resolve, reject) => {
+            if (cmd) {
+                cmd = cmd.trim();
+                cmd = cmd.split(" ");
+                if (cmd[0] == 'npm') {
+                    //打印脚本的输出
+                    const subprocess = spawn('npm', cmd.slice(1, cmd.length));
+                    subprocess.stdout.on('data', (data) => {
+                        console.log(`data:${data}`);
+                    });
+                    subprocess.stderr.on('data', (data) => {
+                        console.log(`error:${data}`);
+                    });
+                    subprocess.stderr.on('close', () => {
+                        console.log("Closed");
+                        let dependenciesNew = (JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))).dependencies;
+                        console.log(dependenciesNew);
+                        resolve();
+                    });
+                }
+            }
+        });
+
+    }
+
+
 }
 
 

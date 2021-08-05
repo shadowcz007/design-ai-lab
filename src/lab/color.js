@@ -1,6 +1,6 @@
-const colorThief = new (require('colorthief/dist/color-thief.umd'))();
+// console.log(__dirname)
+const colorThief = new(require('../../lib/color-thief.umd.js'))();
 let _Color = require('color');
-
 class Color extends _Color {
     // constructor(arg) {
     //     super(arg);
@@ -9,11 +9,11 @@ class Color extends _Color {
 
     // rgb转字符串
     colorStr(c = [0, 0, 0]) {
-        // console.log(c)
-        return `rgb(${c.join(',')})`;
-    }
-    // 计算主色
-    // mainColor
+            // console.log(c)
+            return `rgb(${c.join(',')})`;
+        }
+        // 计算主色
+        // mainColor
     getColor(_im, quality = 10) {
         return new Promise((resolve, reject) => {
             let color;
@@ -44,7 +44,7 @@ class Color extends _Color {
                     color = colorThief.getPalette(_im, num);
                     resolve(color);
                 } else {
-                    _im.addEventListener('load', function () {
+                    _im.addEventListener('load', function() {
                         color = colorThief.getPalette(_im, num);
                         resolve(color);
                     });

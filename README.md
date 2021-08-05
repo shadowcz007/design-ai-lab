@@ -49,9 +49,9 @@ git clone https://github.com/shadowcz007/design-ai-lab.git
 # Go into the repository
 cd design-ai-lab
 # Install dependencies
-npm install
+yarn install
 # Run the app
-npm start
+yarn start
 ```
 
 ## TODO
