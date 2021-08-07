@@ -41,18 +41,9 @@ class GUI {
 
 
         /**
-             * 编辑器对象
-             * 
-                检查编辑器 写的代码 本身的错误
-                TODO 对预设库的调用，比如cv的兼容
-                是否是p5的代码
-                runtime.isP5Function(code);
-                let preRun = ['preload', 'setup', 'draw'];
-                preRun会不断执行;
-
-                每次代码改变的时候，都会重新加载
-                Editor.onDidChangeModelContent=openPractice;
-        */
+         * 编辑器对象
+         * 
+         */
 
         Editor.init(
             document.querySelector("#editor"),
@@ -77,35 +68,6 @@ class GUI {
 
 
     }
-
-    //  创建临时的preview代码，注入依赖库
-    // async createPreviewHtml() {
-    //     let html = document.createElement('html')
-    //     // 预览窗口的html
-    //     html.innerHTML = fs.readFileSync(path.join(__dirname, '/preview.html'), 'utf-8');
-
-    //     let { imports } = Knowledge.get();
-
-    //     console.log('创建临时的preview代码，注入依赖库')
-
-    //     Array.from(imports, p => {
-    //         if (p.type == 'js') {
-    //             let script = document.createElement('script');
-    //             script.type = 'text/javascript';
-    //             script.src = p.value;
-    //             html.querySelector('head').appendChild(script);
-    //             console.log(p)
-    //         };
-    //     });
-
-    //     fs.writeFileSync(path.join(__dirname, '/preview-temp.html'), html.innerHTML);
-    //     return new Promise(async (resolve, reject) => {
-    //         await utils.timeoutPromise(1000);
-    //         let res = await Win.previewWindow.loadFile(path.join(__dirname, '/preview-temp.html'));
-    //         console.log(res)
-    //         resolve();
-    //     });
-    // }
 
     //生成注入的js代码
     createExecuteJs(code) {
@@ -300,14 +262,6 @@ class GUI {
 
     }
 
-    // 把代码文件夹转为插件格式
-    // buildApp(){
-    //     // poster, code="", course="", readme="",size,author="",version=""
-
-    //     // App.exportApp
-    // }
-
-
     //保存窗口状态
     // 0 主窗口 1 主窗口 预览窗口 2 预览窗口
     saveWindowsStatus(status = 0) {
@@ -414,68 +368,9 @@ class GUI {
 
     async updateDevCard() {
         let res = await this.getSaveFileContent();
-        // let readme = $('#knowledge-pannel #readme').val(),
-        //     course = $('#knowledge-pannel #course').text(),
-        //     author= $('#knowledge-pannel #author').val(),
-        //     version= $('#knowledge-pannel #version').val();
-        // App.saveConfig(null, course, readme,author,version);
         let card = this.createConfigCard(res);
         Editor.updateCard(card);
-        // window.Editor=Editor;
     }
-
-    /**
-     * devtool
-     */
-    // closeDevTool() {
-    //     document.getElementById("devtools").style.display = "none";
-    //     document.getElementById("frame").style.height = "100%";
-    //     Win.get(1).closeDevTools();
-    // }
-    // openDevTool(inner = true) {
-    //     const devtoolsView = document.getElementById("devtools");
-    //     Win.get(1).openDevTools({
-    //         activate: inner,
-    //         mode: 'undocked'
-    //     });
-    //     if (inner == true) return;
-    //     const port = remote.getGlobal('_DEBUG_PORT');
-    //     fetch(`http://127.0.0.1:${port}/json/list?t=` + new Date().getTime()).then(res => res.json()).then(
-    //         res => {
-    //             let target = res.filter(r => r.url === Win.get(1).getURL());
-    //             if (target[0]) {
-
-    //                 devtoolsView.setAttribute("src", `http://127.0.0.1:${port}${target[0].devtoolsFrontendUrl}`);
-    //                 //devtoolsView.setAttribute("src", Win.get(1).devToolsWebContents.getURL());
-
-    //                 devtoolsView.addEventListener('did-finish-load', e => {
-    //                     // const { webContents } = remote.webContents;
-
-    //                     const browser = Win.get(1).webContents;
-    //                     const devtools = remote.webContents.fromId(devtoolsView.getWebContentsId());
-
-    //                     browser.setDevToolsWebContents(devtools);
-    //                     browser.openDevTools();
-
-    //                     document.getElementById("devtools").style.display = "flex";
-    //                     if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
-    //                     this.resizer = new Resizer('#frame', {
-    //                         grabSize: 10,
-    //                         resize: 'vertical',
-    //                         handle: 'bar'
-    //                     });
-
-    //                     // console.log('====21=====', this.resizer)
-
-    //                 });
-    //                 devtoolsView.addEventListener('did-fail-load', event => {
-    //                     console.log(event)
-    //                 })
-
-    //             }
-    //         }
-    //     )
-    // }
 
     openPreviewDev() {
         let wv = Win.get(1);
@@ -668,12 +563,13 @@ class GUI {
     saveFileFn() {
         this.getSaveFileContent().then(res => {
             let filename = res.title.trim();
-            let filePath = remote.dialog.showSaveDialogSync({
-                title: "另存为……",
-                defaultPath: (filename === '' ? '未命名' : filename) + '.' + res.extname
-            });
+            filename = filename === '' ? '未命名' : filename
+
+            let filePath = path.join(__dirname, `../examples/${filename}.${res.extname}`);
+
             if (filePath) {
-                res.title = path.basename;
+                // res.title = path.basename;
+                // console.log(res.title)
                 fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
                     if (err) console.error(err);
                     console.log("保存成功");

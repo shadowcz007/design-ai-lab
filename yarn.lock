@@ -5530,6 +5530,11 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "https://mirrors.cloud.tencent.com/npm/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
+isomorphic-ws@4.0.1:
+  version "4.0.1"
+  resolved "http://mirrors.cloud.tencent.com/npm/isomorphic-ws/-/isomorphic-ws-4.0.1.tgz#55fd4cd6c5e6491e76dc125938dd863f5cd4f2dc"
+  integrity sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==
+
 isstream@~0.1.2:
   version "0.1.2"
   resolved "http://mirrors.cloud.tencent.com/npm/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
@@ -7715,6 +7720,14 @@ os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "http://mirrors.cloud.tencent.com/npm/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
+
+osc-js@^2.1.2:
+  version "2.1.2"
+  resolved "http://mirrors.cloud.tencent.com/npm/osc-js/-/osc-js-2.1.2.tgz#3517bf585e8d2406e673efcd1cf8a2e17ffef400"
+  integrity sha512-bu1sT1VMc39SB/OCZITd/qUWisj8/5nLObQphgHY+mX7rkyJhIiYZENkMPbBohKy6PCEU1/aCW7Kuot+Vi666Q==
+  dependencies:
+    isomorphic-ws "4.0.1"
+    ws "7.4.2"
 
 osenv@^0.1.4:
   version "0.1.5"
@@ -10137,6 +10150,11 @@ write-file-atomic@^2.4.2:
     graceful-fs "^4.1.11"
     imurmurhash "^0.1.4"
     signal-exit "^3.0.2"
+
+ws@7.4.2:
+  version "7.4.2"
+  resolved "http://mirrors.cloud.tencent.com/npm/ws/-/ws-7.4.2.tgz#782100048e54eb36fe9843363ab1c68672b261dd"
+  integrity sha512-T4tewALS3+qsrpGI/8dqNMLIVdq/g/85U98HPMa6F0m6xTbvhXU6RCQLqPH3+SlomNV/LdY6RXEbBpMH6EOJnA==
 
 ws@^7.2.3:
   version "7.5.3"
