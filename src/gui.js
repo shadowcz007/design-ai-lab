@@ -134,7 +134,7 @@ class GUI {
         this.pageNumInfo = document.querySelector('#page-num-info');
 
         // app管理
-        this.importFolderBtn = document.querySelector('#import-folder-btn');
+        // this.importFolderBtn = document.querySelector('#import-folder-btn');
         this.devFolderBtn = document.querySelector('#dev-folder-btn');
 
         // 记录是app =0 还是历史= 1
@@ -164,10 +164,10 @@ class GUI {
         });
 
         // 导入代码文件夹 - 转成 插件
-        this.addClickEventListener(this.importFolderBtn, () => {
-            // App.create
-            alert('开发中')
-        });
+        // this.addClickEventListener(this.importFolderBtn, () => {
+        //     // App.create
+        //     alert('开发中')
+        // });
 
         // 打开代码文件夹
         // TODO 扩展参数

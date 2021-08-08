@@ -31,8 +31,7 @@
     "config": {
         "forge": {
             "packagerConfig": {},
-            "makers": [
-                {
+            "makers": [{
                     "name": "@electron-forge/maker-squirrel",
                     "config": {
                         "name": "design_ai_lab_new"
@@ -58,7 +57,9 @@
     "dependencies": {
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@ffprobe-installer/ffprobe": "^1.1.0",
+        "fluent-ffmpeg": "^2.1.2",
         "@fortawesome/fontawesome-free": "^5.15.3",
+        "fomantic-ui": "^2.8.7",
         "@hapi/hapi": "^20.1.2",
         "@node-rs/jieba": "^1.2.0",
         "@paddlejs-models/humanseg": "0.0.5",
@@ -77,8 +78,6 @@
         "emoji-picker-element": "^1.6.0",
         "espree": "^7.3.1",
         "exceljs": "^4.2.1",
-        "fluent-ffmpeg": "^2.1.2",
-        "fomantic-ui": "^2.8.7",
         "gif.js": "^0.2.0",
         "gifuct-js": "^2.1.1",
         "idb-kv-store": "^4.5.0",
@@ -120,12 +119,10 @@
         "@electron-forge/maker-zip": "^6.0.0-beta.59",
         "electron": "13.1.7"
     },
-    "fileAssociations": [
-        {
-            "ext": "designlabplugin",
-            "name": "DesignLab File",
-            "role": "Editor",
-            "perMachine": true
-        }
-    ]
+    "fileAssociations": [{
+        "ext": "designlabplugin",
+        "name": "DesignLab File",
+        "role": "Editor",
+        "perMachine": true
+    }]
 }
