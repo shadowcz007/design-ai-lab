@@ -1,7 +1,7 @@
 {
     "name": "design-ai-lab",
     "version": "0.1.2",
-    "description": "智能设计实验工具 \nArtificial Intelligence for Design",
+    "description": "Artificial Intelligence Toolbox for Design hacker",
     "main": "main.js",
     "scripts": {
         "start": "electron-forge start",
@@ -10,8 +10,7 @@
         "make": "electron-forge make",
         "make:win32": "electron-forge make --arch x64 --platform win32",
         "make:darwin": "electron-forge make --arch x64 --platform darwin",
-        "publish": "electron-forge publish",
-        "lint": "echo \"No linting configured\""
+        "publish": "electron-forge publish"
     },
     "homepage": "https://github.com/shadowcz007/design-ai-lab/",
     "repository": "https://github.com/shadowcz007/design-ai-lab.git",
@@ -19,7 +18,7 @@
     "keywords": [
         "Javascript",
         "Tensorflow.js",
-        "p5.js",
+        "Creative Code",
         "Design.ai Lab",
         "Code Examples"
     ],
@@ -57,9 +56,7 @@
     "dependencies": {
         "@ffmpeg-installer/ffmpeg": "^1.0.20",
         "@ffprobe-installer/ffprobe": "^1.1.0",
-        "fluent-ffmpeg": "^2.1.2",
         "@fortawesome/fontawesome-free": "^5.15.3",
-        "fomantic-ui": "^2.8.7",
         "@hapi/hapi": "^20.1.2",
         "@node-rs/jieba": "^1.2.0",
         "@paddlejs-models/humanseg": "0.0.5",
@@ -78,6 +75,9 @@
         "emoji-picker-element": "^1.6.0",
         "espree": "^7.3.1",
         "exceljs": "^4.2.1",
+        "face-api.js": "^0.22.2",
+        "fluent-ffmpeg": "^2.1.2",
+        "fomantic-ui": "^2.8.7",
         "gif.js": "^0.2.0",
         "gifuct-js": "^2.1.1",
         "idb-kv-store": "^4.5.0",
@@ -103,7 +103,6 @@
         "smartcrop": "^2.0.3",
         "socket.io": "^4.0.0",
         "socket.io-client": "^4.0.0",
-        "spatial-db": "0.0.25",
         "sweetalert2": "^10.15.7",
         "timeago.js": "^4.0.2",
         "unsplash-js": "^7.0.12",

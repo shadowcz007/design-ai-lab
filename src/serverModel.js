@@ -5,6 +5,7 @@ const U2net = require('./server/u2net');
 const Mobilenet = require('./server/mobilenet');
 const Posenet = require('./server/posenet');
 const Bodypix = require('./server/bodypix');
+const Face = require('./server/face');
 
 
 const u2net = new U2net();
@@ -16,6 +17,8 @@ const bodypix = new Bodypix();
 
 const mobilenet = new Mobilenet();
 mobilenet.init();
+
+const face = new Face();
 
 async function u2netDrawSegment(base64) {
     let im = await createImage(base64);
@@ -33,9 +36,9 @@ async function mobilenetClassify(base64) {
     let im = await createImage(base64);
     return mobilenet.classify(im);
 }
-async function mobilenetInfer(base64,embedding=true) {
+async function mobilenetInfer(base64, embedding = true) {
     let im = await createImage(base64);
-    return mobilenet.infer(im,embedding);
+    return mobilenet.infer(im, embedding);
 }
 
 async function estimatePose(base64) {

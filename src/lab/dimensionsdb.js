@@ -1,7 +1,7 @@
 const { remote } = require('electron');
 const path = require('path');
 const hash = require('object-hash');
-const SpatialDb = require('spatial-db');
+// const SpatialDb = require('spatial-db');
 
 const dataPath = remote.getGlobal('_DBPATH');
 
@@ -11,7 +11,7 @@ const dataPath = remote.getGlobal('_DBPATH');
 class DimensionsDb {
     constructor(name = 'dimensions-db', n = 5) {
         //create new spatial-db with 5 dimensions
-        this.db = new SpatialDb(path.join(dataPath, name), n);
+        // this.db = new SpatialDb(path.join(dataPath, name), n);
     }
 
 }

@@ -6,7 +6,7 @@ const internalIp = require('internal-ip');
 const host = internalIp.v4.sync();
 // const utils = require('./utils');
 
-const _IMG_SIZE=320;
+const _IMG_SIZE = 320;
 
 // u2net
 class U2net {

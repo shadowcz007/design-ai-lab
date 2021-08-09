@@ -145,6 +145,17 @@ function doReq(req, res) {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/x-binary' });
         res.end(fs.readFileSync(path.join(__dirname, '../model/bodypix/weights.bin')));
+    } else if (reqUrlBase.match(/\/face-api-weights\/.*shard/ig)) {
+        // 模型
+        // console.log(reqUrlBase)
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(
+            path.join(__dirname, '../model/face-api-weights/' + path.basename(reqUrlBase))
+        ));
+    } else if (reqUrlBase.match(/\/face-api-weights\/.*\.json/ig)) {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(fs.readFileSync(path.join(__dirname, '../model/face-api-weights/' + path.basename(reqUrlBase))));
     }
 
 }
