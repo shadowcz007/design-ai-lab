@@ -91,6 +91,14 @@ const coco_classes = [
 
 class YoloV3 {
 
+     //单例
+     static getInstance() {
+        if (!YoloV3.instance) {
+            YoloV3.instance = new YoloV3();
+        }
+        return YoloV3.instance;
+    }
+
     /**
     * @param {nObject} number of maximum object to recognize in one detection
     * @param {scoreTh} score threshold
@@ -105,6 +113,7 @@ class YoloV3 {
         this.labels = coco_classes;
         this.nClass = coco_classes.length;
         this.url = `http://${host}/yolov3${isTiny === true ? '-tiny' : ''}/model.json`;
+        this.load();
     }
 
     /**
@@ -123,7 +132,7 @@ class YoloV3 {
         };
         this.ready = true;
         console.log(info, features)
-
+        return 
         // if (progressFn) progressFn(info)
     }
 
@@ -275,4 +284,4 @@ class YoloV3 {
 }
 
 
-module.exports = YoloV3;
+module.exports = YoloV3.getInstance();

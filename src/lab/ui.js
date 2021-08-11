@@ -308,6 +308,10 @@ class UI {
     toast(text) {
         Swal.fire(text);
     }
+    // toast(text){
+    //     $('body').toast({message:'Great!'});
+    // }
+    // 
     // loading
     loading(n = 0) {
         if (!this.loadingElement) {

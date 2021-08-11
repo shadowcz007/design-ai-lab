@@ -74,8 +74,12 @@
         </div>
         <div id="course" class="ui segment" style="outline: none;
     box-shadow: none;
-    border: none;">
+    border: none;height: 200px;
+    overflow-y: scroll;">
             <p>- 工具箱</p>
+        </div>
+        <div class="actions">
+            <div class="ui button" id="model-confirm-btn">确认</div>
         </div>
     </div>
 
@@ -130,65 +134,58 @@
     </div> -->
 
     <main id="blank-pannel">
-        <div class="ui placeholder padded segment" style='height:
+        <div class="ui sizer vertical segment">
+            <p></p>
+            <div style='padding: 1em 3em;'>
+                <div class="ui huge header" >工具箱</div>
+                <p></p>
+                <h2 class="ui sub header">TOOLS BOX</h2>
+                <span id="toolsbox-nums">1</span>
+            </div>
+            <p></p>
+            <div style='margin: 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    padding-right: 2em;'>
+                <!--<button class="large ui button" id="import-folder-btn">导入</button>-->
+                <button class="ui compact icon button disabled">
+                <i class="refresh icon"></i>
+                </button>
+
+                <button class="ui compact icon button" id="new-folder-btn">
+                <i class="folder outline icon"></i>
+                </button>
+                
+                <button class="ui compact labeled icon button"  id="dev-folder-btn">
+                    <i class="folder open outline icon"></i>开发
+                </button>
+ 
+            </div>
+            <p></p>
+            <div class="ui placeholder padded segment" style='height:
                 100vh;margin: 0;
                 flex-direction: row;'>
-            <div class="ui one column doubling stackable grid container">
-                <div class="middle aligned column">
-                    <div class="ui basic buttons segment">
-                        <!--<button class="large ui button" id="import-folder-btn">
-                                导入
-                            </button>-->
-                        <button class="large ui button" id="dev-folder-btn">
-                                开发
-                            </button>
+                <div class="ui one column doubling stackable grid container" style='min-width: 80%;'>
+                    <div class="middle aligned column">
+                        <div class="ui relaxed divided list" id="recent-files" style='min-width: 320px;'></div>
                     </div>
-                    <div class="ui cards" id="recent-files">
+                </div>
 
-                        <!--
-                        <div class="card">
-                            <div class="content">
-                                <img class="right floated mini ui image" src="/images/avatar/large/jenny.jpg">
-                                <div class="header">
-                                    Jenny Hess
-                                </div>
-                                <div class="meta">
-                                    New Member
-                                </div>
-                                <div class="description">
-                                    Jenny wants to add you to the group <b>best friends</b>
-                                </div>
-                            </div>
-                            <div class="extra content">
-                                <div class="ui two buttons">
-                                    <div class="ui basic green button">运行</div>
-                                    <div class="ui basic red button">编辑</div>
-                                </div>
-                            </div>
-                        </div> -->
-                    </div>
-
-                    <div class="ui basic buttons segment">
+            </div>
+            <p></p>
+            <div class="ui basic buttons segment">
                         <button class="ui labeled icon button" id="pre-page-btn">
-                                <i class="left chevron icon"></i>
-                                上一页
-                            </button>
+                                <i class="left chevron icon"></i>上一页
+                        </button>
                         <button class="ui compact icon disabled button" id="page-num-info">
                                 共99
-                            </button>
+                        </button>
                         <button class="ui right labeled icon button" id="next-page-btn">
-                                下一页
-                                <i class="right chevron icon"></i>
-                            </button>
-                    </div>
-
-
-                </div>
+                                下一页<i class="right chevron icon"></i>
+                        </button>
             </div>
-
         </div>
-
-
 
     </main>
 

@@ -103,31 +103,28 @@ class App {
         });
     }
     loadConfig() {
-            if (!this.devConfigFile) this.loadConfigFileFromLocal();
-            if (!this.devConfigFile) return
-            let res = utils.readJsonSync(this.devConfigFile.filepath);
-            let code = utils.readFileSync(path.join(this.devConfigFile.dirname, res.main));
-            let poster = utils.readImageToBase64(path.join(this.devConfigFile.dirname, res.poster));
-            let knowledge = res.knowledge;
-            let author = res.author;
-            let version = res.version;
-            let size = res.size || [600, 600];
-            let course = knowledge ? knowledge.course : '',
-                readme = knowledge ? knowledge.readme : '';
-            return {
-                code,
-                poster,
-                size,
-                config: {
-                    course,
-                    readme,
-                    author,
-                    version,
-                    imports: res.imports || []
-                },
-            }
+        if (!this.devConfigFile) this.loadConfigFileFromLocal();
+        if (!this.devConfigFile) return
+        let res = utils.readJsonSync(this.devConfigFile.filepath);
+        let code = utils.readFileSync(path.join(this.devConfigFile.dirname, res.main));
+        let poster = utils.readImageToBase64(path.join(this.devConfigFile.dirname, res.poster));
+        let { knowledge, author, version } = res;
+        let size = res.size || [600, 600];
+        let course = knowledge ? knowledge.course : '',
+            readme = knowledge ? knowledge.readme : '';
+        return {
+            code,
+            poster,
+            size,
+            config: {
+                course,
+                readme,
+                author,
+                version
+            },
         }
-        // 保存除了代码以外的信息 例如 poster,knowledge:course,readme
+    }
+    // 保存除了代码以外的信息 例如 poster,knowledge:course,readme
     saveConfig(poster, course, readme, author, version) {
         console.log('saveConfig', poster, course, readme, author, version)
     }

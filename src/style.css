@@ -234,10 +234,8 @@ button:hover {
 #knowledge-pannel {
     display: none;
     min-height: 200px;
-    height: calc(90vh - 24px);
     width: 70%;
     min-width: 240px;
-    /* background-color: white; */
 }
 
 #editor-pannel {
@@ -262,8 +260,9 @@ button:hover {
 }
 
 #editor {
-    /* width: calc(50% - 4px);*/
-    /* padding: 6em; */
+    width: 60%;
+    background: white;
+    padding: 0 24px;
 }
 
 .resizer {
@@ -285,7 +284,7 @@ button:hover {
 }
 
 #editor_card{
-    min-height: 200px;
+    min-height:160px
 }
 
 /* 

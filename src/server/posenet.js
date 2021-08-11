@@ -27,6 +27,7 @@ class Posenet {
         this.url = `http://${host}/posenet/model.json`;
 
         utils.checkURLIsOk(this.url).then(status => {
+            
             let opts = {
                 architecture: 'MobileNetV1',
                 outputStride: 16,
@@ -40,6 +41,7 @@ class Posenet {
 
             model.then(async(net) => {
                 this.model = net;
+                console.log('estimateSinglePose',net);
                 let c = document.createElement('canvas');
                 c.width = 1;
                 c.height = 1;
@@ -51,7 +53,7 @@ class Posenet {
                     backend: tf.getBackend(),
                     time: (new Date()).getTime() - t1
                 };
-                console.log(info, pose);
+                console.log('estimateSinglePose',info, pose);
                 this.ready = true;
                 if (progressFn) progressFn(info)
             });
@@ -197,4 +199,4 @@ class Posenet {
 }
 
 
-module.exports = Posenet;
+module.exports = Posenet.getInstance();

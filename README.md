@@ -114,6 +114,9 @@ websock在iphone上建立连接失败，在mac和pc和安卓都是好的
 - 系统文件类型注册
 暂时没找到方案
 
+- electron node-gyp 编译问题
+暂时把一些需要再次编译的依赖包去掉了。
+
 - 打包应用的方法
 node v14.17.4
 打包win应用需要安装
@@ -123,3 +126,5 @@ brew install --cask wine-stable
 ```
 sudo npm install -g @electron-forge/cli --unsafe-perm=true --allow-root
 ```
+
+- 如果安装不上，可以试试把yarn.lock删掉，再装

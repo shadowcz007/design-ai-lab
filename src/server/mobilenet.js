@@ -7,6 +7,15 @@ const host = internalIp.v4.sync();
 const utils = require('../utils');
 
 class Mobilenet {
+
+    //单例
+    static getInstance() {
+        if (!Mobilenet.instance) {
+            Mobilenet.instance = new Mobilenet();
+        }
+        return Mobilenet.instance;
+    }
+
     constructor(opts) {
         this.IMAGE_SIZE = 224;
         this.savePathHead = 'indexeddb://Mobilenet_';
@@ -17,6 +26,7 @@ class Mobilenet {
         utils.checkURLIsOk(this.url).then(status => {
             if (status) this.opts.modelUrl = `http://${host}/mobilenet_v2/model.json`;
             this.initSavePath(this.opts);
+            this.init();
         });
 
     }
@@ -74,4 +84,4 @@ class Mobilenet {
     }
 
 }
-module.exports = Mobilenet;
+module.exports = Mobilenet.getInstance();

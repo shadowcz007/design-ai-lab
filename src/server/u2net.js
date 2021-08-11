@@ -113,4 +113,4 @@ class U2net {
     }
 }
 
-module.exports = U2net;
+module.exports = U2net.getInstance();

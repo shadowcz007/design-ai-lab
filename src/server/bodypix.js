@@ -90,4 +90,4 @@ class Bodypix {
 }
 
 
-module.exports = Bodypix;
+module.exports = Bodypix.getInstance();

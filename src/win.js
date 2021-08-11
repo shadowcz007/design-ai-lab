@@ -4,9 +4,6 @@
 
 const { remote } = require("electron");
 const runtime = require('./runtime');
-const fs = require('fs'),
-    path = require('path');
-
 
 class Win {
     constructor() {
@@ -17,7 +14,7 @@ class Win {
         // 代码
         this.code = "";
         // 是否已注入
-        this.codeFinish = false;
+        this.codeFinish = true;
 
         // 自动更新
         this.isAuto = true;
@@ -26,30 +23,15 @@ class Win {
         this.workAreaSize = remote.screen.getPrimaryDisplay().workAreaSize;
         this.previewWindow = (remote.getGlobal("_WINS")).previewWindow;
         this.mainWindow = (remote.getGlobal("_WINS")).mainWindow;
-        // this.previewWindow.webContents.on('context-menu', (event, params) => {
-        //     console.log('context-menu', event, params)
-        // })
-        // 用来优化console的显示消息
-        // this.previewWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
-        //     console.log('console-message', event, level, message, line, sourceId)
-        // })
-
-        // this.previewWindow.webContents.on('did-start-loading', () => {
-        //     this.runCodeOnce = false;
-        // });
 
         // 监听加载事件，然后注入代码
         this.previewWindow.webContents.on('did-finish-load', () => {
-            // if (this.codeFinish === false) {
-            // this.codeFinish = true;
-            // this.codeId = null;
-            this.previewWindow.webContents.executeJavaScript(this.code, false).then(() => {
-                    this.codeFinish = true;
-                    this.statusSuccess();
-                }).catch(e => {
-                    console.log(e, this.code)
-                })
-                // }
+            if (this.codeFinish === false) this.previewWindow.webContents.executeJavaScript(this.code, false).then(() => {
+                this.codeFinish = true;
+                this.statusSuccess();
+            }).catch(e => {
+                console.log(e, this.code)
+            })
         });
         // 当preview窗口崩溃的时候
         this.previewWindow.webContents.on('render-process-gone', (event, details) => {
@@ -60,9 +42,7 @@ class Win {
             console.log('unresponsive', event, details);
         });
 
-
         this.callback = null;
-
     }
 
     edit() {
@@ -81,21 +61,21 @@ class Win {
         let win = this.get(whichWin);
         // res.size
         if (size) {
-            this.show(whichWin, true);
+            // this.show(whichWin, true);
             win.setSize(...size);
         };
     }
     move(t = 'topRight', whichWin = 1) {
-            let win = this.get(whichWin);
-            let size = win.getSize();
-            if (t === 'topRight') {
-                let x = this.workAreaSize.width - size[0],
-                    y = 0;
-                win.setPosition(x, y);
-            }
+        let win = this.get(whichWin);
+        let size = win.getSize();
+        if (t === 'topRight') {
+            let x = this.workAreaSize.width - size[0],
+                y = 0;
+            win.setPosition(x, y);
         }
-        //仅显示主窗口,
-        //仅显示预览窗口
+    }
+    //仅显示主窗口,
+    //仅显示预览窗口
     showWinControl(mShow = true, pShow = true) {
         this.show(0, mShow);
         this.show(1, pShow);
@@ -141,61 +121,59 @@ class Win {
 
     statusSuccess() {
         this.get(1).setTitle("更新成功");
-        console.log('#JS:完成')
+        // console.log('#JS:完成')
         if (this.callback) this.callback('#JS:完成');
     }
     statusChecking() {
         this.get(1).setTitle("输入ing");
-        console.log('#JS:检查中')
+        // console.log('#JS:检查中')
         if (this.callback) this.callback('#JS:检查中');
     }
     statusInjecting() {
         this.get(1).setTitle("更新ing");
-        console.log('#JS:注入中');
+        // console.log('#JS:注入中');
         if (this.callback) this.callback('#JS:注入中');
     }
 
     // 检查间隔时间
     checkTime() {
-            let previewWindow = this.get(1);
-            let n = window.performance.now();
-            // 统计时间间隔
-            this.exTimes.push(Math.abs(n - this.executeJSNow));
-            // 计算时间间隔的平均值
-            let ts = this.exTimes.slice(this.exTimes.length - 10, this.exTimes.length)
+        let previewWindow = this.get(1);
+        let n = window.performance.now();
+        // 统计时间间隔
+        this.exTimes.push(Math.abs(n - this.executeJSNow));
+        // 计算时间间隔的平均值
+        let ts = this.exTimes.slice(this.exTimes.length - 10, this.exTimes.length)
 
-            let setTime = 4000 - Math.min(ts.reduce((a, b) => a + b) / ts.length, 3000);
-            console.log(
-                ts.reduce((a, b) => a + b) / ts.length,
-                `间隔较短 ${setTime, Math.abs(n - this.executeJSNow) < setTime}`,
-                `this.codeFinish ${this.codeFinish}`);
+        let setTime = 4000 - Math.min(ts.reduce((a, b) => a + b) / ts.length, 3000);
+        console.log(
+            ts.reduce((a, b) => a + b) / ts.length,
+            `间隔较短 ${setTime, Math.abs(n - this.executeJSNow) < setTime}`,
+            `this.codeFinish ${this.codeFinish}`);
 
-            if (this.codeFinish === true) return this.statusSuccess();
+        if (this.codeFinish === true) return this.statusSuccess();
 
-            if (Math.abs(n - this.executeJSNow) < setTime) {
-                // 间隔较短
-                this.statusChecking();
-                setTimeout(() => {
-                    this.checkTime(n);
-                }, setTime);
-            } else {
-                // console.log("间隔时间可以")
-                this.show(1, true);
-                if (!previewWindow.webContents.isLoading() && this.codeFinish === false) {
-                    this.statusInjecting();
-                    previewWindow.webContents.reload();
-                } else {
-                    this.statusSuccess();
-                }
-            }
+        if (Math.abs(n - this.executeJSNow) < setTime) {
+            // 间隔较短
+            this.statusChecking();
+            setTimeout(() => {
+                this.checkTime();
+            }, setTime);
+        } else {
+            // console.log("间隔时间可以")
+            // this.show(1, true);
+            if (!previewWindow.webContents.isLoading() && this.codeFinish === false) {
+                this.statusInjecting();
+                previewWindow.webContents.reload();
+            };
         }
-        //注入代码
+    }
+    //注入代码
     executeJavaScript2Preview(code, forceRun = false) {
         if (this.isAuto === false && forceRun === false) return;
         let isNew = false;
         let id = runtime.hash(code);
-        console.log('executeJavaScript2Preview', this.codeId, id)
-            //上次一次代码的记录
+        console.log('executeJavaScript2Preview-forceRun', forceRun)
+        //上次一次代码的记录
         if (!this.codeId) {
             this.codeId = id;
             isNew = true;
@@ -206,7 +184,8 @@ class Win {
             }
         };
 
-        if (isNew === true) {
+        console.log('isNew', isNew, this.codeFinish)
+        if (isNew === true && this.codeFinish === true) {
             this.codeFinish = false;
             this.codeId = id;
             this.code = code;
@@ -225,6 +204,12 @@ class Win {
 
     resetPreview() {
         return this.previewWindow.reload();
+    }
+
+    capturePage(w = 1) {
+        let win = this.get(w);
+        //截图
+        return win.webContents.capturePage();
     }
 
 };

@@ -1,0 +1,26 @@
+<html lang='en'>
+ 
+<head>
+  <script src='node_modules/gibber.audio.lib/dist/gibber.audio.js'></script> 
+</head>
+ 
+<body><p>click window to begin.</p></body>
+ 
+<script>
+ 
+  window.onclick = function() {
+    console.log('click')
+    Gibber.init({
+        workletPath:'node_modules/gibber.audio.lib/dist/gibberish_worklet.js'
+    }).then( () => {
+        console.log('init')
+      const syn = Synth()
+      syn.note.seq( [0,1], 1/4 )
+ 
+      window.onclick = null
+    })
+  }
+ 
+</script> 
+ 
+</html>
