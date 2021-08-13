@@ -35,7 +35,9 @@ class Knowledge {
 
     initDataAndDomByKey(key = 'author') {
         if (this[key] != null) {
-            let knowledge = JSON.parse(localStorage.getItem("knowledge") || "{}");
+            let knowledge = localStorage.getItem("knowledge");
+            if (!knowledge.match("{")) knowledge = "{}";
+            knowledge = JSON.parse(knowledge);
 
             this[key].setAttribute('data-md', knowledge[key] || '');
 

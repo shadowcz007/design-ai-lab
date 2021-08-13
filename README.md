@@ -126,5 +126,3 @@ brew install --cask wine-stable
 ```
 sudo npm install -g @electron-forge/cli --unsafe-perm=true --allow-root
 ```
-
-- 如果安装不上，可以试试把yarn.lock删掉，再装

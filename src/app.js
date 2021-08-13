@@ -8,6 +8,7 @@ const utils = require('./utils');
 const path = require('path');
 
 const { remote } = require('electron');
+const { resolve } = require('path');
 
 class App {
     constructor() {
@@ -41,34 +42,59 @@ class App {
             version
         };
 
-        remote.dialog.showOpenDialog({
-            properties: ['openDirectory', 'createDirectory']
-        }).then(async result => {
-            if (result.canceled === false && result.filePaths && result.filePaths[0]) {
-                let dirname = path.join(result.filePaths[0], data.filenames.filename + '_v' + data.version);
-                // console.log(data,result.filePaths[0],dirname)
-                // 新建文件夹
-                utils.mkdirSync(dirname);
-                // 保存main.js
-                utils.writeFileSync(path.join(dirname, data.filenames.main), data.code);
-                // 保存poster图片到本地
-                utils.writeImageFromBase64(path.join(dirname, data.filenames.poster), data.poster);
-                // 保存config.json
-                utils.writeFileSync(path.join(dirname, data.filenames.config), JSON.stringify({
-                    poster: data.filenames.poster,
-                    main: data.filenames.main,
-                    knowledge: data.knowledge,
-                    size: data.size,
-                    // imports: data.imports,
-                    author: data.author,
-                    version: data.version
-                }, null, 2));
+        return new Promise((resolve, reject) => {
+            remote.dialog.showOpenDialog({
+                properties: ['openDirectory', 'createDirectory']
+            }).then(async result => {
+                if (result.canceled === false && result.filePaths && result.filePaths[0]) {
+                    let dirname = path.join(result.filePaths[0], data.filenames.filename + '_v' + data.version);
+                    // console.log(data,result.filePaths[0],dirname)
+                    let isNew = true;
+                    if (utils.existsSync(dirname)) {
+                        // 文件夹存在
+                        // resolve({ dirname });
+                        const cid = remote.dialog.showMessageBoxSync({
+                            title: "覆盖文件夹",
+                            message: "文件夹已存在，即将覆盖",
+                            buttons: ["覆盖", "取消"],
+                            type: "error",//图标类型
+                        });
+                        if (cid === 0) {
+                            isNew = false;
+                        }else if(cid===1){
+                            // 取消
+                            resolve(null);
+                        }
+                    };
 
-            };
-        }).catch(err => {
-            console.log(err);
-            // resolve(null);
+                    // 新建文件夹
+                    if (isNew === true) utils.mkdirSync(dirname);
+
+                    // 保存main.js
+                    utils.writeFileSync(path.join(dirname, data.filenames.main), data.code);
+                    // 保存poster图片到本地
+                    utils.writeImageFromBase64(path.join(dirname, data.filenames.poster), data.poster);
+                    // 保存config.json
+                    utils.writeFileSync(path.join(dirname, data.filenames.config), JSON.stringify({
+                        poster: data.filenames.poster,
+                        main: data.filenames.main,
+                        knowledge: data.knowledge,
+                        size: data.size,
+                        // imports: data.imports,
+                        author: data.author,
+                        version: data.version
+                    }, null, 2));
+                    resolve({ dirname });
+                } else {
+                    resolve(null);
+                }
+
+            }).catch(err => {
+                console.log(err);
+                resolve(null);
+            })
         })
+
 
     }
 
@@ -86,20 +112,27 @@ class App {
                 properties: ['openDirectory']
             }).then(async result => {
                 if (result.canceled === false && result.filePaths && result.filePaths[0]) {
-                    let files = await utils.loadDirFiles(result.filePaths[0]);
-                    // console.log(files)
-                    let configFile = files.filter(f => f.filename === 'config.json')[0]
-                    if (configFile) {
-                        this.setConfigFile(configFile);
-                        // console.log(this.devConfigFile)
-                        const res = this.loadConfig();
-                        resolve(res);
-                    }
+                    const res = this.loadConfigFromDir(result.filePaths[0])
+                    resolve(res);
                 };
             }).catch(err => {
                 console.log(err);
                 resolve(null);
             })
+        });
+    }
+    loadConfigFromDir(dirname) {
+        return new Promise(async (resolve, reject) => {
+            let files = await utils.loadDirFiles(dirname);
+            // console.log(files)
+            let configFile = files.filter(f => f.filename === 'config.json')[0]
+            if (configFile) {
+                this.setConfigFile(configFile);
+                const res = this.loadConfig();
+                // 把本地开发的路径带上
+                res.devPath=dirname;
+                resolve(res);
+            }
         });
     }
     loadConfig() {

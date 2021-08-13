@@ -43,6 +43,10 @@ function mkdirSync(filepath) {
     return fs.mkdirSync(filepath)
 }
 
+function existsSync(filepath){
+    return fs.existsSync(filepath);
+}
+
 function readImageToBase64(filePath) {
     if (!fs.existsSync(filePath)) return;
     let data = fs.readFileSync(filePath);
@@ -52,7 +56,7 @@ function readImageToBase64(filePath) {
 
 function writeImageFromBase64(filePath, base64) {
     let base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
-    var dataBuffer = new Buffer(base64Data, 'base64');
+    var dataBuffer = Buffer.from(base64Data, 'base64');
     fs.writeFileSync(filePath, dataBuffer);
     return
 }
@@ -94,5 +98,6 @@ module.exports = {
     writeImageFromBase64,
     mkdirSync,
     writeFileSync,
+    existsSync,
     timeoutPromise
 };

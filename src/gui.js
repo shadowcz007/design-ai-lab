@@ -59,7 +59,7 @@ class GUI {
         Win.callback = async (t) => {
             await this.updateDevCard();
             Editor.updateStatus(t);
-            console.log(t,this.mShow, this.pShow);
+            console.log(t, this.mShow, this.pShow);
             if (t == '#JS:完成') Win.showWinControl(this.mShow, this.pShow);
         };
 
@@ -166,43 +166,52 @@ class GUI {
 
         });
 
-        this.addClickEventListener(this.modelConfirmBtn,async e => {
+        this.addClickEventListener(this.modelConfirmBtn, async e => {
             let data = await this.createSaveFileContent();
-            App.exportApp(
+            let size = [400, 400];
+
+            let exRes = await App.exportApp(
                 data.poster,
                 data.code,
                 data.knowledge.course,
                 data.knowledge.readme,
-                [400,400],
+                size,
                 data.author,
                 data.version
-            )
+            );
+
+            if (exRes) {
+                let { dirname } = exRes;
+                let res = await App.loadConfigFromDir(dirname);
+                // console.log(res)
+
+                if (res) {
+                    this.devPath = dirname;
+                    this.openDevCard(res)
+                };
+
+            };
             $('#knowledge-pannel').modal('hide');
+
         })
 
-        this.addClickEventListener()
+        // this.addClickEventListener()
         // 打开代码文件夹
         // TODO 扩展参数
         this.addClickEventListener(this.devFolderBtn, async () => {
             let res = await App.dev();
             if (res) {
-                let { code, poster, config, size } = res;
-                this.openFile({
-                    code,
-                    config,
-                    size: size
-                });
-                this.openFilesBtn ? this.openFilesBtn.style.display = 'none' : null;
-                this.updateDevCard();
-            }
+                this.devPath = res.devPath;
+                this.openDevCard(res)
+            };
         });
 
         // 运行一次
         this.addClickEventListener(this.runBtn, () => {
             let res = App.loadConfig();
             if (res) {
-                this.mShow=true;
-                this.pShow=true;
+                this.mShow = true;
+                this.pShow = true;
                 let { code } = res;
                 Editor.setCode(code);
                 Win.startExecuteJavaScript2Preview();
@@ -273,6 +282,18 @@ class GUI {
             }
         });
 
+    }
+
+    // 打开开发文件
+    openDevCard(res) {
+        let { code, config, size } = res;
+        this.openFile({
+            code,
+            config,
+            size: size
+        });
+        this.openFilesBtn ? this.openFilesBtn.style.display = 'none' : null;
+        this.updateDevCard();
     }
 
     //保存窗口状态
@@ -381,7 +402,7 @@ class GUI {
             Win.capturePage(1).then(async img => {
                 // 压缩图片大小
                 img = img.resize({ width: 120 });
-                let res =await this.createSaveFileContent();
+                let res = await this.createSaveFileContent();
                 res.poster = img.toDataURL();
                 resolve(res);
             });
@@ -390,7 +411,7 @@ class GUI {
 
     async updateDevCard() {
         let res = await this.getSaveFileContent();
-        let card = this.createConfigCard(res);
+        let card = this.createConfigCard({ ...res, devPath: this.devPath });
         Editor.updateCard(card);
     }
 
@@ -466,8 +487,8 @@ class GUI {
         Win.resize(res.size, 1);
         Win.move();
 
-        this.mShow=true;
-        this.pShow=true;
+        this.mShow = true;
+        this.pShow = true;
         //预览窗口注入代码
         this.previewWinExecuteJavaScript(res.code, true);
         // this.createPreviewHtml().then(async() => {
@@ -840,12 +861,18 @@ class GUI {
 
         let html = `<img class="ui avatar image" 
                             src="${URL.createObjectURL(this.base64ToBlob(data.poster))}"
-                            style='border-radius: 0;outline: 1px solid #e2e2e2;'>
+                            style='border-radius: 0;outline: 1px solid #e2e2e2;margin: 8px 0;margin-right: 18px;'>
                     <div class="content">
                         <div class="header" style='width: 300px;'>${readme.innerText}</div>
-                        <div class="description" style='font-size: 12px;margin: 12px 0;'>
+                        <div class="description" style='font-size: 12px;margin: 4px 0;'>
                             <div class="meta">${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""} </div>
                             代码量 ${data.code_length} ${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
+                            ${data.devPath ? `<p style='display: -webkit-box;
+                            -webkit-box-orient: vertical;
+                            -webkit-line-clamp: 2;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            width: 80%;'>路径  <span class="ui small gray text">${data.devPath}</span></p>` : ''}
                         </div>
                     </div>
                     <div class="ui right floated content buttons">

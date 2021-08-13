@@ -45,18 +45,21 @@
 
     <div class="ui modal" id="knowledge-pannel">
         <div class="header">
+
+            <h5 class="ui header" style='margin-top: 12px;'>README<div class="sub header">基本信息</div>
+            </h5>
             <div class="ui form">
                 <div class="inline field">
                     <label>标题</label>
-                    <input type="text" placeholder="标题" id="readme">
+                    <input type="text" placeholder="标题" id="readme" style='background-color: #eee;border-color:#eee'>
                 </div>
                 <div class="inline field">
                     <label>作者</label>
-                    <input type="text" placeholder="作者" id="author">
+                    <input type="text" placeholder="作者" id="author" style='background-color: #eee;border-color:#eee'>
                 </div>
                 <div class="inline field">
                     <label>版本</label>
-                    <input type="text" placeholder="版本" id="version">
+                    <input type="text" placeholder="版本" id="version" style='background-color: #eee;border-color:#eee'>
                 </div>
                 <!-- <div class="inline field">
                     <label>引用</label>
@@ -68,18 +71,21 @@
                 </div> -->
 
             </div>
-
+            <div class="ui section divider"></div>
+            <h5 class="ui header">MORE<div class="sub header">详细说明</div>
+            </h5>
             <!-- <div id="readme">智能设计</div> <div id="author"></div><div id="version"></div>-->
-
+            <div id="course" class="ui segment" style="outline: none;
+            box-shadow: none;
+                border: none;height: 200px;
+                overflow-y: scroll;
+                background-color: #eee;">
+                <p>- 工具箱</p>
+            </div>
         </div>
-        <div id="course" class="ui segment" style="outline: none;
-    box-shadow: none;
-    border: none;height: 200px;
-    overflow-y: scroll;">
-            <p>- 工具箱</p>
-        </div>
+        
         <div class="actions">
-            <div class="ui button" id="model-confirm-btn">确认</div>
+            <div class="ui primary basic button" id="model-confirm-btn">确认</div>
         </div>
     </div>
 
@@ -153,12 +159,12 @@
                 <i class="refresh icon"></i>
                 </button>
 
-                <button class="ui compact icon button" id="new-folder-btn">
-                <i class="folder outline icon"></i>
+                <button class="ui compact labeled icon button" id="new-folder-btn">
+                <i class="code icon"></i>新建
                 </button>
                 
                 <button class="ui compact labeled icon button"  id="dev-folder-btn">
-                    <i class="folder open outline icon"></i>开发
+                    <i class="folder open outline icon"></i>打开
                 </button>
  
             </div>

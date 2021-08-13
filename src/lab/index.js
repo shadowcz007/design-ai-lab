@@ -32,7 +32,6 @@ const nlp = require('./nlp');
 const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
-const Music=require('./music');
 
 // const aframe=require('aframe');
 
@@ -64,6 +63,5 @@ module.exports = {
     ML:require('ml/lib'),
     // aframe:aframe,
     Zdog:require('zdog'),
-    tf:require('@tensorflow/tfjs'),
-    //music:new Music()
+    tf:require('@tensorflow/tfjs')
 };
