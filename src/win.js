@@ -25,13 +25,22 @@ class Win {
         this.mainWindow = (remote.getGlobal("_WINS")).mainWindow;
 
         // 监听加载事件，然后注入代码
-        this.previewWindow.webContents.on('did-finish-load', () => {
-            if (this.codeFinish === false) this.previewWindow.webContents.executeJavaScript(this.code, false).then(() => {
+        this.previewWindow.webContents.on('did-finish-load', async () => {
+            // console.log(this.codeFinish )
+            if (this.codeFinish === false) {
+                await this.previewWindow.webContents.executeJavaScript(this.code, false);
+                // console.log(res)
                 this.codeFinish = true;
                 this.statusSuccess();
-            }).catch(e => {
-                console.log(e, this.code)
-            })
+                // .then(() => {
+                //     this.codeFinish = true;
+                //     this.statusSuccess();
+                // }).catch(e => {
+                //     console.log(e, this.code)
+                // })
+            } else {
+                this.statusSuccess();
+            }
         });
         // 当preview窗口崩溃的时候
         this.previewWindow.webContents.on('render-process-gone', (event, details) => {
@@ -121,7 +130,7 @@ class Win {
 
     statusSuccess() {
         this.get(1).setTitle("更新成功");
-        // console.log('#JS:完成')
+        // console.log('#JS:完成',this.callback)
         if (this.callback) this.callback('#JS:完成');
     }
     statusChecking() {
@@ -147,19 +156,19 @@ class Win {
         let setTime = 4000 - Math.min(ts.reduce((a, b) => a + b) / ts.length, 3000);
         console.log(
             ts.reduce((a, b) => a + b) / ts.length,
-            `间隔较短 ${setTime, Math.abs(n - this.executeJSNow) < setTime}`,
+            `间隔较短 ${Math.abs(n - this.executeJSNow) < setTime}`,
             `this.codeFinish ${this.codeFinish}`);
 
         if (this.codeFinish === true) return this.statusSuccess();
 
+        this.statusChecking();
         if (Math.abs(n - this.executeJSNow) < setTime) {
             // 间隔较短
-            this.statusChecking();
             setTimeout(() => {
                 this.checkTime();
             }, setTime);
         } else {
-            // console.log("间隔时间可以")
+            console.log(!previewWindow.webContents.isLoading(), this.codeFinish)
             // this.show(1, true);
             if (!previewWindow.webContents.isLoading() && this.codeFinish === false) {
                 this.statusInjecting();
@@ -203,13 +212,19 @@ class Win {
     }
 
     resetPreview() {
+        this.codeId = null;
+        this.codeFinish = true;
         return this.previewWindow.reload();
     }
 
     capturePage(w = 1) {
         let win = this.get(w);
+        let im;
+        // 截图之前需要确认窗口是否显示了
+        if (win.isVisible()) im = win.webContents.capturePage();
+        console.log(im)
         //截图
-        return win.webContents.capturePage();
+        return im
     }
 
 };

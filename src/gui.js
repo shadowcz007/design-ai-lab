@@ -57,7 +57,9 @@ class GUI {
         this.mShow = false;
         this.pShow = false;
         Win.callback = async (t) => {
+            console.log('this.updateDevCard();', t)
             await this.updateDevCard();
+
             Editor.updateStatus(t);
             console.log(t, this.mShow, this.pShow);
             if (t == '#JS:完成') Win.showWinControl(this.mShow, this.pShow);
@@ -85,7 +87,11 @@ class GUI {
         if (p5 && typeof (p5) == 'function') new p5(null, 'p5');
         */
         return `console.clear();
-                ${code.trim()};
+                try{
+                    ${code.trim()};
+                }catch(err){
+                    console.log(err);
+                }
                 if(window.gui) {
                     document.querySelector("#gui-main").innerHTML="";
                     gui();
@@ -398,19 +404,22 @@ class GUI {
 
     //获得需要存储的数据,定义文件格式(数据结构)
     getSaveFileContent() {
-        return new Promise((resolve, reject) => {
-            Win.capturePage(1).then(async img => {
-                // 压缩图片大小
+        return new Promise(async (resolve, reject) => {
+            let res = await this.createSaveFileContent();
+            let img = await Win.capturePage(1);
+            // console.log(img)
+            //TODO 压缩图片大小
+            if (img) {
                 img = img.resize({ width: 120 });
-                let res = await this.createSaveFileContent();
                 res.poster = img.toDataURL();
-                resolve(res);
-            });
+            };
+            resolve(res);
         });
     }
 
     async updateDevCard() {
         let res = await this.getSaveFileContent();
+        // console.log(res)
         let card = this.createConfigCard({ ...res, devPath: this.devPath });
         Editor.updateCard(card);
     }
@@ -489,6 +498,7 @@ class GUI {
 
         this.mShow = true;
         this.pShow = true;
+        // Win.showWinControl(true,true);
         //预览窗口注入代码
         this.previewWinExecuteJavaScript(res.code, true);
         // this.createPreviewHtml().then(async() => {
@@ -643,20 +653,13 @@ class GUI {
         // Editor.toggle(true);
         Knowledge.toggle(true);
 
-        // this.closeEditorWin();
-        // this.closePracticeHtml();
-
         this.previewStatus();
-        // console.log('closeFn')
-        // this.editFileFn(true);
-        // this.practiceFn(true);
 
         document.getElementById("editor-pannel").style.display = "none";
         document.getElementById("blank-pannel").style.display = "flex";
 
         this.openFilesBtn ? this.openFilesBtn.style.display = 'block' : null;
 
-        //Win.showWinControl(true,false);
         Win.resetPreview();
 
         //从默认路径，读取卡片信息
@@ -665,6 +668,7 @@ class GUI {
         //窗口
         this.mShow = true;
         this.pShow = false;
+        Win.showWinControl(true, false);
         Win.changeAppIcon([{
             label: '新建',
             click: this.newFileFn

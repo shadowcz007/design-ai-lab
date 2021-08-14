@@ -262,21 +262,25 @@ class UI {
     }
 
     // webview
-    createWebview(src, isMobile = false) {
+    createWebview(src, isMobile = false, isDev = false) {
         let webview = document.createElement('webview');
         webview.style = `width:100%;height:100vh`;
         if (isMobile) webview.setAttribute('useragent',
             `Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Mobile Safari/537.36`);
 
         webview.src = src;
+        if (isDev) {
+            webview.addEventListener('page-title-updated', console.log);
+            webview.addEventListener('dom-ready', console.log);
+            webview.addEventListener('load-commit', console.log);
+            webview.addEventListener('did-finish-load', console.log);
+            webview.addEventListener('did-frame-finish-load', console.log);
+            webview.addEventListener('console-message', console.log);
+            // 鼠标移动到a标签上，会触发
+            webview.addEventListener('update-target-url', console.log);
+        }
         // 不一定会更新标题
-        // webview.addEventListener('page-title-updated', doData);
-        // webview.addEventListener('dom-ready', console.log);
-        // webview.addEventListener('load-commit', console.log);
-        // webview.addEventListener('did-finish-load', console.log);
-        // webview.addEventListener('did-frame-finish-load', console.log);
-        // webview.addEventListener('console-message', console.log);
-        // webview.addEventListener('update-target-url', doData);
+
         // webview.executeJavaScript
         return webview
     }

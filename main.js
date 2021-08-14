@@ -91,9 +91,9 @@ const config = {
         titleBarStyle: "hidden",
         html: _BASIC_HTML,
         // preload: _BASIC_PRELOAD_JS,
-        executeJavaScript: fs.readFileSync(
-            path.join(__dirname, 'src/serverModel.js')
-        )
+        // executeJavaScript: fs.readFileSync(
+        //     path.join(__dirname, 'src/serverModel.js')
+        // )
     }
 }
 
@@ -148,15 +148,15 @@ function createWindow(key, opts, workAreaSize) {
     // console.log(opts)
     win.webContents.once("did-finish-load", () => {
         // console.log("did-finish-load",opts.executeJavaScript);
-        opts.executeJavaScript&&typeof(opts.executeJavaScript)==='string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
-        setTimeout(()=>{
+        opts.executeJavaScript && typeof(opts.executeJavaScript) === 'string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
+        setTimeout(() => {
             opts.show === true ? win.show() : null;
-        },3000);
-        
+        }, 3000);
+
     });
     win.on("closed", () => {
         console.log('closed:', key)
-        // if(key=='mainWindow'){
+            // if(key=='mainWindow'){
         for (const key in global._WINS) {
             // console.log(global._WINS[key])
             global._WINS[key].destroy()
@@ -172,10 +172,10 @@ function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
     if (config.mainWindow) {
         config.mainWindow.height = workAreaSize.height;
-        config.mainWindow.width =Math.max(parseInt(workAreaSize.width*0.3),300);
+        config.mainWindow.width = Math.max(parseInt(workAreaSize.width * 0.3), 300);
     };
 
-    storage.get('app', function (error, data) {
+    storage.get('app', function(error, data) {
         console.log('storage', data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
@@ -221,7 +221,7 @@ function initAppIcon() {
         label: '编辑',
         type: 'normal',
         checked: false,
-        click: async () => {
+        click: async() => {
             global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: true });
         }
     }]);
@@ -239,79 +239,79 @@ function initMenu() {
         ...(_IS_MAC ? [{
             label: _package.name,
             submenu: [{
-                label: '关于',
-                click: () =>
-                    openAboutWindow({
-                        icon_path: path.join(__dirname, 'logo.png'),
-                        product_name: 'Design.ai Lab',
-                        copyright: 'Copyright (c) 2021 shadow',
-                        adjust_window_size: true,
-                        bug_link_text: "反馈bug",
-                        package_json_dir: __dirname,
-                        open_devtools: process.env.NODE_ENV === 'development',
-                        css_path: path.join(__dirname, 'src/style.css'),
-                    }),
-            },
-            { type: 'separator' },
-            // {
-            //     label: '反馈',
-            //     click: async() => {
-            //         const { shell } = require('electron')
-            //         await shell.openExternal('https://electronjs.org')
-            //     }
-            // },
-            // { type: 'separator' },
-            // { role: 'hide' },
-            // { role: 'hideothers' },
-            // { role: 'unhide' },
-            // { type: 'separator' },
-            { role: 'quit', label: '退出' }
+                    label: '关于',
+                    click: () =>
+                        openAboutWindow({
+                            icon_path: path.join(__dirname, 'logo.png'),
+                            product_name: 'Design.ai Lab',
+                            copyright: 'Copyright (c) 2021 shadow',
+                            adjust_window_size: true,
+                            bug_link_text: "反馈bug",
+                            package_json_dir: __dirname,
+                            open_devtools: process.env.NODE_ENV === 'development',
+                            css_path: path.join(__dirname, 'src/style.css'),
+                        }),
+                },
+                { type: 'separator' },
+                // {
+                //     label: '反馈',
+                //     click: async() => {
+                //         const { shell } = require('electron')
+                //         await shell.openExternal('https://electronjs.org')
+                //     }
+                // },
+                // { type: 'separator' },
+                // { role: 'hide' },
+                // { role: 'hideothers' },
+                // { role: 'unhide' },
+                // { type: 'separator' },
+                { role: 'quit', label: '退出' }
             ]
         }] : []),
         // { role: 'fileMenu' }
         {
             label: '文件',
             submenu: [{
-                label: '打开',
-                accelerator: 'CmdOrCtrl+O',
-                click: () => global._WINS.mainWindow.webContents.send('open-file')
-            },
-            {
-                label: '新建',
-                accelerator: 'CmdOrCtrl+N',
-                click: () => global._WINS.mainWindow.webContents.send('new-file')
-            },
-            {
-                label: '另存为',
-                accelerator: 'CmdOrCtrl+S',
-                click: () => global._WINS.mainWindow.webContents.send('save-file')
-            },
-            { type: 'separator' },
-            {
-                label: '编辑',
-                accelerator: 'CmdOrCtrl+E',
-                click: () => global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: false })
-            },
-            {
-                label: '发布',
-                accelerator: 'CmdOrCtrl+P',
-                click: () => global._WINS.mainWindow.webContents.send('public-file')
-            },
-            { type: 'separator' },
-            {
-                label: '重启',
-                accelerator: 'CmdOrCtrl+R',
-                click: () => {
-                    app.relaunch();
-                    app.exit();
+                    label: '打开',
+                    accelerator: 'CmdOrCtrl+O',
+                    click: () => global._WINS.mainWindow.webContents.send('open-file')
+                },
+                {
+                    label: '新建',
+                    accelerator: 'CmdOrCtrl+N',
+                    click: () => global._WINS.mainWindow.webContents.send('new-file')
+                },
+                {
+                    label: '另存为',
+                    accelerator: 'CmdOrCtrl+S',
+                    click: () => global._WINS.mainWindow.webContents.send('save-file')
+                },
+                { type: 'separator' },
+                {
+                    label: '编辑',
+                    accelerator: 'CmdOrCtrl+E',
+                    click: () => global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: false })
+                },
+                {
+                    label: '发布',
+                    accelerator: 'CmdOrCtrl+P',
+                    click: () => global._WINS.mainWindow.webContents.send('public-file')
+                },
+                { type: 'separator' },
+                {
+                    label: '重启',
+                    accelerator: 'CmdOrCtrl+R',
+                    click: () => {
+                        app.relaunch();
+                        app.exit();
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: '关闭',
+                    accelerator: 'CmdOrCtrl+W',
+                    click: () => global._WINS.mainWindow.webContents.send('close-file')
                 }
-            },
-            { type: 'separator' },
-            {
-                label: '关闭',
-                accelerator: 'CmdOrCtrl+W',
-                click: () => global._WINS.mainWindow.webContents.send('close-file')
-            }
             ]
         },
         //{ role: 'editMenu' },
@@ -319,38 +319,38 @@ function initMenu() {
             //role: 'editMenu',
             label: '编辑',
             submenu: [{
-                label: '撤销',
-                accelerator: 'CmdOrCtrl+Z',
-                role: 'undo'
-            },
-            {
-                label: '重做',
-                accelerator: 'Shift+CmdOrCtrl+Z',
-                role: 'redo'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: '剪切',
-                accelerator: 'CmdOrCtrl+X',
-                role: 'cut'
-            },
-            {
-                label: '拷贝',
-                accelerator: 'CmdOrCtrl+C',
-                role: 'copy'
-            },
-            {
-                label: '粘贴',
-                accelerator: 'CmdOrCtrl+V',
-                role: 'paste'
-            },
-            {
-                label: '全选',
-                accelerator: 'CmdOrCtrl+A',
-                role: 'selectall'
-            },
+                    label: '撤销',
+                    accelerator: 'CmdOrCtrl+Z',
+                    role: 'undo'
+                },
+                {
+                    label: '重做',
+                    accelerator: 'Shift+CmdOrCtrl+Z',
+                    role: 'redo'
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: '剪切',
+                    accelerator: 'CmdOrCtrl+X',
+                    role: 'cut'
+                },
+                {
+                    label: '拷贝',
+                    accelerator: 'CmdOrCtrl+C',
+                    role: 'copy'
+                },
+                {
+                    label: '粘贴',
+                    accelerator: 'CmdOrCtrl+V',
+                    role: 'paste'
+                },
+                {
+                    label: '全选',
+                    accelerator: 'CmdOrCtrl+A',
+                    role: 'selectall'
+                },
             ]
         },
         // {
@@ -378,7 +378,7 @@ function initMenu() {
             label: '帮助',
             submenu: [{
                 label: 'Learn More',
-                click: async () => {
+                click: async() => {
                     const { shell } = require('electron')
                     await shell.openExternal('https://electronjs.org')
                 }
@@ -418,7 +418,7 @@ app.whenReady().then(() => {
     app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
         console.log('browser-window-focus')
-        // TODO 待细化,当wifi环境变化的时候
+            // TODO 待细化,当wifi环境变化的时候
     });
 
     app.on('web-contents-created', (event, webContents) => {
