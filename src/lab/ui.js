@@ -73,6 +73,7 @@ class UI {
     clear() {
         document.querySelector("#gui-main").innerHTML = "";
     }
+
     //当没有子元素的时候，隐藏，有则开启
     // isDisplay() {
     //     if (document.querySelector("#gui-main")) {
@@ -86,6 +87,14 @@ class UI {
     //         }
     //     }
     // }
+
+    // 创建createDivider
+    createDivider(){
+        let div = document.createElement('div');
+        div.className = 'ui hidden divider';
+        //div.innerHTML = Array.from(list, t => `<div class="item">${t}</div>`).join('');
+        return div
+    }
 
     // 创建list
     createList(list = []) {
@@ -309,12 +318,12 @@ class UI {
         }
     }
     // toast
-    toast(text) {
-        Swal.fire(text);
-    }
-    // toast(text){
-    //     $('body').toast({message:'Great!'});
+    // toast(text) {
+    //     // Swal.fire(text);
     // }
+    toast(text){
+        $('body').toast({message:text});
+    }
     // 
     // loading
     loading(n = 0) {
@@ -464,6 +473,19 @@ class UI {
             input.click();
         });
 
+        div.setDefaultValue = value => {
+            div.setPlaceholder(value);
+            div.setAttribute('data-count', value.length);
+            // 缓存
+            localStorage.setItem(key, JSON.stringify(value));
+            // if (eventListener && value) {
+            //     setTimeout(() => {
+            //         eventListener(value);
+            //     }, 1200);
+            // };
+
+        };
+
         let isInput = false;
         // 监听事件
         function eventFn(e) {
@@ -482,29 +504,16 @@ class UI {
                 res = [e.target.value];
             } else if (type === 'checkbox') {
                 res = [e.target.checked];
-            }
+            };
 
-            // 缓存
-            localStorage.setItem(key, JSON.stringify(res));
-            div.setAttribute('data-count', res.length);
-            div.setPlaceholder(res);
+            div.setDefaultValue(res);
             if (eventListener) eventListener(res);
             isInput = false;
 
         };
         input.addEventListener('change', eventFn);
 
-        div.setDefaultValue = value => {
-            div.setPlaceholder(value);
-            div.setAttribute('data-count', value.length);
-            if (eventListener && value) {
-                setTimeout(() => {
-                    eventListener(value);
-                }, 1200);
-            };
-
-        };
-
+        
         div.getValue = () => {
             return input.value;
         };
@@ -565,9 +574,14 @@ class UI {
             this.input.value = value[0];
         };
         let div = this.createBaseInput('text', text, false, key, eventListener, setPlaceholder);
-        div.classList.add('input-text');
+        div.className='ui form inline field';
+        div.querySelector('p').outerHTML=`<label>${div.querySelector('p').innerText}</label>`;
 
-        return div
+        let form=document.createElement('div');
+        form.className="ui form";
+        form.appendChild(div);
+        form.setDefaultValue=div.setDefaultValue;
+        return form
     }
     // 文件上传
     createFileInput(text, isMultiple = false, key, eventListener = null) {

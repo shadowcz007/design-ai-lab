@@ -27,20 +27,25 @@ class Win {
         // 监听加载事件，然后注入代码
         this.previewWindow.webContents.on('did-finish-load', async () => {
             // console.log(this.codeFinish )
-            if (this.codeFinish === false) {
-                await this.previewWindow.webContents.executeJavaScript(this.code, false);
-                // console.log(res)
-                this.codeFinish = true;
-                this.statusSuccess();
-                // .then(() => {
-                //     this.codeFinish = true;
-                //     this.statusSuccess();
-                // }).catch(e => {
-                //     console.log(e, this.code)
-                // })
-            } else {
-                this.statusSuccess();
+            try {
+                if (this.codeFinish === false) {
+                    await this.previewWindow.webContents.executeJavaScript(this.code, false);
+                    this.codeFinish = true;
+                    this.statusSuccess();
+                    // .then(() => {
+                    //     this.codeFinish = true;
+                    //     this.statusSuccess();
+                    // }).catch(e => {
+                    //     console.log(e, this.code)
+                    // })
+                } else {
+                    this.statusSuccess();
+                }
+            } catch (error) {
+                console.log(error);
+                this.statusError();
             }
+
         });
         // 当preview窗口崩溃的时候
         this.previewWindow.webContents.on('render-process-gone', (event, details) => {
@@ -128,6 +133,12 @@ class Win {
         }
     }
 
+    statusError() {
+        this.get(1).setTitle("错误");
+        // console.log('#JS:完成',this.callback)
+        if (this.callback) this.callback('#JS:错误');
+    }
+
     statusSuccess() {
         this.get(1).setTitle("更新成功");
         // console.log('#JS:完成',this.callback)
@@ -143,6 +154,7 @@ class Win {
         // console.log('#JS:注入中');
         if (this.callback) this.callback('#JS:注入中');
     }
+
 
     // 检查间隔时间
     checkTime() {
@@ -182,6 +194,10 @@ class Win {
         let isNew = false;
         let id = runtime.hash(code);
         console.log('executeJavaScript2Preview-forceRun', forceRun)
+        if (forceRun === true) {
+            isNew = true;
+            this.codeFinish = true;
+        };
         //上次一次代码的记录
         if (!this.codeId) {
             this.codeId = id;

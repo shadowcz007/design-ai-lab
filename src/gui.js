@@ -53,9 +53,9 @@ class GUI {
             // .catch((err) => this.onPreviewWindowError())
         );
 
-
         this.mShow = false;
         this.pShow = false;
+        this.toastError = false;
         Win.callback = async (t) => {
             console.log('this.updateDevCard();', t)
             await this.updateDevCard();
@@ -63,6 +63,25 @@ class GUI {
             Editor.updateStatus(t);
             console.log(t, this.mShow, this.pShow);
             if (t == '#JS:完成') Win.showWinControl(this.mShow, this.pShow);
+
+            if (t == '#JS:错误' && this.toastError === false) {
+                $('body')
+                    .toast({
+                        message: '发生错误，建议检查代码版本',
+                        displayTime: 0,
+                        class: 'black',
+                        classActions: 'basic left',
+                        actions: [{
+                            text: '确定',
+                            class: 'yellow',
+                            click: function () {
+                                this.toastError = false;
+                                // $('body').toast({message:'You clicked "yes", toast closes by default'});
+                            }
+                        }]
+                    });
+                this.toastError = true;
+            }
         };
 
         /**
@@ -148,6 +167,7 @@ class GUI {
 
         // 打开设置页
         this.addClickEventListener(this.setupCodeBtn, () => {
+            this.modelConfirmBtn.style.display='none';
             $('#knowledge-pannel').modal({
                 onHidden: async () => {
                     await this.updateDevCard();
@@ -172,7 +192,9 @@ class GUI {
 
         });
 
+        // TODO bug
         this.addClickEventListener(this.modelConfirmBtn, async e => {
+            
             let data = await this.createSaveFileContent();
             let size = [400, 400];
 
@@ -208,7 +230,8 @@ class GUI {
             let res = await App.dev();
             if (res) {
                 this.devPath = res.devPath;
-                this.openDevCard(res)
+                this.openDevCard(res);
+                this.modelConfirmBtn.style.display='none';
             };
         });
 
@@ -648,7 +671,7 @@ class GUI {
         // console.log("-----closeFn----")
         //TODO 确定关闭？未保存将丢失
         // this.backup();
-
+        this.modelConfirmBtn.style.display='inline-block';
         //code编辑器只读
         // Editor.toggle(true);
         Knowledge.toggle(true);
@@ -867,7 +890,12 @@ class GUI {
                             src="${URL.createObjectURL(this.base64ToBlob(data.poster))}"
                             style='border-radius: 0;outline: 1px solid #e2e2e2;margin: 8px 0;margin-right: 18px;'>
                     <div class="content">
-                        <div class="header" style='width: 300px;'>${readme.innerText}</div>
+                        <div class="header" style='max-width: 300px;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 1;
+                        overflow: hidden;
+                        text-overflow: ellipsis;'>${readme.innerText}</div>
                         <div class="description" style='font-size: 12px;margin: 4px 0;'>
                             <div class="meta">${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""} </div>
                             代码量 ${data.code_length} ${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
@@ -914,9 +942,15 @@ class GUI {
         if (isCanClose !== true) {
             let runBtn = this.createElement("mini ui button");
             runBtn.innerText = '运行';
+
             div.querySelector('.buttons').appendChild(runBtn);
             this.addClickEventListener(runBtn, e => {
                 e.stopPropagation();
+                if (this.newRun === true) return;
+                if (!runBtn.classList.contains('disabled')) runBtn.classList.add('disabled');
+                if (!runBtn.classList.contains('loading')) runBtn.classList.add('loading');
+                this.newRun = true;
+
                 //控制窗口大小
                 Win.resize(data.size, 1);
                 //移动窗口
@@ -925,6 +959,13 @@ class GUI {
                 this.pShow = true;
                 //注入的js
                 this.previewWinExecuteJavaScript(data.code, true);
+
+                // 3秒后取消
+                setTimeout(() => {
+                    if (runBtn.classList.contains('disabled')) runBtn.classList.remove('disabled');
+                    if (runBtn.classList.contains('loading')) runBtn.classList.remove('loading');
+                    this.newRun = false;
+                }, 10000);
             });
         };
 
