@@ -57,6 +57,21 @@ class Win {
         });
 
         this.callback = null;
+
+        // 点击小图标显示窗口
+        remote.getGlobal('_APPICON').addListener('click', () => {
+            if (this.mShow) {
+                this.get(0).focus();
+                this.get(0).moveTop();
+            };
+            if (this.pShow) {
+                this.get(1).focus();
+                this.get(1).moveTop();
+            };
+        });
+
+        this.mShow = false;
+        this.pShow = false;
     }
 
     edit() {
@@ -97,16 +112,30 @@ class Win {
 
     show(type = 0, show = true) {
         let win = this.get(type);
-        if (win && win.isVisible() !== show) show == true ? win.show() : win.hide();
+        if (win && win.isVisible() !== show) {
+            show == true ? win.show() : win.hide();
+            if (type == 0) this.mShow = show;
+            if (type == 1) this.pShow = show;
+        }
     }
+
 
     //动态改变系统托盘菜单
     //items=[ { label,click} ]
     changeAppIcon(items = []) {
-        if (items.length == 0) return;
-        let contextMenu = remote.Menu.buildFromTemplate(items);
-        remote.getGlobal('_APPICON').setContextMenu(contextMenu);
+        //if (items.length == 0) return;
+        let app = remote.getGlobal('_APPICON');
+        let m = app.contextMenu;
+        app.setContextMenu(
+            remote.Menu.buildFromTemplate([
+                ...m.items,
+                { type: 'separator' },
+                ...items]));
+
+        //let contextMenu = remote.Menu.buildFromTemplate(items);
+        // remote.getGlobal('_APPICON').setContextMenu(contextMenu);
     }
+
 
     get(w = 0) {
         if (w === 0) {
@@ -116,6 +145,24 @@ class Win {
             this.previewWindow = this.previewWindow || (remote.getGlobal("_WINS")).previewWindow;
             return this.previewWindow
         }
+    }
+
+    getMainBound() {
+        let mainWindow = this.get(0);
+        let bounds = mainWindow.getBounds();
+        localStorage.setItem('_mainbound', JSON.stringify(bounds));
+        console.log(bounds.height)
+        return bounds
+    }
+
+    setMainBound() {
+        try {
+            let bounds = localStorage.getItem('_mainbound');
+            bounds = JSON.parse(bounds);
+            this.resize([bounds.width, bounds.height], 0);
+        } catch (error) {
+
+        };
     }
 
     //窗口状态

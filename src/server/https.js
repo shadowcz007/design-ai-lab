@@ -6,19 +6,22 @@ const path = require('path');
 
 const serverUrl = require('./serverUrl');
 const mkcert = require('./mkcert');
+let _IS_DEV = false;
 
-function start() {
+function start(isDev = false) {
     mkcert.create().then(opts => {
         const httpsServer = https.createServer(opts, doReq);
         httpsServer.listen(443, () => {
-            console.log(` 🎉 https server running at ${serverUrl.get()}`)
+            if (isDev) console.log(` 🎉 https server running at ${serverUrl.get()}`)
         });
     });
 
     let httpServer = http.createServer(doReq);
-    httpServer.listen(80,()=>{
-        console.log(` 🎉 http server running at ${serverUrl.get()}`)
+    httpServer.listen(80, () => {
+        if (isDev) console.log(` 🎉 http server running at ${serverUrl.get()}`)
     });
+
+    _IS_DEV = isDev;
 };
 
 function doReq(req, res) {
@@ -26,7 +29,7 @@ function doReq(req, res) {
     res.setHeader('Access-Control-Request-Method', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', '*');
-    // console.log(req.url);
+    if (_IS_DEV) console.log(req.url);
     let reqUrlBase = req.url.replace(/\?.*/ig, '');
     if (reqUrlBase === '/') {
         const html = fs.readFileSync(path.join(__dirname, './mobile.html'), 'utf8');

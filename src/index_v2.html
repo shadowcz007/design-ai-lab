@@ -22,7 +22,16 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
+<body style='overflow:hidden'>
+
+    <div class="ui inverted segment" style="
+        height: 100vh;
+        width: 100%;
+        position: fixed;
+        z-index: 999999;
+    " id="loading">
+    <div class="ui active inverted loader"></div>
+    </div>
 
     <div class="ui left demo vertical inverted sidebar labeled icon menu" style='padding-top: 32px;'>
 
@@ -173,7 +182,7 @@
                 100vh;margin: 0;
                 flex-direction: row;'>
                 <div class="ui one column doubling stackable grid container" style='min-width: 80%;'>
-                    <div class="middle aligned column">
+                    <div class="column">
                         <div class="ui relaxed divided list" id="recent-files" style='min-width: 320px;'></div>
                     </div>
                 </div>

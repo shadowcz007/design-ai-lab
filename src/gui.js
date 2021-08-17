@@ -21,6 +21,7 @@ window.Knowledge = Knowledge;
  * - DOM的封装
  */
 class GUI {
+
     constructor() {
 
         /**
@@ -62,6 +63,7 @@ class GUI {
 
             Editor.updateStatus(t);
             console.log(t, this.mShow, this.pShow);
+            if (this.mShow) this.loading.style.display = 'none';
             if (t == '#JS:完成') Win.showWinControl(this.mShow, this.pShow);
 
             if (t == '#JS:错误' && this.toastError === false) {
@@ -91,6 +93,7 @@ class GUI {
         //主界面提示
         this.info = document.querySelector('#info');
 
+        this.loading = document.querySelector('#loading');
     }
 
     //生成注入的js代码
@@ -167,7 +170,7 @@ class GUI {
 
         // 打开设置页
         this.addClickEventListener(this.setupCodeBtn, () => {
-            this.modelConfirmBtn.style.display='none';
+            this.modelConfirmBtn.style.display = 'none';
             $('#knowledge-pannel').modal({
                 onHidden: async () => {
                     await this.updateDevCard();
@@ -194,7 +197,7 @@ class GUI {
 
         // TODO bug
         this.addClickEventListener(this.modelConfirmBtn, async e => {
-            
+
             let data = await this.createSaveFileContent();
             let size = [400, 400];
 
@@ -231,7 +234,7 @@ class GUI {
             if (res) {
                 this.devPath = res.devPath;
                 this.openDevCard(res);
-                this.modelConfirmBtn.style.display='none';
+                this.modelConfirmBtn.style.display = 'none';
             };
         });
 
@@ -336,18 +339,25 @@ class GUI {
             // let { imports } = Knowledge.get();
             // obj.imports = imports;
         };
-        storage.set('app', obj, function (error) {
-            if (error) throw error;
+        return new Promise((resolve, reject) => {
+            storage.set('app', obj, function (error) {
+                if (error) throw error;
+                resolve();
+            });
         });
+
     }
     loadWindowStatus() {
-        storage.get('app', function (error, data) {
-            console.log('storage', data)
-            Win.resize(data.size, 1);
-            if (data.status === 1 && data.mainWindow.show) {
-                Win.resize([data.mainWindow.bound.width, data.mainWindow.bound.height], 0);
-            }
-        })
+        return new Promise((resolve, reject) => {
+            storage.get('app', function (error, data) {
+                console.log('storage', data)
+                Win.resize(data.size, 1);
+                if (data.status === 1 && data.mainWindow.show) {
+                    Win.resize([data.mainWindow.bound.width, data.mainWindow.bound.height], 0);
+                };
+                resolve();
+            })
+        });
     }
 
     //默认读取examples的地址
@@ -394,11 +404,11 @@ class GUI {
 
         let img = await Win.capturePage(0);
         // 压缩图片大小
-        img = img.resize({ width: 120 });
+        if (img) img = img.resize({ width: 120 });
 
         return {
             //封面图
-            poster: img.toDataURL(),
+            poster: img ? img.toDataURL() : utils.readImageToBase64(path.join(__dirname, '../assets/ios/AppIcon.appiconset/icon-40.png')),
             //标题
             title: knowledgeJson.readme,
             //知识内容、课程介绍、代码解释等，markdown
@@ -502,8 +512,36 @@ class GUI {
         };
     }
 
+    appMode(status = 1) {
+        if (status == 0) {
+            this.mShow = true;
+            this.pShow = false;
+        };
+        if (status == 1) {
+            this.mShow = true;
+            this.pShow = true;
+        };
+        if (status === 2) {
+            this.mShow = false;
+            this.pShow = true;
+        }
+
+        if (status != 0) {
+            Win.getMainBound();
+            Win.changeAppIcon([{
+                label: '关闭',
+                click: () => {
+                    this.closeFn();
+                }
+            }]);
+        }
+
+    }
+
 
     openFile(res) {
+        this.appMode(1);
+
         // console.log('openFile', res)
         Knowledge.set(res.config);
         Editor.setCode(res.code);
@@ -515,6 +553,7 @@ class GUI {
         // 主窗口尺寸更新
         Win.resize([300, 300], 0);
         console.log('打开文件夹中ing………………')
+        this.loading.style.display = 'block';
         //预览窗口的尺寸更新
         Win.resize(res.size, 1);
         Win.move();
@@ -539,6 +578,7 @@ class GUI {
         document.getElementById("blank-pannel").style.display = "none";
 
         this.saveWindowsStatus(1);
+
     }
 
     // 热更新模式
@@ -553,21 +593,9 @@ class GUI {
         };
     };
 
-    editStatus() {
-        //编辑状态
-        // this.editFileBtn.innerHTML = `<i class="far fa-lightbulb"></i>`;
-        //document.getElementById("knowledge-pannel").classList.add("pannel-large");
-        // Layout.destroy();
-        // Layout.dragEnabled(false);
-    }
 
-    previewStatus() {
-        //预览状态
-        // console.log("预览状态")
-        // this.editFileBtn.innerHTML = `<i class="far fa-eye"></i>`;
-        document.getElementById("knowledge-pannel").classList.remove("pannel-large");
-        // Layout.init();
-    }
+
+
     //编辑状态切换
     editFileFn(hardReadOnly = null) {
 
@@ -584,12 +612,8 @@ class GUI {
         }]);
         this.saveWindowsStatus(1);
 
-        if (isReadOnly) {
-            //预览状态
-            this.previewStatus();
-        } else {
+        if (!isReadOnly) {
             //编辑状态
-            this.editStatus();
             Win.edit();
         };
     }
@@ -611,6 +635,7 @@ class GUI {
     newFileFn() {
         //新建的时候先保存上次的编辑的内容
         // this.backup();
+        this.appMode(1);
 
         document.querySelector(".grid").style.display = "block";
         document.getElementById("blank-pannel").style.display = "none";
@@ -625,12 +650,8 @@ class GUI {
         });
         Editor.setCode('//Hello AI world!');
         // Layout.clearAndReset();
-        this.mShow = true;
-        this.pShow = false;
-        Win.changeAppIcon([{
-            label: '保存',
-            click: () => this.saveFileFn()
-        }]);
+
+
     }
 
     saveFileFn() {
@@ -667,41 +688,28 @@ class GUI {
 
     }
 
-    closeFn() {
-        // console.log("-----closeFn----")
-        //TODO 确定关闭？未保存将丢失
-        // this.backup();
-        this.modelConfirmBtn.style.display='inline-block';
-        //code编辑器只读
-        // Editor.toggle(true);
+    initWin() {
+        this.modelConfirmBtn.style.display = 'inline-block';
         Knowledge.toggle(true);
-
-        this.previewStatus();
-
         document.getElementById("editor-pannel").style.display = "none";
         document.getElementById("blank-pannel").style.display = "flex";
-
         this.openFilesBtn ? this.openFilesBtn.style.display = 'block' : null;
-
-        Win.resetPreview();
-
         //从默认路径，读取卡片信息
         this.exampleFiles();
-
-        //窗口
         this.mShow = true;
         this.pShow = false;
+        setTimeout(() => this.loading.style.display = 'none', 2000);
+    }
+
+    closeFn() {
+
+        this.initWin();
+        Win.resetPreview();
+        //窗口
         Win.showWinControl(true, false);
-        Win.changeAppIcon([{
-            label: '新建',
-            click: this.newFileFn
-        }]);
-
-        // 主窗口尺寸变换
-        Win.resize([parseInt(Win.workAreaSize.width / 2), Win.workAreaSize.height], 0);
-
-        this.saveWindowsStatus(0);
-
+        Win.changeAppIcon();
+        Win.setMainBound();
+        //this.loadWindowStatus().then(() => setTimeout(() => this.saveWindowsStatus(0), 1500));
     }
 
     //创建卡片集
@@ -885,12 +893,12 @@ class GUI {
         let readme = this.createElement('', 'h5');
         readme.innerHTML = Knowledge.marked(data.knowledge.readme);
         readme.innerText = readme.innerText;
-
+        // console.log(data)
         let html = `<img class="ui avatar image" 
-                            src="${URL.createObjectURL(this.base64ToBlob(data.poster))}"
+                            src="${data.poster ? URL.createObjectURL(this.base64ToBlob(data.poster)) : path.join(__dirname, '../assets/ios/AppIcon.appiconset/icon-40.png')}"
                             style='border-radius: 0;outline: 1px solid #e2e2e2;margin: 8px 0;margin-right: 18px;'>
                     <div class="content">
-                        <div class="header" style='max-width: 300px;
+                        <div class="header" style='width: 180px;
                         display: -webkit-box;
                         -webkit-box-orient: vertical;
                         -webkit-line-clamp: 1;
@@ -955,7 +963,8 @@ class GUI {
                 Win.resize(data.size, 1);
                 //移动窗口
                 Win.move();
-                this.mShow = true;
+                Win.show(0, false);
+                this.mShow = false;
                 this.pShow = true;
                 //注入的js
                 this.previewWinExecuteJavaScript(data.code, true);
@@ -966,6 +975,9 @@ class GUI {
                     if (runBtn.classList.contains('loading')) runBtn.classList.remove('loading');
                     this.newRun = false;
                 }, 10000);
+
+                this.appMode(2);
+
             });
         };
 

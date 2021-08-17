@@ -26,9 +26,11 @@ const _BASIC_HTML = path.join(__dirname, 'src/basic.html');
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 // const _BASIC_PRELOAD_JS = path.join(__dirname, 'src/ffmpeg_server.js');
 
-global._DEBUG_PORT = 3000;
-app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
-app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
+if (process.env.NODE_ENV === 'development') {
+    global._DEBUG_PORT = 3000;
+    app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
+    app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
+}
 
 // app.commandLine.appendSwitch('enable-webassembly');
 
@@ -47,10 +49,10 @@ app.commandLine.appendSwitch('ignore-certificate-errors', true);
 
 const config = {
     mainWindow: {
-        width: 500,
-        height: 600,
+        width: 450,
+        height: 500,
         minHeight: 400,
-        minWidth: 500,
+        minWidth: 450,
         align: 'topLeft',
         title: "实验",
         show: true,
@@ -144,19 +146,20 @@ function createWindow(key, opts, workAreaSize) {
     }
 
     // 打开调试工具
-    if (process.env.NODE_ENV === 'development') win.webContents.openDevTools();
-    // console.log(opts)
+    if (process.env.NODE_ENV === 'development') {
+        win.webContents.openDevTools();
+        console.log(opts);
+    }
+
     win.webContents.once("did-finish-load", () => {
-        // console.log("did-finish-load",opts.executeJavaScript);
-        opts.executeJavaScript && typeof(opts.executeJavaScript) === 'string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
+        opts.executeJavaScript && typeof (opts.executeJavaScript) === 'string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
         setTimeout(() => {
             opts.show === true ? win.show() : null;
-        }, 3000);
-
+        }, 6000);
     });
     win.on("closed", () => {
-        console.log('closed:', key)
-            // if(key=='mainWindow'){
+        if (process.env.NODE_ENV === 'development') console.log('closed:', key)
+        // if(key=='mainWindow'){
         for (const key in global._WINS) {
             // console.log(global._WINS[key])
             global._WINS[key].destroy()
@@ -171,12 +174,12 @@ function createWindow(key, opts, workAreaSize) {
 function initWindow() {
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
     if (config.mainWindow) {
-        config.mainWindow.height = workAreaSize.height;
-        config.mainWindow.width = Math.max(parseInt(workAreaSize.width * 0.3), 300);
+        config.mainWindow.height = parseInt(workAreaSize.height * 0.8);
+        // config.mainWindow.width = Math.max(parseInt(workAreaSize.width * 0.3), 300);
     };
 
-    storage.get('app', function(error, data) {
-        console.log('storage', data)
+    storage.get('app', function (error, data) {
+        if (process.env.NODE_ENV === 'development') console.log('storage', data)
         if (error) throw error;
         //是否发布，发布了，主窗口将隐藏
         //  0 主窗口 1 主窗口 预览窗口 2 预览窗口
@@ -185,13 +188,15 @@ function initWindow() {
                 config.mainWindow.show = (data.status === 1);
                 config.mainWindow.width = data.mainWindow.bound.width;
                 config.mainWindow.height = data.mainWindow.bound.height;
+
+                // 控制窗口显示状态 
+                config.mainWindow.executeJavaScript = `GUI.appMode(${data.status});`;
             };
             if (config.previewWindow) {
                 config.previewWindow.show = !!data.executeJavaScript;
                 // config.previewWindow.show=true;
                 config.previewWindow.closable = true;
                 config.previewWindow.executeJavaScript = data.executeJavaScript;
-                config.previewWindow.imports = data.imports;
                 config.previewWindow.width = data.size[0];
                 config.previewWindow.height = data.size[1];
                 config.previewWindow.resizable = false;
@@ -204,7 +209,7 @@ function initWindow() {
             //主窗口显示在欢迎界面
             //初始状态在 欢迎界面
             // TODO 调试下，没有运行
-            if (config.mainWindow) config.mainWindow.executeJavaScript = `GUI.closeFn();`;
+            if (config.mainWindow) config.mainWindow.executeJavaScript = `GUI.initWin();`;
         };
         for (const key in config) {
             // console.log(config[key])
@@ -215,106 +220,110 @@ function initWindow() {
 };
 
 
+const aboutItem = {
+    label: '关于',
+    click: () =>
+        openAboutWindow({
+            icon_path: path.join(__dirname, 'assets/icons/ios/AppIcon.appiconset/icon-1024.png'),
+            product_name: _package.name,
+            copyright: `Copyright (c) 2021 ${_package.author}`,
+            adjust_window_size: true,
+            bug_link_text: "反馈bug",
+            package_json_dir: __dirname,
+            open_devtools: process.env.NODE_ENV === 'development',
+            css_path: path.join(__dirname, 'src/style.css'),
+        }),
+}, bugItem = {
+    label: '反馈bug',
+    click: async () => {
+        const { shell } = require('electron')
+        await shell.openExternal(_package.bugs)
+    }
+}, separatorItem = { type: 'separator' },
+    quitItem = { role: 'quit', label: '退出' };
+
+
+// {
+//     label: '编辑',
+//     type: 'normal',
+//     checked: false,
+//     click: async () => {
+//         global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: true });
+//     }
+// }
+
 function initAppIcon() {
     global._APPICON = new Tray(path.join(__dirname, "assets/icons/ios/AppIcon.appiconset/icon-20@2x.png"));
-    const contextMenu = Menu.buildFromTemplate([{
-        label: '编辑',
-        type: 'normal',
-        checked: false,
-        click: async() => {
-            global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: true });
-        }
-    }]);
+    const contextMenu = Menu.buildFromTemplate([
+        aboutItem,
+        bugItem
+    ]);
 
-
+    global._APPICON.contextMenu=contextMenu;
     global._APPICON.setContextMenu(contextMenu);
-    global._APPICON.setToolTip('智能设计');
-    // return contextMenu
+    global._APPICON.setToolTip(_package.name);
+   
 }
 
 function initMenu() {
-
     const template = [
         // { role: 'appMenu' }
         ...(_IS_MAC ? [{
             label: _package.name,
-            submenu: [{
-                    label: '关于',
-                    click: () =>
-                        openAboutWindow({
-                            icon_path: path.join(__dirname, 'logo.png'),
-                            product_name: 'Design.ai Lab',
-                            copyright: 'Copyright (c) 2021 shadow',
-                            adjust_window_size: true,
-                            bug_link_text: "反馈bug",
-                            package_json_dir: __dirname,
-                            open_devtools: process.env.NODE_ENV === 'development',
-                            css_path: path.join(__dirname, 'src/style.css'),
-                        }),
-                },
-                { type: 'separator' },
-                // {
-                //     label: '反馈',
-                //     click: async() => {
-                //         const { shell } = require('electron')
-                //         await shell.openExternal('https://electronjs.org')
-                //     }
-                // },
-                // { type: 'separator' },
-                // { role: 'hide' },
-                // { role: 'hideothers' },
-                // { role: 'unhide' },
-                // { type: 'separator' },
-                { role: 'quit', label: '退出' }
+            submenu: [
+                aboutItem,
+                bugItem,
+                separatorItem,
+                quitItem
             ]
         }] : []),
         // { role: 'fileMenu' }
-        {
-            label: '文件',
-            submenu: [{
-                    label: '打开',
-                    accelerator: 'CmdOrCtrl+O',
-                    click: () => global._WINS.mainWindow.webContents.send('open-file')
-                },
-                {
-                    label: '新建',
-                    accelerator: 'CmdOrCtrl+N',
-                    click: () => global._WINS.mainWindow.webContents.send('new-file')
-                },
-                {
-                    label: '另存为',
-                    accelerator: 'CmdOrCtrl+S',
-                    click: () => global._WINS.mainWindow.webContents.send('save-file')
-                },
-                { type: 'separator' },
-                {
-                    label: '编辑',
-                    accelerator: 'CmdOrCtrl+E',
-                    click: () => global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: false })
-                },
-                {
-                    label: '发布',
-                    accelerator: 'CmdOrCtrl+P',
-                    click: () => global._WINS.mainWindow.webContents.send('public-file')
-                },
-                { type: 'separator' },
-                {
-                    label: '重启',
-                    accelerator: 'CmdOrCtrl+R',
-                    click: () => {
-                        app.relaunch();
-                        app.exit();
-                    }
-                },
-                { type: 'separator' },
-                {
-                    label: '关闭',
-                    accelerator: 'CmdOrCtrl+W',
-                    click: () => global._WINS.mainWindow.webContents.send('close-file')
-                }
-            ]
-        },
-        //{ role: 'editMenu' },
+        // {
+        //     label: '文件',
+        //     submenu: [{
+        //             label: '打开',
+        //             accelerator: 'CmdOrCtrl+O',
+        //             click: () => global._WINS.mainWindow.webContents.send('open-file')
+        //         },
+        //         {
+        //             label: '新建',
+        //             accelerator: 'CmdOrCtrl+N',
+        //             click: () => global._WINS.mainWindow.webContents.send('new-file')
+        //         },
+        //         {
+        //             label: '另存为',
+        //             accelerator: 'CmdOrCtrl+S',
+        //             click: () => global._WINS.mainWindow.webContents.send('save-file')
+        //         },
+        //         { type: 'separator' },
+        //         {
+        //             label: '编辑',
+        //             accelerator: 'CmdOrCtrl+E',
+        //             click: () => global._WINS.mainWindow.webContents.send('edit-file', { hardReadOnly: false })
+        //         },
+        //         {
+        //             label: '发布',
+        //             accelerator: 'CmdOrCtrl+P',
+        //             click: () => global._WINS.mainWindow.webContents.send('public-file')
+        //         },
+        //         { type: 'separator' },
+        //         {
+        //             label: '重启',
+        //             accelerator: 'CmdOrCtrl+R',
+        //             click: () => {
+        //                 app.relaunch();
+        //                 app.exit();
+        //             }
+        //         },
+        //         { type: 'separator' },
+        //         {
+        //             label: '关闭',
+        //             accelerator: 'CmdOrCtrl+W',
+        //             click: () => global._WINS.mainWindow.webContents.send('close-file')
+        //         }
+        //     ]
+        // },
+        // //{ role: 'editMenu' },
         {
             //role: 'editMenu',
             label: '编辑',
@@ -353,37 +362,37 @@ function initMenu() {
                 },
             ]
         },
+        // // {
+        // //     label: '模式',
+        // //     submenu: modeMenu.items
+        // // },
+        // // {
+        // //     role: 'windowMenu'
+        // // },
         // {
-        //     label: '模式',
-        //     submenu: modeMenu.items
+        //     label: '窗口',
+        //     role: 'window',
+        //     submenu: [{
+        //         label: '调试',
+        //         // accelerator: 'CmdOrCtrl+M',
+        //         click: () => global._WINS.mainWindow.webContents.send('open-devtools')
+        //     }, {
+        //         label: '最小化',
+        //         // accelerator: 'CmdOrCtrl+M',
+        //         role: 'minimize'
+        //     }]
         // },
         // {
-        //     role: 'windowMenu'
-        // },
-        {
-            label: '窗口',
-            role: 'window',
-            submenu: [{
-                label: '调试',
-                // accelerator: 'CmdOrCtrl+M',
-                click: () => global._WINS.mainWindow.webContents.send('open-devtools')
-            }, {
-                label: '最小化',
-                // accelerator: 'CmdOrCtrl+M',
-                role: 'minimize'
-            }]
-        },
-        {
-            role: 'help',
-            label: '帮助',
-            submenu: [{
-                label: 'Learn More',
-                click: async() => {
-                    const { shell } = require('electron')
-                    await shell.openExternal('https://electronjs.org')
-                }
-            }]
-        }
+        //     role: 'help',
+        //     label: '帮助',
+        //     submenu: [{
+        //         label: 'Learn More',
+        //         click: async() => {
+        //             const { shell } = require('electron')
+        //             await shell.openExternal('https://electronjs.org')
+        //         }
+        //     }]
+        // }
     ]
 
     const menu = Menu.buildFromTemplate(template);
@@ -405,7 +414,7 @@ ipcMain.on('init-window', (event, arg) => {
 app.whenReady().then(() => {
     // web服务,包括模型
     const server = require('./src/server/https');
-    server.start();
+    server.start(process.env.NODE_ENV === 'development');
 
     initAppIcon()
     initMenu();
@@ -417,12 +426,12 @@ app.whenReady().then(() => {
     });
     app.on('browser-window-focus', (event, win) => {
         // console.log(event,win)
-        console.log('browser-window-focus')
-            // TODO 待细化,当wifi环境变化的时候
+        if (process.env.NODE_ENV === 'development') console.log('browser-window-focus')
+        // TODO 待细化,当wifi环境变化的时候
     });
 
     app.on('web-contents-created', (event, webContents) => {
-        console.log('web-contents-created')
+        if (process.env.NODE_ENV === 'development') console.log('web-contents-created')
     });
 })
 
