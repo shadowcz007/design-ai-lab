@@ -4,7 +4,7 @@ const md5 = require('md5');
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
-const image = new (require('./image'));
+const image = new(require('./image'));
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -47,24 +47,24 @@ class Layout {
 class UI {
 
     constructor() {
-        // this.isDisplay();
-    }
-    // 取id
+            // this.isDisplay();
+        }
+        // 取id
     md5(str = "") {
-        return md5(str)
-    }
-    //手动隐藏,显示p5.js
-    // p5Show(isShow = true) {
-    //     if (document.querySelector("#p5")) {
-    //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-    //         // if (isShow == false && p5.instance) p5.instance.remove();
-    //     };
-    //     if (document.querySelector('#gui-main')) {
-    //         document.querySelector('#gui-main').style.top = '0';
-    //         document.querySelector('#gui-main').style.height = '100vh';
-    //     }
-    // }
-    // GUI布局
+            return md5(str)
+        }
+        //手动隐藏,显示p5.js
+        // p5Show(isShow = true) {
+        //     if (document.querySelector("#p5")) {
+        //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+        //         // if (isShow == false && p5.instance) p5.instance.remove();
+        //     };
+        //     if (document.querySelector('#gui-main')) {
+        //         document.querySelector('#gui-main').style.top = '0';
+        //         document.querySelector('#gui-main').style.height = '100vh';
+        //     }
+        // }
+        // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
@@ -89,7 +89,7 @@ class UI {
     // }
 
     // 创建createDivider
-    createDivider(){
+    createDivider() {
         let div = document.createElement('div');
         div.className = 'ui hidden divider';
         //div.innerHTML = Array.from(list, t => `<div class="item">${t}</div>`).join('');
@@ -105,31 +105,31 @@ class UI {
     };
     // 模态框
     createModel(header = '', content = '') {
-        let div = document.createElement('div');
-        div.className = 'ui modal';
-        div.innerHTML = `
+            let div = document.createElement('div');
+            div.className = 'ui modal';
+            div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-        div.add = function (child, type = 'content') {
-            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
-        };
-        div.show = function () {
-            $(div).modal('show');
-        };
-        div.hide = function () {
-            $(div).modal('hide');
-        };
-        return div
-    }
-    // 标签
+            div.add = function(child, type = 'content') {
+                if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+            };
+            div.show = function() {
+                $(div).modal('show');
+            };
+            div.hide = function() {
+                $(div).modal('hide');
+            };
+            return div
+        }
+        // 标签
     createTag(text, color = 'red') {
-        let div = document.createElement('a');
-        div.className = `ui ${color} tag label`;
-        div.innerHTML = text;
-        return div
-    }
-    // 标签集
+            let div = document.createElement('a');
+            div.className = `ui ${color} tag label`;
+            div.innerHTML = text;
+            return div
+        }
+        // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
@@ -145,10 +145,10 @@ class UI {
 
     // 创建折叠菜单
     createAccordion(items = []) {
-        let div = document.createElement('div');
-        div.className = 'ui vertical accordion menu';
-        div.innerHTML = Array.from(items, i => {
-            return `<div class="item">
+            let div = document.createElement('div');
+            div.className = 'ui vertical accordion menu';
+            div.innerHTML = Array.from(items, i => {
+                        return `<div class="item">
                         <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
@@ -533,6 +533,13 @@ class UI {
             localStorage.setItem(key, JSON.stringify(defaultValue));
             // div.setAttribute('data-count', defaultValue.length);
             div.setDefaultValue(defaultValue);
+
+            if (eventListener && defaultValue) {
+                setTimeout(() => {
+                    eventListener(defaultValue);
+                },200);
+            };
+
         };
 
         div.reset = () => {
