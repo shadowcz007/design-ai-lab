@@ -4,7 +4,7 @@ const md5 = require('md5');
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
-const image = new(require('./image'));
+const image = new (require('./image'));
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -47,24 +47,24 @@ class Layout {
 class UI {
 
     constructor() {
-            // this.isDisplay();
-        }
-        // 取id
+        // this.isDisplay();
+    }
+    // 取id
     md5(str = "") {
-            return md5(str)
-        }
-        //手动隐藏,显示p5.js
-        // p5Show(isShow = true) {
-        //     if (document.querySelector("#p5")) {
-        //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-        //         // if (isShow == false && p5.instance) p5.instance.remove();
-        //     };
-        //     if (document.querySelector('#gui-main')) {
-        //         document.querySelector('#gui-main').style.top = '0';
-        //         document.querySelector('#gui-main').style.height = '100vh';
-        //     }
-        // }
-        // GUI布局
+        return md5(str)
+    }
+    //手动隐藏,显示p5.js
+    // p5Show(isShow = true) {
+    //     if (document.querySelector("#p5")) {
+    //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+    //         // if (isShow == false && p5.instance) p5.instance.remove();
+    //     };
+    //     if (document.querySelector('#gui-main')) {
+    //         document.querySelector('#gui-main').style.top = '0';
+    //         document.querySelector('#gui-main').style.height = '100vh';
+    //     }
+    // }
+    // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
@@ -96,6 +96,28 @@ class UI {
         return div
     }
 
+    createFeed(items = []) {
+        let div = document.createElement('div');
+        div.className = 'ui feed';
+        div.innerHTML = Array.from(items, item => `<div class="event" data-item='${JSON.stringify(item)}'>
+            <div class="label">
+            ${item.imgurl ? `<img src="${item.imgurl}">` : ''}
+            </div>
+            <div class="content">
+            <div class="summary">
+                <a class="user">
+                ${item.name ? item.name : ""}
+                </a> ${item.text ? item.text : ""}
+                ${item.date ? `<div class="date">${item.date}</div>` : ''}
+            </div>
+            <div class="meta">
+            ${item.like ? `<a class="like"><i class="like icon"></i>${item.like}</a>` : ""}
+            </div>
+            </div>
+        </div>`).join("");
+        return div
+    }
+
     // 创建list
     createList(list = []) {
         let div = document.createElement('div');
@@ -105,31 +127,34 @@ class UI {
     };
     // 模态框
     createModel(header = '', content = '') {
-            let div = document.createElement('div');
-            div.className = 'ui modal';
-            div.innerHTML = `
+        let div = document.createElement('div');
+        div.className = 'ui modal';
+        div.innerHTML = `
             <div class="header">${header}</div>
             <div class="content">${content}
             </div>`;
-            div.add = function(child, type = 'content') {
-                if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
-            };
-            div.show = function() {
-                $(div).modal('show');
-            };
-            div.hide = function() {
-                $(div).modal('hide');
-            };
-            return div
-        }
-        // 标签
+        div.add = function (child, type = 'content') {
+            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).appendChild(child);
+        };
+        div.clear = function (type = 'content') {
+            if (div.querySelector(`.${type}`)) div.querySelector(`.${type}`).innerHTML = "";
+        };
+        div.show = function () {
+            $(div).modal('show');
+        };
+        div.hide = function () {
+            $(div).modal('hide');
+        };
+        return div
+    }
+    // 标签
     createTag(text, color = 'red') {
-            let div = document.createElement('a');
-            div.className = `ui ${color} tag label`;
-            div.innerHTML = text;
-            return div
-        }
-        // 标签集
+        let div = document.createElement('a');
+        div.className = `ui ${color} tag label`;
+        div.innerHTML = text;
+        return div
+    }
+    // 标签集
     createTags(tags = []) {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
@@ -145,10 +170,10 @@ class UI {
 
     // 创建折叠菜单
     createAccordion(items = []) {
-            let div = document.createElement('div');
-            div.className = 'ui vertical accordion menu';
-            div.innerHTML = Array.from(items, i => {
-                        return `<div class="item">
+        let div = document.createElement('div');
+        div.className = 'ui vertical accordion menu';
+        div.innerHTML = Array.from(items, i => {
+            return `<div class="item">
                         <a class="${i.active ? 'active' : ''} title"><i class="dropdown icon"></i>${i.title}</a>
                         <div class="${i.active ? 'active' : ''} content">
                             <div class="ui form">
@@ -174,6 +199,8 @@ class UI {
                 item.changeFn(e.target.checked);
             });
         };
+        div.getValue = () => div.querySelector('input').checked;
+        div.setValue = checked => div.querySelector('input').checked = checked;
         return div
     }
 
@@ -321,8 +348,8 @@ class UI {
     // toast(text) {
     //     // Swal.fire(text);
     // }
-    toast(text){
-        $('body').toast({message:text});
+    toast(text) {
+        $('body').toast({ message: text });
     }
     // 
     // loading
@@ -486,6 +513,7 @@ class UI {
 
         };
 
+
         let isInput = false;
         // 监听事件
         function eventFn(e) {
@@ -513,10 +541,12 @@ class UI {
         };
         input.addEventListener('change', eventFn);
 
-        
+
         div.getValue = () => {
             return input.value;
         };
+        div.setValue = div.setDefaultValue;
+
         div.p = p;
         div.input = input;
         div.appendChild(p);
@@ -537,9 +567,8 @@ class UI {
             if (eventListener && defaultValue) {
                 setTimeout(() => {
                     eventListener(defaultValue);
-                },200);
+                }, 200);
             };
-
         };
 
         div.reset = () => {
@@ -581,13 +610,15 @@ class UI {
             this.input.value = value[0];
         };
         let div = this.createBaseInput('text', text, false, key, eventListener, setPlaceholder);
-        div.className='ui form inline field';
-        div.querySelector('p').outerHTML=`<label>${div.querySelector('p').innerText}</label>`;
+        div.className = 'ui form inline field';
+        div.querySelector('p').outerHTML = `<label>${div.querySelector('p').innerText}</label>`;
 
-        let form=document.createElement('div');
-        form.className="ui form";
+        let form = document.createElement('div');
+        form.className = "ui form";
         form.appendChild(div);
-        form.setDefaultValue=div.setDefaultValue;
+        form.setDefaultValue = div.setDefaultValue;
+        form.setValue = div.setValue;
+        form.getValue = div.getValue;
         return form
     }
     // 文件上传
@@ -913,6 +944,23 @@ class UI {
     //创建图片，根据url返回图片dom
     createImage(url) {
         return image.createImage(url);
+    }
+
+    // 创建图片预览，并且提供下载按钮
+    createImageAndPreview() {
+        let div = document.createElement('div');
+        //如果是图片，则多一个图片预览
+        div.classList.add('input-image-default');
+        div.setValue = value => {
+            if (!value || !(value && value[0])) return
+            div.classList.add('input-image');
+            div.style.backgroundImage = `url(${encodeURI(value[0])})`;
+            div.setAttribute('data-src', value[0]);
+        };
+        div.getValue = () => {
+            return div.getAttribute('data-src')
+        };
+        return div
     }
 
     // 创建图片预览，并且提供下载按钮

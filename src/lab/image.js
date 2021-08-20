@@ -19,7 +19,7 @@ class ImageTool {
     createCanvasFromImage(im) {
         // im.width = im.naturalWidth;
         // im.height = im.naturalHeight;
-        let canvas = this.createCanvas(im.naturalWidth,im.naturalHeight);
+        let canvas = this.createCanvas(im.naturalWidth || im.width, im.naturalHeight || im.height);
         let ctx = canvas.getContext('2d');
         ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
         return canvas
@@ -69,7 +69,7 @@ class ImageTool {
         return url
     }
     // unsplash
-    getUnsplash(accessKey, count= 30) {
+    getUnsplash(accessKey, count = 30) {
         let unsplash = createApi({
             accessKey: accessKey,
         });
@@ -77,7 +77,7 @@ class ImageTool {
             unsplash.photos.getRandom({
                 count: count,
             }).then(result => {
-                
+
                 switch (result.type) {
                     case 'error':
                         // console.log('error occurred: ', result.errors[0]);
