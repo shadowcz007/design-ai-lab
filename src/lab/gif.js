@@ -1,23 +1,23 @@
 const _GIF = require('gif.js/dist/gif');
 // const fs = require('fs');
 const base = require('./base');
-const image = new (require('./image'));
+const image = new(require('./image'));
 
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
-    constructor(transparent=null) {
-        // transparent hex color, 0x00FF00 = green
-        this.gif = new _GIF({
-            workers: 4,
-            quality: 10,
-            background: 'rgba(0,0,0,0)',
-            transparent: transparent,
-            // dither:'FloydSteinberg',
-            workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
-        });
-    }
-    // canvasElement imageElement
+    constructor(transparent = null) {
+            // transparent hex color, 0x00FF00 = green
+            this.gif = new _GIF({
+                workers: 4,
+                quality: 10,
+                background: 'rgba(0,0,0,0)',
+                transparent: transparent,
+                // dither:'FloydSteinberg',
+                workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
+            });
+        }
+        // canvasElement imageElement
     add(elt, fps = 10) {
         this.gif.addFrame(elt, {
             delay: 1000 / fps,
@@ -29,7 +29,7 @@ class GIF {
         // let ctx;
         for (const url of urls) {
             let im = await image.createImage(url);
-            this.add(im,fps);
+            this.add(im, fps);
         };
         let res = await this.render();
         return res;
@@ -56,17 +56,23 @@ class GIF {
         };
         return
     }
-    render() {
+
+    // 是否以base64返回
+    render(isBase64 = true) {
         return new Promise((resolve, reject) => {
-            this.gif.on('finished', function (blob) {
-                resolve(URL.createObjectURL(blob));
+            this.gif.on('finished', async blob => {
+                let url = URL.createObjectURL(blob);
+                if (isBase64) {
+                    url = await image.getNativeImageFromWebview2(url);
+                };
+                resolve(url);
             });
             this.gif.render();
         });
     }
 
-    download(url,name='design-ai-lab.gif'){
-        let a=document.createElement('a');
+    download(url, name = 'design-ai-lab.gif') {
+        let a = document.createElement('a');
         a.href = url;
         a.download = name;
         a.click();
@@ -89,9 +95,10 @@ class GIF {
                     tempCanvas.height = frames[0].dims.height;
                     gifCanvas.width = frames[0].dims.width;
                     gifCanvas.height = frames[0].dims.height;
-
+                    // console.log(frames)
+                    let delays = 0;
                     frames = Array.from(frames, f => {
-                        console.log(f)
+                        delays += f.delay;
                         let c = document.createElement('canvas');
                         c.width = f.dims.width;
                         c.height = f.dims.height;
@@ -103,7 +110,10 @@ class GIF {
 
                         return c
                     });
-                    resolve(frames);
+                    resolve({
+                        frames,
+                        fps: parseInt(frames.length * 1000 / delays)
+                    });
                 })
         })
 

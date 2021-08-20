@@ -4,7 +4,7 @@ const md5 = require('md5');
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
-const image = new (require('./image'));
+const image = new(require('./image'));
 
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
@@ -47,24 +47,24 @@ class Layout {
 class UI {
 
     constructor() {
-        // this.isDisplay();
-    }
-    // 取id
+            // this.isDisplay();
+        }
+        // 取id
     md5(str = "") {
-        return md5(str)
-    }
-    //手动隐藏,显示p5.js
-    // p5Show(isShow = true) {
-    //     if (document.querySelector("#p5")) {
-    //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
-    //         // if (isShow == false && p5.instance) p5.instance.remove();
-    //     };
-    //     if (document.querySelector('#gui-main')) {
-    //         document.querySelector('#gui-main').style.top = '0';
-    //         document.querySelector('#gui-main').style.height = '100vh';
-    //     }
-    // }
-    // GUI布局
+            return md5(str)
+        }
+        //手动隐藏,显示p5.js
+        // p5Show(isShow = true) {
+        //     if (document.querySelector("#p5")) {
+        //         document.querySelector("#p5").style.display = (isShow === true) ? "flex" : "none";
+        //         // if (isShow == false && p5.instance) p5.instance.remove();
+        //     };
+        //     if (document.querySelector('#gui-main')) {
+        //         document.querySelector('#gui-main').style.top = '0';
+        //         document.querySelector('#gui-main').style.height = '100vh';
+        //     }
+        // }
+        // GUI布局
     layout(type = 'default', isDev = false) {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
@@ -97,9 +97,9 @@ class UI {
     }
 
     createFeed(items = []) {
-        let div = document.createElement('div');
-        div.className = 'ui feed';
-        div.innerHTML = Array.from(items, item => `<div class="event" data-item='${JSON.stringify(item)}'>
+            let div = document.createElement('div');
+            div.className = 'ui feed';
+            div.innerHTML = Array.from(items, item => `<div class="event" data-item='${JSON.stringify(item)}'>
             <div class="label">
             ${item.imgurl ? `<img src="${item.imgurl}">` : ''}
             </div>
@@ -192,7 +192,7 @@ class UI {
     createToggle(item) {
         let div = document.createElement('div');
         div.className = 'ui toggle checkbox';
-        div.innerHTML = `<input type="checkbox" name="${item.name}">
+        div.innerHTML = `<input type="checkbox" name="${item.name}" ${!!item.checked?'checked':''}>
                         <label>${item.label}</label>`;
         if (item.changeFn) {
             div.querySelector('input').addEventListener('change', e => {
@@ -399,6 +399,11 @@ class UI {
         return p;
     }
 
+    createHeader(type,text=""){
+        let p = document.createElement('h'+type);
+        p.innerText = text;
+        return p;
+    }
 
     // 封装的控件
     createIcon(key, eventListener, isAdd = true) {
