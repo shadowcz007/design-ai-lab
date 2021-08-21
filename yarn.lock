@@ -8298,6 +8298,11 @@ regex-not@^1.0.0, regex-not@^1.0.2:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
 
+regl@^2.1.0:
+  version "2.1.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/regl/-/regl-2.1.0.tgz#7dae71e9ff20f29c4f42f510c70cd92ebb6b657c"
+  integrity sha512-oWUce/aVoEvW5l2V0LK7O5KJMzUSKeiOwFuJehzpSFd43dO5spP9r+sSUfhKtsky4u6MCqWJaRL+abzExynfTg==
+
 remove-bom-buffer@^3.0.0:
   version "3.0.0"
   resolved "http://mirrors.cloud.tencent.com/npm/remove-bom-buffer/-/remove-bom-buffer-3.0.0.tgz#c2bf1e377520d324f623892e33c10cac2c252b53"

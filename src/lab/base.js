@@ -22,6 +22,7 @@ class Base {
         // 
     sleep = m => new Promise(r => setTimeout(r, m));
 
+    // 打乱
     shuffle(arr) {
         let arrNew = [...arr];
         //用Math.random()函数生成0~1之间的随机数与0.5比较，返回-1或1
@@ -33,6 +34,11 @@ class Base {
     }
 
 
+    // 唯一
+    unique(arr) {
+        //Set数据结构，它类似于数组，其成员的值都是唯一的
+        return Array.from(new Set(arr)); // 利用Array.from将Set结构转换成数组
+    }
 
     // toast
 
@@ -54,7 +60,7 @@ class Base {
 
     // arraybuffer转buffer
     arrayBuffer2Buffer(ab) {
-        var buf = new Buffer(ab.byteLength);
+        var buf = Buffer.from(ab.byteLength);
         var view = new Uint8Array(ab);
         for (var i = 0; i < buf.length; ++i) {
             buf[i] = view[i];

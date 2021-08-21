@@ -57,7 +57,7 @@ class GUI {
         this.mShow = false;
         this.pShow = false;
         this.toastError = false;
-        Win.callback = async (t) => {
+        Win.callback = async(t) => {
             console.log('this.updateDevCard();', t)
             await this.updateDevCard();
 
@@ -76,7 +76,7 @@ class GUI {
                         actions: [{
                             text: '确定',
                             class: 'yellow',
-                            click: function () {
+                            click: function() {
                                 this.toastError = false;
                                 // $('body').toast({message:'You clicked "yes", toast closes by default'});
                             }
@@ -172,7 +172,7 @@ class GUI {
         this.addClickEventListener(this.setupCodeBtn, () => {
             this.modelConfirmBtn.style.display = 'none';
             $('#knowledge-pannel').modal({
-                onHidden: async () => {
+                onHidden: async() => {
                     await this.updateDevCard();
                 }
             }).modal('show');
@@ -187,9 +187,17 @@ class GUI {
         // 新建代码文件夹
         this.addClickEventListener(this.newFolderBtn, () => {
             Knowledge.set({
-                author: '', readme: '未命名', course: '示例模版', version: 0.1
+                author: '',
+                readme: '未命名',
+                course: '示例模版',
+                version: 0.1
             });
-
+            Editor.setCode(`
+            //Hello AI world!
+            function gui() {
+                let h = Lab.ui.createHeader(1, 'HELLO AI WORLD');
+                Lab.ui.add(h);
+            }`);
             $('#knowledge-pannel').modal('show');
             //  $('body').toast({message:'Great!'});
 
@@ -229,7 +237,7 @@ class GUI {
         // this.addClickEventListener()
         // 打开代码文件夹
         // TODO 扩展参数
-        this.addClickEventListener(this.devFolderBtn, async () => {
+        this.addClickEventListener(this.devFolderBtn, async() => {
             let res = await App.dev();
             if (res) {
                 this.devPath = res.devPath;
@@ -340,7 +348,7 @@ class GUI {
             // obj.imports = imports;
         };
         return new Promise((resolve, reject) => {
-            storage.set('app', obj, function (error) {
+            storage.set('app', obj, function(error) {
                 if (error) throw error;
                 resolve();
             });
@@ -349,7 +357,7 @@ class GUI {
     }
     loadWindowStatus() {
         return new Promise((resolve, reject) => {
-            storage.get('app', function (error, data) {
+            storage.get('app', function(error, data) {
                 console.log('storage', data)
                 Win.resize(data.size, 1);
                 if (data.status === 1 && data.mainWindow.show) {
@@ -437,7 +445,7 @@ class GUI {
 
     //获得需要存储的数据,定义文件格式(数据结构)
     getSaveFileContent() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
             let res = await this.createSaveFileContent();
             let img = await Win.capturePage(1);
             // console.log(img)
@@ -453,7 +461,7 @@ class GUI {
     async updateDevCard() {
         let res = await this.getSaveFileContent();
         // console.log(res)
-        let card = this.createConfigCard({ ...res, devPath: this.devPath });
+        let card = this.createConfigCard({...res, devPath: this.devPath });
         Editor.updateCard(card);
     }
 
@@ -506,8 +514,10 @@ class GUI {
             console.log('!!!!', res);
             this.openFile(res);
             Win.changeAppIcon([{
-                label: '发布',
-                click: this.pubilcFn
+                label: '关闭',
+                click: () => {
+                    this.closeFn();
+                }
             }]);
         };
     }
@@ -664,7 +674,7 @@ class GUI {
             if (filePath) {
                 // res.title = path.basename;
                 // console.log(res.title)
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function (err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
@@ -777,21 +787,21 @@ class GUI {
     // }
 
     closeEditorWin() {
-        document.getElementById("knowledge-pannel").style.display = "block";
-        document.getElementById("editor-pannel").classList.remove("pannel-large");
-        document.body.querySelector('#frame').style.borderWidth = '0px !important;';
-        document.body.querySelector('#frame').style.height = "100%";
-        // Layout.reset();
-        // this.openBtn.classList.remove('button-active');
-    }
-    // 放大编程页面
-    // toggleEditorWin() {
-    //     if (this.openBtn.classList.contains('button-active')) {
-    //         this.openEditorWin();
-    //     } else {
-    //         this.closeEditorWin();
-    //     }
-    // }
+            document.getElementById("knowledge-pannel").style.display = "block";
+            document.getElementById("editor-pannel").classList.remove("pannel-large");
+            document.body.querySelector('#frame').style.borderWidth = '0px !important;';
+            document.body.querySelector('#frame').style.height = "100%";
+            // Layout.reset();
+            // this.openBtn.classList.remove('button-active');
+        }
+        // 放大编程页面
+        // toggleEditorWin() {
+        //     if (this.openBtn.classList.contains('button-active')) {
+        //         this.openEditorWin();
+        //     } else {
+        //         this.closeEditorWin();
+        //     }
+        // }
 
     //编程，UI状态关闭
     // closePracticeHtml() {
@@ -890,11 +900,11 @@ class GUI {
 
     // 创建基础卡片
     createBaseCard(data) {
-        let readme = this.createElement('', 'h5');
-        readme.innerHTML = Knowledge.marked(data.knowledge.readme);
-        readme.innerText = readme.innerText;
-        // console.log(data)
-        let html = `<img class="ui avatar image" 
+            let readme = this.createElement('', 'h5');
+            readme.innerHTML = Knowledge.marked(data.knowledge.readme);
+            readme.innerText = readme.innerText;
+            // console.log(data)
+            let html = `<img class="ui avatar image" 
                             src="${data.poster ? URL.createObjectURL(this.base64ToBlob(data.poster)) : path.join(__dirname, '../assets/ios/AppIcon.appiconset/icon-40.png')}"
                             style='border-radius: 0;outline: 1px solid #e2e2e2;margin: 8px 0;margin-right: 18px;'>
                     <div class="content">
