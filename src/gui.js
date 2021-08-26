@@ -687,8 +687,10 @@ class GUI {
                     });
 
                     Win.changeAppIcon([{
-                        label: '发布',
-                        click: this.pubilcFn
+                        label: '关闭',
+                        click: ()=>{
+                            this.closeFn();
+                        }
                     }]);
 
                 });

@@ -668,6 +668,7 @@ class UI {
 
 
     // check输入控件
+    // TODO fixbug
     createCheckInput(text, key, eventListener = null) {
         let setPlaceholder = function (value) {
             if (!value || !(value && value.length > 0)) return
@@ -946,6 +947,117 @@ class UI {
 
         return canvas
     }
+
+    createTextCanvas2(txt,style,isAdd=false){
+        let canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d');
+        let { fontSize, color, fontFamily } = style || {
+            fontSize: 12,
+            color: 'black',
+            fontFamily: 'monospace'
+        };
+        fontSize = fontSize || 12;
+        color = color || 'black';
+        fontFamily = fontFamily || 'monospace';
+
+        // 更新文字
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let x = 2;
+            ctx.font = `${fontSize * x}px ${fontFamily}`;
+            let font = ctx.measureText(txt);
+            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 2*fontSize * x;
+            canvas.width = (font.width) + 2*fontSize * x;
+            ctx.font = `${fontSize * x}px ${fontFamily}`;
+            ctx.fillStyle = color;
+            ctx.textAlign = "start";
+            ctx.textBaseline = "top";
+            ctx.fillText(txt, fontSize * x, fontSize * x);
+         
+        canvas=this.trim(canvas);
+        canvas.className = 'text_canvas';
+        if (isAdd) this.add(canvas);
+        return canvas;
+    }
+
+//TODO Trim Canvas Pixels Method
+// https://gist.github.com/remy/784508
+    trim(canvas) {
+
+        let ctx = canvas.getContext('2d'),
+
+        // create a temporary canvas in which we will draw back the trimmed text
+        copy = document.createElement('canvas').getContext('2d'),
+
+        // Use the Canvas Image Data API, in order to get all the
+        // underlying pixels data of that canvas. This will basically
+        // return an array (Uint8ClampedArray) containing the data in the
+        // RGBA order. Every 4 items represent one pixel.
+        pixels = ctx.getImageData(0, 0, canvas.width, canvas.height),
+
+        // total pixels
+        l = pixels.data.length,
+        
+        // main loop counter and pixels coordinates
+        i, x, y,
+
+        // an object that will store the area that isn't transparent
+        bound = { top: null, left: null, right: null, bottom: null };
+
+    // for every pixel in there
+    for (i = 0; i < l; i += 4) {
+
+        // if the alpha value isn't ZERO (transparent pixel)
+        if (pixels.data[i+3] !== 0) {
+
+        // find it's coordinates
+        x = (i / 4) % canvas.width;
+        y = ~~((i / 4) / canvas.width);
+    
+        // store/update those coordinates
+        // inside our bounding box Object
+
+        if (bound.top === null) {
+            bound.top = y;
+        }
+        
+        if (bound.left === null) {
+            bound.left = x; 
+        } else if (x < bound.left) {
+            bound.left = x;
+        }
+        
+        if (bound.right === null) {
+            bound.right = x; 
+        } else if (bound.right < x) {
+            bound.right = x;
+        }
+        
+        if (bound.bottom === null) {
+            bound.bottom = y;
+        } else if (bound.bottom < y) {
+            bound.bottom = y;
+        }
+        }
+    }
+    
+    // actual height and width of the text
+    // (the zone that is actually filled with pixels)
+    var trimHeight = bound.bottom - bound.top,
+        trimWidth = bound.right - bound.left,
+
+        // get the zone (trimWidth x trimHeight) as an ImageData
+        // (Uint8ClampedArray of pixels) from our canvas
+        trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+    
+    // Draw back the ImageData into the canvas
+    copy.canvas.width = trimWidth;
+    copy.canvas.height = trimHeight;
+    copy.putImageData(trimmed, 0, 0);
+
+    // return the canvas element
+    return copy.canvas;
+}
+
     //创建图片，根据url返回图片dom
     createImage(url) {
         return image.createImage(url);

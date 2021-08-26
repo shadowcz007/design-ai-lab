@@ -1,35 +1,38 @@
 const _GIF = require('gif.js/dist/gif');
 // const fs = require('fs');
 const base = require('./base');
-const image = new(require('./image'));
+const image = new (require('./image'));
 
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
-    constructor(transparent = null) {
-            // transparent hex color, 0x00FF00 = green
-            this.gif = new _GIF({
-                workers: 4,
-                quality: 10,
-                background: 'rgba(0,0,0,0)',
-                transparent: transparent,
-                // dither:'FloydSteinberg',
-                workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
-            });
-        }
-        // canvasElement imageElement
-    add(elt, fps = 10) {
+    // TODO 合成透明底的 有bug
+    constructor(transparent = null, background = 0xFFFFFF) {
+        // transparent hex color, 0x00FF00 = green
+        // background 当背景是透明色时，默认填充的背景色，不支持透明度
+        let opts = {
+            workers: 6,
+            quality: 10,
+            // dither:'FloydSteinberg',
+            workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
+        };
+        if (transparent) opts.transparent = 0x00FF00;
+        if (background) opts.background = background;
+        this.gif = new _GIF(opts);
+    }
+    // canvasElement imageElement
+    add(elt, fps = 10, copy = true) {
         this.gif.addFrame(elt, {
             delay: 1000 / fps,
-            copy: true
+            copy: copy
         });
     }
 
-    async createGifFromUrls(urls = [], fps = 12) {
+    async createGifFromUrls(urls = [], fps = 12, copy = true) {
         // let ctx;
         for (const url of urls) {
             let im = await image.createImage(url);
-            this.add(im, fps);
+            this.add(im, fps, copy);
         };
         let res = await this.render();
         return res;
@@ -65,6 +68,7 @@ class GIF {
                 if (isBase64) {
                     url = await image.getNativeImageFromWebview2(url);
                 };
+                this.gif.abort();
                 resolve(url);
             });
             this.gif.render();
@@ -117,7 +121,49 @@ class GIF {
                 })
         })
 
-    };
+    }
+
+    createFromCtx(width = 300, height = 300,parameters, from={}, to={}, ctxFn,transparent) {
+        let canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        let ctx = canvas.getContext('2d');
+
+        let frames = [];
+        let {duration,delay,endDelay,round,easing}=parameters;
+        duration=duration||1000;
+        delay=delay||0;
+        endDelay=endDelay||0;
+        round=round||0;
+        easing=easing||'linear';
+
+        let data={...from};
+        return new Promise((resolve, reject) => {
+            anime({
+                targets: data,
+                ...to,
+                duration: duration,
+                delay: delay,
+                endDelay: endDelay,
+                round:round,
+                easing:easing ,
+                begin: anim => {
+                    frames = [];
+                },
+                update: () => {
+                    if (ctxFn) ctxFn(ctx,data);
+                    frames.push(canvas.toDataURL());
+                },
+                complete: async anim => {
+                    let gif = new GIF(transparent);
+                    let base64 = await this.createGifFromUrls(frames, frames.length/(0.001*duration), false);
+                    resolve(base64);
+                }
+            });
+        })
+
+    }
 }
 
 module.exports = GIF;
