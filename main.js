@@ -19,6 +19,7 @@ const _IS_MAC = process.platform === 'darwin';
 //全局变量
 global._WINS = {};
 global._APPICON = null;
+global._DEV=process.env.NODE_ENV === 'development';
 
 const _INDEX_HTML = path.join(__dirname, 'src/index_v2.html');
 const _PRE_HTML = path.join(__dirname, 'src/preview.html');
@@ -26,7 +27,7 @@ const _BASIC_HTML = path.join(__dirname, 'src/basic.html');
 const _PRELOAD_JS = path.join(__dirname, 'src/preload.js');
 // const _BASIC_PRELOAD_JS = path.join(__dirname, 'src/ffmpeg_server.js');
 
-if (process.env.NODE_ENV === 'development') {
+if (global._DEV) {
     global._DEBUG_PORT = 3000;
     app.commandLine.appendSwitch('remote-debugging-port', global._DEBUG_PORT);
     app.commandLine.appendSwitch('remote-debugging-address', 'http://127.0.0.1');
@@ -369,19 +370,26 @@ function initMenu() {
         // // {
         // //     role: 'windowMenu'
         // // },
-        // {
-        //     label: '窗口',
-        //     role: 'window',
-        //     submenu: [{
-        //         label: '调试',
-        //         // accelerator: 'CmdOrCtrl+M',
-        //         click: () => global._WINS.mainWindow.webContents.send('open-devtools')
-        //     }, {
-        //         label: '最小化',
-        //         // accelerator: 'CmdOrCtrl+M',
-        //         role: 'minimize'
-        //     }]
-        // },
+        {
+            label: '窗口',
+            role: 'window',
+            submenu:global._DEV?[
+            {
+                label: '调试',
+                // accelerator: 'CmdOrCtrl+M',
+                click: () => global._WINS.mainWindow.webContents.send('open-devtools')
+            }, 
+            {
+                label: '最小化',
+                // accelerator: 'CmdOrCtrl+M',
+                role: 'minimize'
+            }]:[
+            {
+                label: '最小化',
+                // accelerator: 'CmdOrCtrl+M',
+                role: 'minimize'
+            }]
+        },
         // {
         //     role: 'help',
         //     label: '帮助',

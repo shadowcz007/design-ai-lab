@@ -526,6 +526,7 @@ class GUI {
         if (status == 0) {
             this.mShow = true;
             this.pShow = false;
+            Win.getMainBound();
         };
         if (status == 1) {
             this.mShow = true;
@@ -537,7 +538,6 @@ class GUI {
         }
 
         if (status != 0) {
-            Win.getMainBound();
             Win.changeAppIcon([{
                 label: '关闭',
                 click: () => {

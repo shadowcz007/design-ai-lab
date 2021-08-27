@@ -159,8 +159,8 @@ class UI {
         let div = document.createElement('div');
         div.className = 'ui divided selection list';
 
-        div.innerHTML = Array.from(tags, t => `<a class="item">
-            <div class="ui red horizontal label" data-id='${t.id || ''}'>${t.label ? t.label : t}</div>
+        div.innerHTML = Array.from(tags, t => `<a class="item" data-id='${String(t.id) || ''}'>
+            <div class="ui red horizontal label" data-id='${String(t.id) || ''}'>${t.label ? t.label : t}</div>
         </a>`).join('');
 
         // div.items=Array.from(div.querySelectorAll('.item'),i=>i);

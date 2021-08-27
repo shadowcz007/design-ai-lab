@@ -151,7 +151,7 @@ class Win {
         let mainWindow = this.get(0);
         let bounds = mainWindow.getBounds();
         localStorage.setItem('_mainbound', JSON.stringify(bounds));
-        console.log(bounds.height)
+        console.log('保存',bounds.height)
         return bounds
     }
 
