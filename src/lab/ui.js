@@ -962,18 +962,22 @@ class UI {
 
         // 更新文字
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let x = 2;
+        let x = 2;
             ctx.font = `${fontSize * x}px ${fontFamily}`;
             let font = ctx.measureText(txt);
-            canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 2*fontSize * x;
-            canvas.width = (font.width) + 2*fontSize * x;
-            ctx.font = `${fontSize * x}px ${fontFamily}`;
-            ctx.fillStyle = color;
-            ctx.textAlign = "start";
-            ctx.textBaseline = "top";
-            ctx.fillText(txt, fontSize * x, fontSize * x);
-         
-        canvas=this.trim(canvas);
+            if(font.width>0){
+                canvas.height = (font.fontBoundingBoxAscent + font.fontBoundingBoxDescent) + 2*fontSize * x;
+                canvas.width = (font.width) + 2*fontSize * x;
+                ctx.font = `${fontSize * x}px ${fontFamily}`;
+                ctx.fillStyle = color;
+                ctx.textAlign = "start";
+                ctx.textBaseline = "top";
+                ctx.fillText(txt, fontSize * x, fontSize * x);
+                canvas=this.trim(canvas);
+            }else{
+                canvas.width=1;
+            } 
+        
         canvas.className = 'text_canvas';
         if (isAdd) this.add(canvas);
         return canvas;
