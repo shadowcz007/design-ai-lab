@@ -160,7 +160,7 @@ class UI {
         div.className = 'ui divided selection list';
 
         div.innerHTML = Array.from(tags, t => `<a class="item" data-id='${String(t.id) || ''}'>
-            <div class="ui red horizontal label" data-id='${String(t.id) || ''}'>${t.label ? t.label : t}</div>
+            <div class="ui ${t.color} horizontal label" data-id='${String(t.id) || ''}'>${t.label ? t.label : t}</div>
         </a>`).join('');
 
         // div.items=Array.from(div.querySelectorAll('.item'),i=>i);
@@ -1090,7 +1090,7 @@ class UI {
         let div = document.createElement('div');
         div.className = "ui special cards";
         div.innerHTML = `<div class="card" style='height: fit-content;'>
-                <div class="blurring dimmable image">
+                <div class="blurring dimmable image" style='min-height: 44px;'>
                     <div class="ui dimmer">
                     <div class="content">
                         <div class="center">

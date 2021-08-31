@@ -139,7 +139,10 @@ class GIF {
         easing=easing||'linear';
 
         let data={...from};
-        return new Promise((resolve, reject) => {
+
+        const animeRes=()=>{
+            let res=[];
+           return new Promise((resolve, reject) => {
             anime({
                 targets: data,
                 ...to,
@@ -149,19 +152,33 @@ class GIF {
                 round:round,
                 easing:easing ,
                 begin: anim => {
-                    frames = [];
+                    res = [];
                 },
                 update: () => {
-                    if (ctxFn) ctxFn(ctx,data);
-                    frames.push(canvas.toDataURL());
+                    res.push(data);
+                    // if (ctxFn) ctxFn(ctx,data);
+                    // frames.push(canvas.toDataURL());
                 },
-                complete: async anim => {
-                    let gif = new GIF(transparent);
-                    let base64 = await this.createGifFromUrls(frames, frames.length/(0.001*duration), false);
-                    resolve(base64);
+                complete: anim => {
+                    resolve(res);
                 }
             });
-        })
+        });
+
+        };
+
+        return new Promise((resolve, reject) => {
+            animeRes().then(async res=>{
+                console.log(res.length)
+                for (const data of res) {
+                    if (ctxFn) ctxFn(ctx,data);
+                        frames.push(canvas.toDataURL());
+                };
+                let gif = new GIF(transparent);
+                let base64 = await this.createGifFromUrls(frames, frames.length/(0.001*duration), false);
+                resolve(base64);
+            })
+        });
 
     }
 }
