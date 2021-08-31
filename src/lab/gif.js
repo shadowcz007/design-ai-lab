@@ -1,26 +1,26 @@
 const _GIF = require('gif.js/dist/gif');
 // const fs = require('fs');
 const base = require('./base');
-const image = new (require('./image'));
+const image = new(require('./image'));
 
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
     // TODO 合成透明底的 有bug
     constructor(transparent = null, background = 0xFFFFFF) {
-        // transparent hex color, 0x00FF00 = green
-        // background 当背景是透明色时，默认填充的背景色，不支持透明度
-        let opts = {
-            workers: 6,
-            quality: 10,
-            // dither:'FloydSteinberg',
-            workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
-        };
-        if (transparent) opts.transparent = 0x00FF00;
-        if (background) opts.background = background;
-        this.gif = new _GIF(opts);
-    }
-    // canvasElement imageElement
+            // transparent hex color, 0x00FF00 = green
+            // background 当背景是透明色时，默认填充的背景色，不支持透明度
+            let opts = {
+                workers: 6,
+                quality: 10,
+                // dither:'FloydSteinberg',
+                workerScript: path.join(__dirname, '../../node_modules/gif.js/dist/gif.worker.js')
+            };
+            if (transparent) opts.transparent = 0x00FF00;
+            if (background) opts.background = background;
+            this.gif = new _GIF(opts);
+        }
+        // canvasElement imageElement
     add(elt, fps = 10, copy = true) {
         this.gif.addFrame(elt, {
             delay: 1000 / fps,
@@ -123,59 +123,61 @@ class GIF {
 
     }
 
-    createFromCtx(width = 300, height = 300,parameters, from={}, to={}, ctxFn,transparent) {
-        let canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+    createFromCtx(width = 300, height = 300, parameters, from = {}, to = {}, ctxFn, transparent) {
+        let { duration, delay, endDelay, round, easing } = parameters;
+        duration = duration || 1000;
+        delay = delay || 0;
+        endDelay = endDelay || 0;
+        round = round || 0;
+        easing = easing || 'linear';
 
-        let ctx = canvas.getContext('2d');
+        let data = {...from };
 
-        let frames = [];
-        let {duration,delay,endDelay,round,easing}=parameters;
-        duration=duration||1000;
-        delay=delay||0;
-        endDelay=endDelay||0;
-        round=round||0;
-        easing=easing||'linear';
-
-        let data={...from};
-
-        const animeRes=()=>{
-            let res=[];
-           return new Promise((resolve, reject) => {
-            anime({
-                targets: data,
-                ...to,
-                duration: duration,
-                delay: delay,
-                endDelay: endDelay,
-                round:round,
-                easing:easing ,
-                begin: anim => {
-                    res = [];
-                },
-                update: () => {
-                    res.push(data);
-                    // if (ctxFn) ctxFn(ctx,data);
-                    // frames.push(canvas.toDataURL());
-                },
-                complete: anim => {
-                    resolve(res);
-                }
+        const animeRes = () => {
+            let res = [];
+            return new Promise((resolve, reject) => {
+                anime({
+                    targets: data,
+                    ...to,
+                    duration: duration,
+                    delay: delay,
+                    endDelay: endDelay,
+                    round: round,
+                    easing: easing,
+                    begin: anim => {
+                        res = [];
+                    },
+                    update: () => {
+                        res.push({...data });
+                        // console.log(data);
+                        // frames.push(canvas.toDataURL());
+                    },
+                    complete: anim => {
+                        resolve(res);
+                    }
+                });
             });
-        });
 
         };
 
         return new Promise((resolve, reject) => {
-            animeRes().then(async res=>{
-                console.log(res.length)
+
+            animeRes().then(async res => {
+                let canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                let ctx = canvas.getContext('2d');
+
+                let frames = [];
+
                 for (const data of res) {
-                    if (ctxFn) ctxFn(ctx,data);
-                        frames.push(canvas.toDataURL());
+                    if (ctxFn) ctxFn(ctx, data);
+                    //console.log(data)
+                    frames.push(canvas.toDataURL());
                 };
                 let gif = new GIF(transparent);
-                let base64 = await this.createGifFromUrls(frames, frames.length/(0.001*duration), false);
+                let base64 = await gif.createGifFromUrls(frames, frames.length / (0.001 * duration), false);
                 resolve(base64);
             })
         });
