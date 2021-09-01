@@ -721,6 +721,7 @@ class GUI {
         Win.showWinControl(true, false);
         Win.changeAppIcon();
         Win.setMainBound();
+        setTimeout(() => this.saveWindowsStatus(0), 1500);
         //this.loadWindowStatus().then(() => setTimeout(() => this.saveWindowsStatus(0), 1500));
     }
 
