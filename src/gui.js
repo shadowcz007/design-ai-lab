@@ -688,7 +688,7 @@ class GUI {
 
                     Win.changeAppIcon([{
                         label: '关闭',
-                        click: ()=>{
+                        click: () => {
                             this.closeFn();
                         }
                     }]);
