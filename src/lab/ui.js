@@ -145,9 +145,9 @@ class UI {
         div.hide = function () {
             $(div).modal('hide');
         };
-        div.remove=function(){
-            div.remove();
-        }
+        // div.remove=function(){
+        //     if(div)div.remove();
+        // }
         return div
     }
     // 标签
