@@ -551,7 +551,9 @@ class UI {
 
 
         div.getValue = () => {
-            return input.value;
+            // console.log(type)
+            // if(type=='file')return input.getAttribute('data-imgurl');
+            return input.value||div.getAttribute('data-imgurl');
         };
         div.setValue = div.setDefaultValue;
 
@@ -597,6 +599,7 @@ class UI {
             if (!value || !(value && value[0])) return
             this.classList.add('input-image');
             this.style.backgroundImage = `url(${encodeURI(value[0])})`;
+            this.setAttribute('data-imgurl',encodeURI(value[0]));
         };
 
         let div = this.createBaseInput("file", text, isMultiple, key, eventListener, setPlaceholder);

@@ -674,7 +674,7 @@ class GUI {
             if (filePath) {
                 // res.title = path.basename;
                 // console.log(res.title)
-                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', function(err) {
+                fs.writeFile(filePath, JSON.stringify(res, null, 2), 'utf8', err => {
                     if (err) console.error(err);
                     console.log("保存成功");
                     //保存成功
