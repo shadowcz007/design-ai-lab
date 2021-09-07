@@ -39,6 +39,11 @@ class Store {
             this.db.values().then(res => resolve(res));
         });
     }
+    getKeys(){
+        return new Promise((resolve, reject) => {
+            this.db.keys().then(res => resolve(res));
+        });
+    }
     clear() {
         return new Promise((resolve, reject) => {
             this.db.clear().then(() => resolve(true));

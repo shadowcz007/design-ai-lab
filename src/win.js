@@ -285,7 +285,7 @@ class Win {
         let im;
         // 截图之前需要确认窗口是否显示了
         if (win.isVisible()) im = win.webContents.capturePage();
-        console.log(im)
+        // console.log(im)
         //截图
         return im
     }

@@ -18,7 +18,7 @@ class App {
     };
 
     // 导出
-    exportApp(poster, code = "", course = "", readme = "", size, author = "", version = "") {
+    exportApp(id,poster, code = "", course = "", readme = "", size, author = "", version = "") {
         // {
         //     "poster": "demo.png",
         //     "main": "main.js",
@@ -37,7 +37,7 @@ class App {
             code,
             poster,
             knowledge: { course, readme },
-            // imports,
+            id,
             author,
             version
         };
@@ -80,7 +80,7 @@ class App {
                         main: data.filenames.main,
                         knowledge: data.knowledge,
                         size: data.size,
-                        // imports: data.imports,
+                        id,
                         author: data.author,
                         version: data.version
                     }, null, 2));
@@ -141,11 +141,12 @@ class App {
         let res = utils.readJsonSync(this.devConfigFile.filepath);
         let code = utils.readFileSync(path.join(this.devConfigFile.dirname, res.main));
         let poster = utils.readImageToBase64(path.join(this.devConfigFile.dirname, res.poster));
-        let { knowledge, author, version } = res;
+        let { knowledge, author, version ,id} = res;
         let size = res.size || [600, 600];
         let course = knowledge ? knowledge.course : '',
             readme = knowledge ? knowledge.readme : '';
         return {
+            id,
             code,
             poster,
             size,

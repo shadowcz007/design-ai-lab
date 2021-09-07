@@ -17,6 +17,7 @@ global._DBPATH = storage.getDataPath();
 const _IS_MAC = process.platform === 'darwin';
 
 //全局变量
+global._APPID=null;
 global._WINS = {};
 global._APPICON = null;
 global._DEV=process.env.NODE_ENV === 'development';
@@ -153,7 +154,9 @@ function createWindow(key, opts, workAreaSize) {
     }
 
     win.webContents.once("did-finish-load", () => {
-        opts.executeJavaScript && typeof (opts.executeJavaScript) === 'string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
+        // setTimeout(() => {
+             opts.executeJavaScript && typeof (opts.executeJavaScript) === 'string' ? win.webContents.executeJavaScript(opts.executeJavaScript, false) : null;
+        // }, 1000);
         setTimeout(() => {
             opts.show === true ? win.show() : null;
         }, 6000);
@@ -411,6 +414,12 @@ function initMenu() {
 
 ipcMain.on('init-window', (event, arg) => {
     initWindow()
+});
+ipcMain.on('open-app', (event, arg) => {
+    global._APPID={
+        id:arg.id,
+        name:arg.name
+    }
 });
 
 // ipcMain.on('preview-ready', (event, arg) => {

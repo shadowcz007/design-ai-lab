@@ -1,10 +1,12 @@
 /* 渲染进程
  */
-const { ipcRenderer } = require("electron");
+const { ipcRenderer,remote } = require("electron");
 const GUI = require('./gui');
-
+if(remote.getGlobal('_DEV')){
+    window.GUI = GUI;
+}
 GUI.init();
-window.GUI = GUI;
+
 //打开文件
 ipcRenderer.on("open-file", () => GUI.openFileFn());
 //编辑/预览 切换

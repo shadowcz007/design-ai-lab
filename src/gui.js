@@ -1,4 +1,4 @@
-const { remote } = require("electron");
+const { ipcRenderer,remote } = require("electron");
 const storage = require('electron-json-storage');
 const fs = require("fs"),
     path = require("path");
@@ -13,9 +13,11 @@ const Log = require('./log');
 const utils = require('./utils');
 
 const _package = remote.getGlobal('_PACKAGE');
-window.Win = Win;
-window.Knowledge = Knowledge;
-
+if(remote.getGlobal('_DEV')){
+    // window.GUI = GUI;
+    window.Win = Win;
+    window.Knowledge = Knowledge;
+}
 /**
  * GUI界面
  * - DOM的封装
@@ -210,6 +212,7 @@ class GUI {
             let size = [400, 400];
 
             let exRes = await App.exportApp(
+                data.id,
                 data.poster,
                 data.code,
                 data.knowledge.course,
@@ -240,6 +243,7 @@ class GUI {
         this.addClickEventListener(this.devFolderBtn, async() => {
             let res = await App.dev();
             if (res) {
+                // console.log(res)
                 this.devPath = res.devPath;
                 this.openDevCard(res);
                 this.modelConfirmBtn.style.display = 'none';
@@ -326,7 +330,9 @@ class GUI {
 
     // 打开开发文件
     openDevCard(res) {
-        let { code, config, size } = res;
+        let { code, config, size,id } = res;
+        // console.log('appId',id)
+        ipcRenderer.send('open-app',{id,name:config.readme});
         this.openFile({
             code,
             config,
@@ -414,7 +420,7 @@ class GUI {
         // 压缩图片大小
         if (img) img = img.resize({ width: 120 });
 
-        return {
+        let data={
             //封面图
             poster: img ? img.toDataURL() : utils.readImageToBase64(path.join(__dirname, '../assets/ios/AppIcon.appiconset/icon-40.png')),
             //标题
@@ -439,6 +445,11 @@ class GUI {
             author: knowledgeJson.author,
             //创建时间
             create_time: (new Date()).getTime()
+        }
+
+        return {
+            id:fileDb.id(data),
+            ...data
         }
 
     }
@@ -762,7 +773,7 @@ class GUI {
 
     getCardsByPage(data = [], pageNum = 1, pageSize = 9, isCanClose = false) {
         this.pageNumInfo.innerText = `${pageNum} / 共${~~(data.length / pageSize) + 1}`;
-
+    
         if (pageNum === 1) {
             this.prePageBtn.classList.add('disabled');
         } else {
@@ -779,6 +790,7 @@ class GUI {
         data = data.slice(pageSize * (pageNum - 1), pageSize * pageNum);
         // ks.slice(3*(i-1),3*i);
         this.createCards(data, isCanClose);
+        // console.log('data',data)
     }
 
     // 
@@ -919,6 +931,7 @@ class GUI {
                         text-overflow: ellipsis;'>${readme.innerText}</div>
                         <div class="description" style='font-size: 12px;margin: 4px 0;'>
                             <div class="meta">${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""} </div>
+                            ${data.id?'<i class="infinity icon"></i>':''}
                             代码量 ${data.code_length} ${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
                             ${data.devPath ? `<p style='display: -webkit-box;
                             -webkit-box-orient: vertical;
@@ -981,7 +994,9 @@ class GUI {
                 this.pShow = true;
                 //注入的js
                 this.previewWinExecuteJavaScript(data.code, true);
-
+            //  console.log('data',data)
+                // 
+                ipcRenderer.send('open-app',{id:data.id,name:data.capturePage});
                 // 3秒后取消
                 setTimeout(() => {
                     if (runBtn.classList.contains('disabled')) runBtn.classList.remove('disabled');
@@ -1000,6 +1015,7 @@ class GUI {
         this.addClickEventListener(exportBtn, e => {
             // console.log(data)
             App.exportApp(
+                data.id,
                 data.poster,
                 data.code,
                 data.knowledge.course,

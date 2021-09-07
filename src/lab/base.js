@@ -6,12 +6,15 @@ const hash = require('object-hash'),
     md5 = require('md5');
 const fs = require('fs'),
     path = require('path');
-const nativeImage = require('electron').nativeImage;
-const { resolve } = require('path');
+const {nativeImage,remote}=require('electron');
+
 
 
 class Base {
     constructor() {}
+    getAppId(){
+        return remote.getGlobal('_APPID');
+    }
     md5(str) {
         return md5(str)
     }

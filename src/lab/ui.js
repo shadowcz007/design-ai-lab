@@ -428,7 +428,8 @@ class UI {
             'copy': '<i class="icon copy"></i>',
             'setup': '<i class="icon cog"></i>',
             'settings': '<i class="icon settings"></i>',
-            'thumbtack': '<i class="icon thumbtack"></i>'
+            'thumbtack': '<i class="icon thumbtack"></i>',
+            'infinity':'<i class="infinity icon"></i>'
         };
         let html = icons[key];
         if (!html) html = `<i class="${key}"></i>`;
@@ -696,6 +697,7 @@ class UI {
 
         div.appendChild(select);
         select.className = 'ui compact selection dropdown';
+        select.style='min-height: 3em;';
         options = Array.from(options, o => `<option value ="${o.value}">${o.text}</option>`)
         select.innerHTML = options.join('');
         select.addEventListener('change', e => {
@@ -708,6 +710,9 @@ class UI {
                 oe.innerText = o.text;
                 select.appendChild(oe);
             });
+        }
+        div.getValue=()=>{
+            return $(select).val()
         }
         div.init = () => {
             $('.ui.dropdown')
