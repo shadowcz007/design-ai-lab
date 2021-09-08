@@ -116,7 +116,8 @@ class Win {
             show == true ? win.show() : win.hide();
             if (type == 0) this.mShow = show;
             if (type == 1) this.pShow = show;
-        }
+        };
+        if(type===1&&show === false&&win.isDevToolsOpened())win.closeDevTools();
     }
 
 

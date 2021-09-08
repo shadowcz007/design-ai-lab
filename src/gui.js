@@ -994,9 +994,9 @@ class GUI {
                 this.pShow = true;
                 //注入的js
                 this.previewWinExecuteJavaScript(data.code, true);
-            //  console.log('data',data)
+                // console.log('data',data)
                 // 
-                ipcRenderer.send('open-app',{id:data.id,name:data.capturePage});
+                ipcRenderer.send('open-app',{id:data.id,name:data.title});
                 // 3秒后取消
                 setTimeout(() => {
                     if (runBtn.classList.contains('disabled')) runBtn.classList.remove('disabled');

@@ -701,7 +701,7 @@ class UI {
         options = Array.from(options, o => `<option value ="${o.value}">${o.text}</option>`)
         select.innerHTML = options.join('');
         select.addEventListener('change', e => {
-            eventListener(e.target.value)
+           if(eventListener) eventListener(e.target.value)
         })
         div.appendOptions = (opts) => {
             Array.from(opts, o => {
