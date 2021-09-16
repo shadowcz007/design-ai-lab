@@ -25,6 +25,16 @@ class ImageTool {
         return canvas
     }
 
+    base642URL(base64){
+        return new Promise((resolve, reject) => {
+            fetch(base64)
+            .then(res => res.blob())
+            .then(blob => {
+                resolve(URL.createObjectURL(blob));
+            })
+        });
+    }
+
     im2base64(im) {
         let canvas = this.createCanvasFromImage(im);
         return canvas.toDataURL();
@@ -202,7 +212,6 @@ class ImageTool {
             });
         });
     }
-
 
 }
 

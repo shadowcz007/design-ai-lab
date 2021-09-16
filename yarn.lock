@@ -7931,6 +7931,10 @@ pinkie@^2.0.0:
   resolved "http://mirrors.cloud.tencent.com/npm/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
+"pixelit@https://github.com/giventofly/pixelit.git":
+  version "0.0.0"
+  resolved "https://github.com/giventofly/pixelit.git#23849454bec10fdc9b363f5413852eef0b81fac9"
+
 pixelmatch@^4.0.2:
   version "4.0.2"
   resolved "http://mirrors.cloud.tencent.com/npm/pixelmatch/-/pixelmatch-4.0.2.tgz#8f47dcec5011b477b67db03c243bc1f3085e8854"

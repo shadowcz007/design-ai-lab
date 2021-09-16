@@ -404,7 +404,16 @@ function initMenu() {
         //         }
         //     }]
         // }
-    ]
+    ];
+
+    if(global._DEV) template.push({
+        label: '开发',
+        // accelerator: 'CmdOrCtrl+M',
+        click: () => {
+            global._WINS.mainWindow.openDevTools();
+            global._WINS.previewWindow.openDevTools();
+        }
+    })
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);

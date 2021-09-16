@@ -4,7 +4,6 @@
 
 const IdbKvStore = require('idb-kv-store');
 
-
 class Store {
     constructor(key) {
         this.init(key);

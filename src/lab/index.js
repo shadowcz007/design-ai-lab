@@ -28,6 +28,7 @@ const Shape = require('./shape');
 const screenpoint = require('./screenpoint')
 const DimensionsDb = require('./dimensionsdb');
 const Store = require('./store');
+const AppStore = require('./appStore');
 const nlp = require('./nlp');
 const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
@@ -57,6 +58,7 @@ module.exports = {
     shape: new Shape(),
     cv: cv,
     Store: Store,
+    AppStore:AppStore,
     Deeplab: Deeplab,
     nlp: nlp,
     excel: excel,

@@ -7,8 +7,7 @@ const hash = require('object-hash'),
 const fs = require('fs'),
     path = require('path');
 const {nativeImage,remote}=require('electron');
-
-
+const _DBPATH=remote.getGlobal('_DBPATH');
 
 class Base {
     constructor() {}
@@ -190,7 +189,16 @@ class Base {
 
     }
 
-
+    getSize(url){
+        return new Promise((resolve, reject) => {
+             fetch(url)
+                 .then(res => res.blob())
+                 .then(blob => {
+                     // console.log()
+                     resolve(blob.size/1000/1000)
+                 })
+         });
+     }
 }
 
 

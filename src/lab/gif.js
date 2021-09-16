@@ -20,6 +20,7 @@ class GIF {
         if (background) opts.background = background;
         this.gif = new _GIF(opts);
     }
+   
     // canvasElement imageElement
     add(elt, fps = 10, copy = true) {
         this.gif.addFrame(elt, {
@@ -137,6 +138,7 @@ class GIF {
             previewCanvas.width=width;
             previewCanvas.height=height;
             let ctx =previewCanvas.getContext('2d');
+            let res = [];
             return new Promise((resolve, reject) => {
                 anime({
                     targets: data,
@@ -149,9 +151,10 @@ class GIF {
                     update: () => {
                         if (ctxFn) ctxFn(ctx, {...data});
                         // console.log(data)
+                        res.push({...data });
                     },
                     complete: anim => {
-                        resolve();
+                        resolve(res);
                     }
                 });
             });
@@ -198,16 +201,25 @@ class GIF {
                     
                     let base64 = await this.createGifFromUrls(frames, frames.length / (0.001 * duration), false);
                     resolve(base64);
-               
                 
             })
         });
         }
-
-        
-
-        
-
+    }
+    createFromAnimeData(width = 300, height = 300,duration=1000, data=[], ctxFn){
+        return new Promise(async (resolve, reject) => {
+                let canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                let ctx =canvas.getContext('2d');
+                let frames = [];
+                for (const d of data) {
+                    if (ctxFn) ctxFn(ctx, d);
+                    frames.push(canvas.toDataURL());
+                };
+                let base64 = await this.createGifFromUrls(frames, frames.length / (0.001 * duration), false);
+                resolve(base64);
+        });
     }
 }
 

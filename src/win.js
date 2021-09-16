@@ -39,7 +39,7 @@ class Win {
                     //     console.log(e, this.code)
                     // })
                 } else {
-                    this.statusSuccess();
+                    this.statusChecking();
                 }
             } catch (error) {
                 console.log(error);
