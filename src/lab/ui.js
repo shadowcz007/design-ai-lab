@@ -5,7 +5,7 @@ const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
 const image = new(require('./image'));
-
+const REGL=require('regl');
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 
@@ -47,7 +47,7 @@ class Layout {
 class UI {
 
     constructor() {
-            // this.isDisplay();
+            this.REGL=REGL;
         }
         // 取id
     md5(str = "") {
@@ -69,6 +69,7 @@ class UI {
         let ly = new Layout(document.querySelector('#gui-main'), isDev);
         ly.start(type);
     }
+    
 
     clear() {
         document.querySelector("#gui-main").innerHTML = "";
@@ -552,7 +553,8 @@ class UI {
 
 
         div.getValue = () => {
-            // console.log(type)
+            // console.log(type,localStorage.getItem(key))
+        
             // if(type=='file')return input.getAttribute('data-imgurl');
             return input.value||div.getAttribute('data-imgurl');
         };

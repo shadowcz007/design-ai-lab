@@ -29,6 +29,10 @@ class GIF {
         });
     }
 
+    count(){
+        return this.gif.frames.length
+    }
+
     async createGifFromUrls(urls = [], fps = 12, copy = true) {
         // let ctx;
         for (const url of urls) {

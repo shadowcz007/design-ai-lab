@@ -9,7 +9,6 @@
 
  */
 
-
 const STATE_IDLE = 'idle';
 const STATE_PANNING = 'panning';
 
