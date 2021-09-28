@@ -884,7 +884,7 @@ class UI {
 
 
     //创建canvas，返回canvas
-    createCanvas(width, height, className, id, show = false, isAdd = false) {
+    createCanvas(width=300, height=300, className, id, show = false, isAdd = false) {
         let canvas = this.createBaseCanvas(width, height);
         if (className) canvas.className = className;
         if (id) canvas.id = id;
@@ -897,6 +897,9 @@ class UI {
         //     let ctx=canvas.getContext('2d');
         //     ctx.drawImage(...arguments);
         // };
+        canvas.show=()=>{
+            canvas.style.display = "block";
+        }
         return canvas
     }
 
@@ -1081,7 +1084,7 @@ class UI {
     }
 
     // 创建图片预览，并且提供下载按钮
-    createImageAndPreview() {
+    createImageAndPreview(url) {
         let div = document.createElement('div');
         //如果是图片，则多一个图片预览
         div.classList.add('input-image-default');
@@ -1094,6 +1097,7 @@ class UI {
         div.getValue = () => {
             return div.getAttribute('data-src')
         };
+        if(url) div.setValue([url]);
         return div
     }
 

@@ -9,6 +9,7 @@ const fs = require('fs'),
 const {nativeImage,remote}=require('electron');
 const _DBPATH=remote.getGlobal('_DBPATH');
 
+
 class Base {
     constructor() {}
     getAppId(){
@@ -101,6 +102,13 @@ class Base {
         return Array.from(files, f => path.join(fileDir, f));
     }
 
+    loadFromLocal(filePath){
+        filePath=path.join(__dirname,'../../node_modules/'+filePath);
+        return new Promise(async (resolve, reject) => {
+            let res=await this.loadFromUrl('js',filePath);
+            resolve(res);
+        });
+    }
 
     /**
      * 异步加载一个js文件或css文件，并执行回调函数

@@ -205,12 +205,50 @@ class ImageTool {
                     data: await r.arrayBuffer()
                 }
             }).then(r => {
-                console.log(r)
-                let res = arrayBuffer2Base64(r.data);
-                res = `data:${r.type};base64,${res}`;
-                resolve(res);
+                // console.log(r)
+                if(r.type.match('image')){
+                    let res = arrayBuffer2Base64(r.data);
+                    res = `data:${r.type};base64,${res}`;
+                    resolve(res);
+                }else{
+                    resolve(null);
+                }
+               
             });
         });
+    }
+
+    // 申请的class 竟然不在window对象下 
+    initPixelit(){
+        return new Promise((resolve, reject) => {
+            // console.log(pixelit)
+            try {
+                this.Pixelit=pixelit;
+            } catch (error) {
+                let isHas=false;
+                Array.from(document.head.querySelectorAll('script'),s=>{
+                    if(s.src.match('pixelit.js')) isHas=true;
+                });
+                if(!isHas) {
+                    base.loadFromLocal('pixelit/dist/pixelit.js').then(res=>{
+                        
+                        if(res){
+                            setTimeout(()=>{
+                                this.Pixelit=pixelit;
+                                resolve(res);
+                                // console.log(this.pixelit,pixelit)
+                            },1000);
+                        }else{
+                            resolve(res);
+                        }
+                        
+                    })
+                };
+            }
+             
+            resolve(true);
+        });
+        
     }
 
 }
