@@ -13,11 +13,50 @@ const Log = require('./log');
 const utils = require('./utils');
 
 const _package = remote.getGlobal('_PACKAGE');
+
+
+// 缓存
+class Storage{
+    constructor(){
+        this.types={
+            // 存储APP的窗口状态
+            0:'app',
+            // 用来保存app所在的路径
+            1:'example_file_path',
+            // app的状态缓存
+            2:'example_file_status'
+        }
+    }
+    set(index=0,data){
+        return new Promise((resolve, reject) => {
+            storage.set(this.types[index], data, function(error) {
+                if (error) throw error;
+                resolve();
+            });
+        });
+    }
+    get(index=0){
+        return new Promise((resolve, reject) => {
+            storage.get(this.types[index], function(error, data) {
+                if (error) throw error;
+                resolve(data);
+            });
+        });
+    }
+};
+
+const store=new Storage();
+
+
+
 if(remote.getGlobal('_DEV')){
     // window.GUI = GUI;
     window.Win = Win;
     window.Knowledge = Knowledge;
+    window.store=store;
 }
+
+
 /**
  * GUI界面
  * - DOM的封装
@@ -147,16 +186,11 @@ class GUI {
          */
         this.myCourseBtn = document.querySelector("#my-course-btn");
         this.setupBtn = document.querySelector('#setup-btn');
-        this.nextPageBtn = document.querySelector('#next-page-btn');
-        this.prePageBtn = document.querySelector('#pre-page-btn');
-        this.pageNumInfo = document.querySelector('#page-num-info');
+        // this.nextPageBtn = document.querySelector('#next-page-btn');
+        // this.prePageBtn = document.querySelector('#pre-page-btn');
+        // this.pageNumInfo = document.querySelector('#page-num-info');
 
-
-
-        // 记录是app =0 还是历史= 1
-        this.currentCardsFrom = 0;
-        this.currentPage = 1;
-
+ 
         // 设置页
         this.setupExampleFilePathBtn = document.querySelector("#setup-example-file-path");
 
@@ -285,8 +319,8 @@ class GUI {
         //APP
         this.addClickEventListener(this.myCourseBtn, e => {
             e.stopPropagation();
-            this.currentCardsFrom = 0;
-            this.currentPage = 1;
+            // this.currentCardsFrom = 0;
+            // this.currentPage = 1;
             this.exampleFiles().then(() => {
                 document.querySelector('#setup-pannel').style.display = 'none';
                 document.querySelector('#blank-pannel').style.display = 'flex';
@@ -294,38 +328,7 @@ class GUI {
             });
 
         });
-        //历史
-        // this.addClickEventListener(this.recentBtn, e => {
-        //     e.stopPropagation();
-        //     this.currentCardsFrom = 1;
-        //     this.currentPage = 1;
-        //     this.recentFiles();
-        //     document.querySelector('#setup-pannel').style.display = 'none';
-        //     document.querySelector('#blank-pannel').style.display = 'flex';
-        //     $('.ui.labeled.icon.sidebar').sidebar('toggle');
-        // });
-
-        // 下一页
-        this.addClickEventListener(this.nextPageBtn, e => {
-            e.stopPropagation();
-            this.currentPage++;
-            if (this.currentCardsFrom === 0) {
-                this.exampleFiles(this.currentPage);
-            } else if (this.currentCardsFrom === 1) {
-                // this.recentFiles(this.currentPage);
-            }
-        });
-        // 上一页
-        this.addClickEventListener(this.prePageBtn, e => {
-            e.stopPropagation();
-            this.currentPage--;
-            if (this.currentCardsFrom === 0) {
-                this.exampleFiles(this.currentPage);
-            } else if (this.currentCardsFrom === 1) {
-                // this.recentFiles(this.currentPage);
-            }
-        });
-
+       
     }
 
     // 打开开发文件
@@ -350,27 +353,19 @@ class GUI {
             obj.executeJavaScript = this.createExecuteJs(Editor.getCode().trim());
             let knowledgeJson = Knowledge.get();
             obj.title = knowledgeJson.title;
-            // let { imports } = Knowledge.get();
-            // obj.imports = imports;
         };
-        return new Promise((resolve, reject) => {
-            storage.set('app', obj, function(error) {
-                if (error) throw error;
-                resolve();
-            });
-        });
-
+        return store.set(0,obj);
     }
     loadWindowStatus() {
         return new Promise((resolve, reject) => {
-            storage.get('app', function(error, data) {
-                console.log('storage', data)
+            store.get(0).then(data=>{
+                // console.log('storage', data)
                 Win.resize(data.size, 1);
                 if (data.status === 1 && data.mainWindow.show) {
                     Win.resize([data.mainWindow.bound.width, data.mainWindow.bound.height], 0);
                 };
                 resolve();
-            })
+            });
         });
     }
 
@@ -379,27 +374,24 @@ class GUI {
         return new Promise((resolve, reject) => {
             remote.dialog.showOpenDialog({
                 properties: ['openDirectory']
-            }).then(result => {
+            }).then(async result => {
                 if (result.canceled === false) {
-                    storage.set('example_file_path', { data: result.filePaths[0] }, error => {
-                        if (error) throw error;
-                        this.exampleFiles();
-                    });
+                    await store.set(1,{ data: result.filePaths[0] });
+                    this.exampleFiles();
                 };
-
+                resolve();
             }).catch(err => {
-                console.log(err)
+                console.log(err);
+                resolve();
             })
-
         });
     }
 
     loadExampleFiles() {
-        return new Promise((resolve, reject) => {
-            storage.get('example_file_path', (error, data) => {
-                // console.log('storage', data)
-                if (error) throw error;
-                let dirname = data.data || path.join(__dirname, '../examples');
+        return new Promise(async (resolve, reject) => {
+            let data=await store.get(1);
+            // console.log(data)
+            let dirname = data.data || path.join(__dirname, '../examples');
                 utils.loadDirFiles(dirname).then(files => {
                     files = files.filter(f => f.extname.match(_package.fileAssociations[0].ext));
                     Promise.all(Array.from(files, f => fs.readFileSync(f.filepath, 'utf-8'))).then((res) => {
@@ -407,8 +399,6 @@ class GUI {
                         resolve(res);
                     });
                 });
-            });
-
         });
     }
 
@@ -638,20 +628,7 @@ class GUI {
             Win.edit();
         };
     }
-
-    // backup() {
-    //     this.getSaveFileContent().then(res => {
-    //         fileDb.fileAdd(res);
-    //         this.info.innerText = '已备份';
-    //         // remote.dialog.showMessageBox({
-    //         //     type: 'info',
-    //         //     message: '已备份',
-    //         //     buttons: ['好的']
-    //         // });
-    //     });
-    // }
-
-
+ 
     //新建文件
     newFileFn() {
         //新建的时候先保存上次的编辑的内容
@@ -671,7 +648,6 @@ class GUI {
         });
         Editor.setCode('//Hello AI world!');
         // Layout.clearAndReset();
-
 
     }
 
@@ -754,52 +730,26 @@ class GUI {
     }
 
     //我的卡片
-    exampleFiles(pageNum = 1, pageSize = 9) {
+    exampleFiles() {
         return new Promise((resolve, reject) => {
             this.loadExampleFiles().then((ds) => {
                 document.querySelector('#toolsbox-nums').innerText = ds.length;
-                this.getCardsByPage(ds, pageNum, pageSize);
-                resolve();
+                // 根据最近使用过的调整排序
+                store.get(2).then(newData=>{
+                    if(newData){
+                        for (let index = 0; index < ds.length; index++) {
+                            if(newData[ds[index].id]){
+                                ds[index].create_time=newData[ds[index].id];
+                            }
+                         }
+                    };
+                    ds = ds.sort((a, b) => b.create_time - a.create_time);
+                    this.createCards(ds, false);
+                    resolve();
+                })
             });
         })
     }
-
-    //最近打开的卡片
-    // recentFiles(pageNum = 1, pageSize = 9) {
-    //     let data = fileDb.fileGetAll();
-    //     this.getCardsByPage(data, pageNum, pageSize, true);
-    //     // this.createCards(fileDb.fileGetAll(), true);
-    // }
-
-    getCardsByPage(data = [], pageNum = 1, pageSize = 9, isCanClose = false) {
-        this.pageNumInfo.innerText = `${pageNum} / 共${~~(data.length / pageSize) + 1}`;
-    
-        if (pageNum === 1) {
-            this.prePageBtn.classList.add('disabled');
-        } else {
-            this.prePageBtn.classList.remove('disabled')
-        };
-
-        if (pageSize * pageNum >= data.length) {
-            this.nextPageBtn.classList.add('disabled');
-        } else {
-            this.nextPageBtn.classList.remove('disabled')
-        };
-
-        data = data.sort((a, b) => b.create_time - a.create_time);
-        data = data.slice(pageSize * (pageNum - 1), pageSize * pageNum);
-        // ks.slice(3*(i-1),3*i);
-        this.createCards(data, isCanClose);
-        // console.log('data',data)
-    }
-
-    // 
-    // openEditorWin() {
-    //     Layout.destroy();
-    //     document.getElementById("knowledge-pannel").style.display = "none";
-    //     document.getElementById("editor-pannel").classList.add("pannel-large");
-    //     //this.openBtn.classList.add('button-active');
-    // }
 
     closeEditorWin() {
             document.getElementById("knowledge-pannel").style.display = "block";
@@ -809,39 +759,11 @@ class GUI {
             // Layout.reset();
             // this.openBtn.classList.remove('button-active');
         }
-        // 放大编程页面
-        // toggleEditorWin() {
-        //     if (this.openBtn.classList.contains('button-active')) {
-        //         this.openEditorWin();
-        //     } else {
-        //         this.closeEditorWin();
-        //     }
-        // }
-
-    //编程，UI状态关闭
-    // closePracticeHtml() {
-    //     // document.getElementById("knowledge-pannel").style.display = "block";
-    //     // document.getElementById("editor-pannel").classList.remove("pannel-large");
-    //     this.practiceBtn.innerHTML = `<i class="sync icon"></i>`;
-    //     // console.log(Editor)
-    //     // Editor.toggle(false);
-    //     this.practiceBtn.setAttribute('sync-stop', 1);
-    //     // this.closeDevTool();
-    // };
-
+      
     //编程，UI状态
     openPracticeHtml() {
-        // document.getElementById("knowledge-pannel").style.display = "none";
-        // document.getElementById("editor-pannel").classList.add("pannel-large");
-        this.practiceBtn.innerHTML = `<i class="sync icon fa-spin"></i>`;
-        this.practiceBtn.removeAttribute('sync-stop');
-        // document.getElementById("log").style.display = "block";
-        // if (this.resizer) return document.body.querySelector('#frame').style.borderWidth = '12px';
-        // this.resizer = new Resizer('#frame', {
-        //     grabSize: 10,
-        //     resize: 'vertical',
-        //     handle: 'bar'
-        // });
+       this.practiceBtn.innerHTML = `<i class="sync icon fa-spin"></i>`;
+        this.practiceBtn.removeAttribute('sync-stop');    
     }
 
     //编程功能，按钮
@@ -879,14 +801,10 @@ class GUI {
     //发布按钮
     pubilcFn() {
         //code编辑器状态设为只读
-        // Editor.toggle(true);
-        // this.closePracticeHtml();
         this.mShow = false;
         this.pShow = true;
 
         Win.public();
-
-        //this.openPractice(false, true);
 
         this.saveWindowsStatus(2);
         Win.changeAppIcon([{
@@ -945,26 +863,6 @@ class GUI {
                    
                     </div>`
 
-
-        // let html = `<div class="content">
-        //                     <img class="right floated mini ui image" src="${URL.createObjectURL(this.base64ToBlob(data.poster))}">
-        //                     <div class="header">
-        //                         ${readme.innerText}
-        //                     </div>
-        //                     <div class="meta">
-        //                         ${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""}
-        //                     </div>
-        //                     <div class="description">
-        //                         代码量 ${data.code_length}
-        //                         <br>${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
-        //                     </div>
-        //                 </div>
-        //                 <div class="extra content">
-        //                     <div class="ui two buttons">
-
-        //                     </div>
-        //                 </div>
-        //             `;
         let div = this.createElement('item');
         div.innerHTML = html;
         return div;
@@ -995,6 +893,13 @@ class GUI {
                 //注入的js
                 this.previewWinExecuteJavaScript(data.code, true);
                 // console.log('data',data)
+                // 记录打开次数
+                store.get(2).then(d=>{
+                    if(!d) d={};
+                    d[data.id]=(new Date()).getTime();
+                    store.set(2,d);
+                });
+                
                 // 
                 ipcRenderer.send('open-app',{id:data.id,name:data.title});
                 // 3秒后取消

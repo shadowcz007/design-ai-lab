@@ -1039,9 +1039,9 @@
   resolved "http://mirrors.cloud.tencent.com/npm/@node-rs%2fjieba-win32-x64-msvc/-/jieba-win32-x64-msvc-1.3.1.tgz#012f7f9b4155f98dcd47f9a54305feb9ca9ace1b"
   integrity sha512-fvxbRrk9nuChl52HM/5tXTp8GaFUYM4VOEXuXbGjlb2i1XTt/DbFGxtNtCtwvPk20pUx2m/SZIf6sPvWJEzWrw==
 
-"@node-rs/jieba@^1.2.0":
+"@node-rs/jieba@^1.3.1":
   version "1.3.1"
-  resolved "http://mirrors.cloud.tencent.com/npm/@node-rs%2fjieba/-/jieba-1.3.1.tgz#bcfefcb5e79e71c25f9d659f135f74f7069c0bac"
+  resolved "https://registry.yarnpkg.com/@node-rs/jieba/-/jieba-1.3.1.tgz#bcfefcb5e79e71c25f9d659f135f74f7069c0bac"
   integrity sha512-bUQH9hULQ2K4XzGUsChsF/uBhRBU/aCk6oBr/CeQgu8TQW01VYk3wQqRmSII1D4gbrRCoMQFVzrPJGZfv8R/HA==
   dependencies:
     "@node-rs/helper" "^1.2.1"

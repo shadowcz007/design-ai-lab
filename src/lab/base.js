@@ -12,6 +12,12 @@ const _DBPATH=remote.getGlobal('_DBPATH');
 
 class Base {
     constructor() {}
+    getRootPath(){
+        return path.join(__dirname, '../..');
+    }
+    getNodeModulesPath(){
+        return this.getRootPath()+'/node_modules';
+    }
     getAppId(){
         return remote.getGlobal('_APPID');
     }
@@ -102,6 +108,7 @@ class Base {
         return Array.from(files, f => path.join(fileDir, f));
     }
 
+    // 通过appendChild script加载js
     loadFromLocal(filePath){
         filePath=path.join(__dirname,'../../node_modules/'+filePath);
         return new Promise(async (resolve, reject) => {
@@ -126,7 +133,7 @@ class Base {
             if (fileType === 'js') {
                 // 创建script节点
                 let script = document.createElement('script');
-                script.type = 'text/javascript';
+                script.type ='text/javascript';
                 // 设置script的src属性
                 script.src = src;
                 // 将script元素插入head元素中
