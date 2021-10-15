@@ -15,6 +15,12 @@ class Base {
     getRootPath(){
         return path.join(__dirname, '../..');
     }
+    getBaseName(filepath){
+        return path.basename(filepath);
+    }
+    getExtName(filepath){
+        return path.extname(filepath);
+    }
     getNodeModulesPath(){
         return this.getRootPath()+'/node_modules';
     }

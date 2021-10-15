@@ -640,7 +640,7 @@ class UI {
         let setPlaceholder = function (value) {
             // console.log(isMultiple, value)
             if (!value || !(value && value[0])) return
-            this.p.innerText = path.basename(value[0]);
+            this.p.innerText = base.getBaseName(value[0]);
         };
 
         let div = this.createBaseInput('file', text, isMultiple, key, eventListener, setPlaceholder);
@@ -1186,6 +1186,7 @@ class UI {
         let properties = ['openFile', 'openDirectory'];
         if (type == 1) properties = ['openFile'];
         if (type == 2) properties = ['openDirectory'];
+        if(type==3) properties=['openFile', 'multiSelections'];
         let filePaths = dialog.showOpenDialogSync({
             title: title,
             properties: properties
@@ -1286,7 +1287,7 @@ class UI {
             ]
         });
         if (filepath) {
-            let extname = path.extname(filepath);
+            let extname = base.getExtName(filepath);
             console.log(filepath, extname)
             if (extname.toLowerCase() === '.jpg' || extname.toLowerCase() === '.jpeg') {
                 fs.writeFileSync(filepath, img.toJPEG(80));
@@ -1322,19 +1323,47 @@ class UI {
             base.saveJson(json, filepath);
         };
     }
-    // 读取
-    openJsonDialog() {
-        let filepath = this.getFilePath(1, '读取');
+    // 读取json
+    openJsonDialog(type=1) {
+        let filepath = this.getFilePath(type, '读取');
         if (filepath) {
-            // const fs = require('fs');
-            filepath = filepath[0];
-            let json = fs.readFileSync(filepath, 'utf8');
-            json = JSON.parse(json);
-            return json
+            if(type===1){
+                filepath = filepath[0];
+                let json = fs.readFileSync(filepath, 'utf8');
+                json = JSON.parse(json);
+                return {filepath,json}
+            }else if(type===3){
+                let datas=[];
+                for (const fp of filepath) {
+                    let json=fs.readFileSync(fp, 'utf8');
+                    json = JSON.parse(json);
+                    datas.push({filepath:fp,json});
+                };
+                return datas;
+            }
         }
     }
 
-
+    // 读取txt
+    openStringDialog(type=1) {
+        let filepath = this.getFilePath(type, '读取');
+        if (filepath) {
+            if(type===1){
+                filepath = filepath[0];
+                let data = fs.readFileSync(filepath, 'utf8');
+                return {filepath,data}
+            }else if(type===3){
+                let datas=[];
+                for (const fp of filepath) {
+                    datas.push({
+                        filepath:fp,
+                        data:fs.readFileSync(fp, 'utf8')
+                    });
+                };
+                return datas;
+            }
+        }
+    }
 }
 
 module.exports = UI;

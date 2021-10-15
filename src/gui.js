@@ -895,9 +895,11 @@ class GUI {
                 // console.log('data',data)
                 // 记录打开次数
                 store.get(2).then(d=>{
-                    if(!d) d={};
-                    d[data.id]=(new Date()).getTime();
-                    store.set(2,d);
+                    if(data.id){
+                        if(!d) d={};
+                        d[data.id]=(new Date()).getTime();
+                        store.set(2,d);
+                    }
                 });
                 
                 // 
