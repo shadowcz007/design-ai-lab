@@ -6,25 +6,25 @@ const hash = require('object-hash'),
     md5 = require('md5');
 const fs = require('fs'),
     path = require('path');
-const {nativeImage,remote}=require('electron');
-const _DBPATH=remote.getGlobal('_DBPATH');
+const { nativeImage, remote } = require('electron');
+const _DBPATH = remote.getGlobal('_DBPATH');
 
 
 class Base {
     constructor() {}
-    getRootPath(){
+    getRootPath() {
         return path.join(__dirname, '../..');
     }
-    getBaseName(filepath){
+    getBaseName(filepath) {
         return path.basename(filepath);
     }
-    getExtName(filepath){
+    getExtName(filepath) {
         return path.extname(filepath);
     }
-    getNodeModulesPath(){
-        return this.getRootPath()+'/node_modules';
+    getNodeModulesPath() {
+        return this.getRootPath() + '/node_modules';
     }
-    getAppId(){
+    getAppId() {
         return remote.getGlobal('_APPID');
     }
     md5(str) {
@@ -83,6 +83,9 @@ class Base {
         return buf;
     };
 
+    saveData(filepath, data) {
+        fs.writeFileSync(filepath, data);
+    }
 
     // 直接保存base64 为本地文件
     saveBase64(base64, filepath = null) {
@@ -115,10 +118,10 @@ class Base {
     }
 
     // 通过appendChild script加载js
-    loadFromLocal(filePath){
-        filePath=path.join(__dirname,'../../node_modules/'+filePath);
-        return new Promise(async (resolve, reject) => {
-            let res=await this.loadFromUrl('js',filePath);
+    loadFromLocal(filePath) {
+        filePath = path.join(__dirname, '../../node_modules/' + filePath);
+        return new Promise(async(resolve, reject) => {
+            let res = await this.loadFromUrl('js', filePath);
             resolve(res);
         });
     }
@@ -139,7 +142,7 @@ class Base {
             if (fileType === 'js') {
                 // 创建script节点
                 let script = document.createElement('script');
-                script.type ='text/javascript';
+                script.type = 'text/javascript';
                 // 设置script的src属性
                 script.src = src;
                 // 将script元素插入head元素中
@@ -210,16 +213,16 @@ class Base {
 
     }
 
-    getSize(url){
+    getSize(url) {
         return new Promise((resolve, reject) => {
-             fetch(url)
-                 .then(res => res.blob())
-                 .then(blob => {
-                     // console.log()
-                     resolve(blob.size/1000/1000)
-                 })
-         });
-     }
+            fetch(url)
+                .then(res => res.blob())
+                .then(blob => {
+                    // console.log()
+                    resolve(blob.size / 1000 / 1000)
+                })
+        });
+    }
 }
 
 
