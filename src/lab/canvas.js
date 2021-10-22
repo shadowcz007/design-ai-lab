@@ -335,6 +335,31 @@ class Canvas {
         // t.hasRotatingPoint=false;
         return t
     }
+
+    // 从url添加svg
+    addSVGFromURL(url,style, selectable = true, hasControls = false){
+        style = Object.assign({
+            // lockMovementX: true,
+            // lockRotation: true,
+            // lockScalingX: true,
+            // lockScalingY: true,
+        },
+        style || {}
+        );
+        delete style.type;
+        return new Promise((resolve, reject) => {
+            new fabric.loadSVGFromURL(url, (objects, options)=> {
+                var obj = fabric.util.groupSVGElements(objects, options);
+                this.canvas.add(obj);
+                // console.log(objects,obj)
+                obj.selectable = selectable;
+                obj.hasControls = hasControls;
+                resolve(obj);
+            });
+        });
+    
+    }
+    // 添加dom图片
     addImg(imageElement, style, selectable = true, hasControls = false) {
         style = Object.assign({
                 // lockMovementX: true,

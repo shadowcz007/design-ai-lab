@@ -6,6 +6,7 @@ const hash = require('object-hash'),
     md5 = require('md5');
 const fs = require('fs'),
     path = require('path');
+const debounce = require('debounce');
 const { nativeImage, remote } = require('electron');
 const _DBPATH = remote.getGlobal('_DBPATH');
 
@@ -73,6 +74,10 @@ class Base {
         });
     }
 
+    debounce(fn,time){
+        return debounce(fn,time)
+    }
+
     // arraybuffer转buffer
     arrayBuffer2Buffer(ab) {
         var buf = Buffer.from(ab.byteLength);
@@ -82,6 +87,13 @@ class Base {
         }
         return buf;
     };
+
+    // 把字符串数据转为url
+    str2URL(data,type){
+        // svg "image/svg+xml;charset=utf-8"
+        var blob = new Blob([data], {type:type});
+        return URL.createObjectURL(blob);
+    }
 
     saveData(filepath, data) {
         fs.writeFileSync(filepath, data);

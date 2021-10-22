@@ -1,6 +1,5 @@
 const fs = require('fs');
 const md5 = require('md5');
-
 const { clipboard, remote, nativeImage } = require('electron');
 const dialog = remote.dialog;
 const base = require('./base');
@@ -352,9 +351,11 @@ class UI {
     // toast(text) {
     //     // Swal.fire(text);
     // }
+    
     toast(text) {
-        $('body').toast({ message: text });
+       $('body').toast({ message: text });
     }
+
     // 
     // loading
     loading(n = 0) {
