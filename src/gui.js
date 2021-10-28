@@ -740,6 +740,7 @@ class GUI {
                         for (let index = 0; index < ds.length; index++) {
                             if(newData[ds[index].id]){
                                 ds[index].create_time=newData[ds[index].id];
+                                ds[index].isHot=true;
                             }
                          }
                     };
@@ -850,6 +851,7 @@ class GUI {
                         <div class="description" style='font-size: 12px;margin: 4px 0;'>
                             <div class="meta">${data.create_time ? timeago.format(data.create_time, 'zh_CN') + " " : ""} </div>
                             ${data.id?'<i class="infinity icon"></i>':''}
+                            ${data.isHot?'<i class="heart icon"></i>':''}
                             代码量 ${data.code_length} ${((fileDb.id(_package) === data.package_id) ? `版本 ${data.version}` : '<i class="exclamation circle icon"></i>')}
                             ${data.devPath ? `<p style='display: -webkit-box;
                             -webkit-box-orient: vertical;
