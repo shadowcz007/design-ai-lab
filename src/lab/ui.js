@@ -1140,6 +1140,14 @@ class UI {
         // })
     }
 
+    createDownlad(url){
+        let a = document.createElement('a');
+        a.href = encodeURI(url);
+        a.setAttribute('name', 'design-ai');
+        a.setAttribute('download', 'design-ai');
+        a.click();
+    }
+
     /**
      * 创建视频
      * @param {*} url string
