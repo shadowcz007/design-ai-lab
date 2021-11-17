@@ -40,6 +40,25 @@ class ImageTool {
         return canvas.toDataURL();
     }
 
+    svg2base64(svgStr=null,type='png',width=null,height=null){
+        if(!svgStr)return;
+        return new Promise((resolve, reject) => {
+            let url=base.str2URL(svgStr,"image/svg+xml;charset=utf-8");
+            let img=new Image();
+            img.onload=()=>{
+                width=width||img.width*2;
+                height=height||img.height*2;
+                let canvas = this.createCanvas(width,height);
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(img,0, 0,width,height);
+                let base64=canvas.toDataURL(`image/${type}`);
+                URL.revokeObjectURL(url);
+                resolve(base64);
+            };
+            img.src=url;
+        });
+    }
+
     createImage(url) {
         return new Promise((resolve, reject) => {
             let _img = new Image();

@@ -663,6 +663,11 @@
     "@hapi/bourne" "2.x.x"
     "@hapi/hoek" "9.x.x"
 
+"@imagemagick/magick-wasm@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@imagemagick/magick-wasm/-/magick-wasm-0.0.8.tgz#c2081a08ca3684aeb733940ddb125eab4e42f9c1"
+  integrity sha512-c25cLrnx0H7hokeD5IIcfohc0YOxNF1SECk7CONEoIwI/M1BgGr3aWrFBHvB7+4YetR2H3LDLh908ix8m17B7Q==
+
 "@jimp/bmp@^0.16.1":
   version "0.16.1"
   resolved "http://mirrors.cloud.tencent.com/npm/@jimp%2fbmp/-/bmp-0.16.1.tgz#6e2da655b2ba22e721df0795423f34e92ef13768"
@@ -967,6 +972,21 @@
   dependencies:
     cross-spawn "^7.0.1"
 
+"@mediapipe/camera_utils@^0.3.1632432234":
+  version "0.3.1632432234"
+  resolved "https://registry.yarnpkg.com/@mediapipe/camera_utils/-/camera_utils-0.3.1632432234.tgz#60d859ac347506e2729f431afb8995b0a8ca8589"
+  integrity sha512-uGWOSd/1dNUka5/KkDs37pjYoHhFwUtQwQL/zhkQxZHAgYS8oCcz9vupa3pHthUzHDqzTw4XqB7teuoVRO+8/A==
+
+"@mediapipe/drawing_utils@^0.3.1620248257":
+  version "0.3.1620248257"
+  resolved "https://registry.yarnpkg.com/@mediapipe/drawing_utils/-/drawing_utils-0.3.1620248257.tgz#b39dfd235e7cf520e3e39d8b2bac2c5d717a7158"
+  integrity sha512-s598oo1K6C62mX3rWXJ7n1RJFdXjyQn3f6CeI+lU6kD69MVyBcV3hdmO5LnEZlCw5NRDANtaM8WAOuqZHaldLg==
+
+"@mediapipe/holistic@^0.5.1635989137":
+  version "0.5.1635989137"
+  resolved "https://registry.yarnpkg.com/@mediapipe/holistic/-/holistic-0.5.1635989137.tgz#68a2af45056f1f9bfa9bcf8a5b28a66a0ec56161"
+  integrity sha512-iY1bOZ4QUR1jBwJzmaQI6u3BZLYfOTAdj2S8EgXPp/ngGtcyNN3oaVH3eTGUBzYsBd/MXG1RmDzBPd9e9DyKJw==
+
 "@napi-rs/triples@^1.0.3":
   version "1.0.3"
   resolved "http://mirrors.cloud.tencent.com/npm/@napi-rs%2ftriples/-/triples-1.0.3.tgz#76d6d0c3f4d16013c61e45dfca5ff1e6c31ae53c"
@@ -1210,6 +1230,11 @@
   version "0.0.2-beta.16"
   resolved "http://mirrors.cloud.tencent.com/npm/@paddlejs%2fpaddlejs-core/-/paddlejs-core-0.0.2-beta.16.tgz#b836046102f0bb98aa8fab2210d78aca53f8909d"
   integrity sha512-Qn/41bFZVvJWnaJS9pUoj7yrjqbwit9YOtj03bj7De+Ixu8bsbwBgjstwu6iiHn0MMOqV8eyaB7QtY8RfoLYTw==
+
+"@pixiv/three-vrm@^0.6.7":
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/@pixiv/three-vrm/-/three-vrm-0.6.7.tgz#19abb9624f008e77b9843b4df9447b961b03f405"
+  integrity sha512-nlv8T89m4loRGh+QfqqNWlJTS3eG7F42pwmGGxLDcruX65ZqDll3C2D+o6M0yHRsTQYPGYNCw2DSuzr2GMCVmA==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -5638,6 +5663,11 @@ just-debounce@^1.0.0:
   resolved "http://mirrors.cloud.tencent.com/npm/just-debounce/-/just-debounce-1.1.0.tgz#2f81a3ad4121a76bc7cb45dbf704c0d76a8e5ddf"
   integrity sha512-qpcRocdkUmf+UTNBYx5w6dexX5J31AKK1OmPwH630a83DdVVUIngk55RSAiIGpQyoH0dlr872VHfPjnQnK1qDQ==
 
+kalidokit@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/kalidokit/-/kalidokit-1.0.5.tgz#30bd19fe26cb847f29549fc3b87168d90bbcc320"
+  integrity sha512-+jfaNvIAxVSeZauVTIWS98xpWxsVcgpcxt3IFEtSWdHN9ov5/yVKp75meLuKPOnXXer9BpaYNTIWraeaeKJnrg==
+
 keyv@^3.0.0:
   version "3.1.0"
   resolved "http://mirrors.cloud.tencent.com/npm/keyv/-/keyv-3.1.0.tgz#ecc228486f69991e49e9476485a5be1e8fc5c4d9"
@@ -9309,6 +9339,11 @@ textextensions@^3.2.0:
   version "3.3.0"
   resolved "http://mirrors.cloud.tencent.com/npm/textextensions/-/textextensions-3.3.0.tgz#03530d5287b86773c08b77458589148870cc71d3"
   integrity sha512-mk82dS8eRABNbeVJrEiN5/UMSCliINAuz8mkUwH4SwslkNP//gbEzlWNS5au0z5Dpx40SQxzqZevZkn+WYJ9Dw==
+
+three@^0.134.0:
+  version "0.134.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.134.0.tgz#d7ad4d85d050da0861bf39749b06ddfb5f17157f"
+  integrity sha512-LbBerg7GaSPjYtTOnu41AMp7tV6efUNR3p4Wk5NzkSsNTBuA5mDGOfwwZL1jhhVMLx9V20HolIUo0+U3AXehbg==
 
 throttleit@0.0.2:
   version "0.0.2"

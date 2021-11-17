@@ -342,6 +342,7 @@ class UI {
 
     //默认直接添加到gui里，类似于p5的逻辑，创建即添加
     add(dom) {
+        
         if (document.querySelector("#gui-main")) {
             document.querySelector("#gui-main").appendChild(dom);
             // this.isDisplay();
@@ -748,50 +749,50 @@ class UI {
         return g;
     }
 
-    createDesktopCameraInput(eventListener = null) {
+async initCamera(){
+    await base.loadFromLocal('@mediapipe/camera_utils/camera_utils.js');
+}
 
-        var video = this.createGroup();
+ createDesktopCameraInput(onFrameFn = null,width=300,height=300) {
+        
+        let video = this.createGroup();
         video.style = `outline:1px solid black;width:300px;height:300px`;
-
-        let btn = this.createButton('摄像头', () => {
-            navigator.mediaDevices
-                .getUserMedia({
-                    video: {
-                        width: 400,
-                        height: 400,
-                        facingMode: "environment"
+        
+        let btn = this.createButton('摄像头', async () => {
+            if(video.getAttribute('data-status')==='play'){
+                // 暂停
+                if(video.querySelector('video')&&video.querySelector('video').srcObject.getTracks()) {
+                    video.querySelector('video').srcObject.getTracks()[0].stop();
+                };
+                btn.innerText='开启';
+                video.setAttribute('data-status','stop');
+            }else{
+                if(!Camera) return console.error('initCamera');
+                let v=video.querySelector('video')?video.querySelector('video'):await this.createVideo(null, false);
+                
+                const camera = new Camera(v, {
+                    onFrame: async () => {
+                        // console.log(new Date())
+                        if(onFrameFn) await onFrameFn(v);
                     },
-                    audio: false,
-                })
-                .then(async (stream) => {
-                    let v = await this.createVideo(stream, false);
-                    v.style = `outline: none;
-                width: 100%;
-                height: 100%;`;
-                    v.width = 400;
-                    v.height = 400;
-                    video.innerHTML = '';
-                    video.appendChild(v);
-                    if (eventListener) eventListener(v);
-                    return;
+                    width: width,
+                    height: height
                 });
+                camera.start();
+                if(!video.querySelector('video'))video.add(v);
+                video.setAttribute('data-status','play');
+            }
+            
         }, false);
 
-        var g = this.createGroup(btn, video);
-
-        navigator.mediaDevices.enumerateDevices().then(gotDevices);
-
-        function gotDevices(mediaDevices) {
-            let count = 1;
-            mediaDevices.forEach((mediaDevice) => {
-                if (mediaDevice.kind === "videoinput") {
-                    console.log(mediaDevice)
-                }
-            });
-        };
+        var g = this.createGroup();
+        g.add(btn);
+        g.add(video);
 
         g.stop = function () {
-            video.querySelector('video').srcObject.stop();
+            if(video.querySelector('video')&&video.querySelector('video').srcObject.getTracks())video.querySelector('video').srcObject.getTracks()[0].stop();
+            // video.querySelector('video').srcObject.stop();
+            
         }
 
         return g;
@@ -1164,16 +1165,24 @@ class UI {
         v.className = 'video';
         if (isAdd) this.add(v);
         return new Promise((resolve, reject) => {
+            let isCallBack=false;
             v.oncanplay = () => {
                 v.height = v.videoHeight;
                 v.width = v.videoWidth;
                 v.oncanplay = null;
                 if (autoPlay) v.play();
+                isCallBack=true;
                 resolve(v);
             }
             v.onerror = () => {
+                isCallBack=true;
                 resolve(v)
-            }
+            };
+            setTimeout(()=>{
+                if(isCallBack===false){
+                    resolve(v);
+                }
+            },1000);
         });
     }
     createaAudio(url, isAdd = true) {

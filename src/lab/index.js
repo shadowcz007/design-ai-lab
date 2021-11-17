@@ -35,6 +35,7 @@ const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
 
 // const aframe=require('aframe');
+// Lab.base.loadFromLocal('kalidokit/dist/kalidokit.umd.js')
 
 module.exports = {
     base: base,

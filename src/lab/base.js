@@ -74,6 +74,17 @@ class Base {
         });
     }
 
+    // 按固定大小分成若干组
+    chunk(arr, size) {
+        var newArr = [];
+        var i = 0;
+        while(i < arr.length){
+            newArr.push(arr.slice(i,i+size));
+            i = i + size;
+        }
+        return newArr;
+    }
+    
     debounce(fn,time){
         return debounce(fn,time)
     }
@@ -94,6 +105,7 @@ class Base {
         var blob = new Blob([data], {type:type});
         return URL.createObjectURL(blob);
     }
+
 
     saveData(filepath, data) {
         fs.writeFileSync(filepath, data);
@@ -152,24 +164,31 @@ class Base {
         return new Promise((resolve, reject) => {
             // 需要加载js文件
             if (fileType === 'js') {
-                // 创建script节点
-                let script = document.createElement('script');
-                script.type = 'text/javascript';
-                // 设置script的src属性
-                script.src = src;
-                // 将script元素插入head元素中
-                head.appendChild(script);
 
-                // 监听script元素的onload和onreadystatechange事件
-                script.onload = script.onreadystatechange = () => {
-                    // 判断脚本是否加载完成
-                    if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
-                        resolve(true);
+                if(Array.from(head.querySelectorAll('script'),s=>s.src.replace(/.*\:\/\//ig,'')===src).filter(f=>f).length===0){
+                    // 创建script节点
+                    let script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    // 设置script的src属性
+                    script.src = src;
+                    // 将script元素插入head元素中
+                    head.appendChild(script);
+
+                    // 监听script元素的onload和onreadystatechange事件
+                    script.onload = script.onreadystatechange = () => {
+                        // 判断脚本是否加载完成
+                        if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                            resolve(true);
+                        }
                     }
-                }
 
-                // 监听onerror事件
-                script.onerror = () => resolve(false);
+                    // 监听onerror事件
+                    script.onerror = () => resolve(false);
+                }else{
+                    // 已经有了
+                    resolve(true);
+                }
+                
 
                 // 需要加载css文件
             } else if (fileType === 'css') {
@@ -225,6 +244,7 @@ class Base {
 
     }
 
+    // npm install probe-image-size
     getSize(url) {
         return new Promise((resolve, reject) => {
             fetch(url)
