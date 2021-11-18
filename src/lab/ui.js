@@ -1091,7 +1091,7 @@ async initCamera(){
         //如果是图片，则多一个图片预览
         div.classList.add('input-image-default');
         div.setValue = value => {
-            if (!value || !(value && value[0])) return
+            if (!value || !(value && value[0])) return;
             div.classList.add('input-image');
             div.style.backgroundImage = `url(${encodeURI(value[0])})`;
             div.setAttribute('data-src', value[0]);

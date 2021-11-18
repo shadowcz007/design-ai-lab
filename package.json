@@ -59,7 +59,6 @@
         "@ffprobe-installer/ffprobe": "^1.1.0",
         "@fortawesome/fontawesome-free": "^5.15.3",
         "@hapi/hapi": "^20.1.2",
-        "@imagemagick/magick-wasm": "^0.0.8",
         "@mediapipe/camera_utils": "^0.3.1632432234",
         "@mediapipe/drawing_utils": "^0.3.1620248257",
         "@mediapipe/holistic": "^0.5.1635989137",
