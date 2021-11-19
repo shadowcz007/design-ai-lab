@@ -668,11 +668,6 @@
     "@hapi/bourne" "2.x.x"
     "@hapi/hoek" "9.x.x"
 
-"@imagemagick/magick-wasm@^0.0.8":
-  version "0.0.8"
-  resolved "http://mirrors.cloud.tencent.com/npm/@imagemagick%2fmagick-wasm/-/magick-wasm-0.0.8.tgz#c2081a08ca3684aeb733940ddb125eab4e42f9c1"
-  integrity sha512-c25cLrnx0H7hokeD5IIcfohc0YOxNF1SECk7CONEoIwI/M1BgGr3aWrFBHvB7+4YetR2H3LDLh908ix8m17B7Q==
-
 "@jimp/bmp@^0.16.1":
   version "0.16.1"
   resolved "http://mirrors.cloud.tencent.com/npm/@jimp%2fbmp/-/bmp-0.16.1.tgz#6e2da655b2ba22e721df0795423f34e92ef13768"

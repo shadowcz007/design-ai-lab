@@ -163,12 +163,55 @@ class UI {
         div.className = 'ui divided selection list';
 
         div.innerHTML = Array.from(tags, t => `<a class="item" data-id='${String(t.id) || ''}'>
-            <div class="ui ${t.color} horizontal label" data-id='${String(t.id) || ''}'>${t.label ? t.label : t}</div>
+            <div class="ui ${t.color?t.color:''} horizontal label" data-id='${String(t.id) || ''}'>${t.label ? t.label : t}</div>
         </a>`).join('');
 
         // div.items=Array.from(div.querySelectorAll('.item'),i=>i);
 
         return div
+    }
+    createRadio(title=null,items=[]){
+        let div = document.createElement('div');
+        div.className = 'ui form';
+        div.innerHTML=`<div class="grouped fields">
+                ${title?'<label>'+title+'</label>':''}
+                ${items?Array.from(items,r=>{
+                    return `<div class="field">
+                        <div class="ui radio checkbox" name="${r.name}">
+                            <input type="radio" name="${r.name}" ${r.checked?`checked="checked"`:''}>
+                            <label>${r.label}</label>
+                        </div>
+                    </div>`
+                }).join(''):''}
+            </div>`;
+        $(div).find('.checkbox').checkbox({
+            // uncheckable: true,
+            beforeChecked: function() {
+                var $checkbox  = $(div).find('.checkbox');
+                // console.log($checkbox)
+                $checkbox.checkbox('uncheck');
+              },
+            // onChecked:function(){
+            //     var $checkbox  = $(div).find('.checkbox');
+            //     $checkbox.each(function() {
+            //         if($(this).checkbox('is checked')) {
+            //             console.log(this)
+            //         }
+            //       });
+            // }
+          });
+        div.getValue=()=>{
+            let res;
+            var $checkbox  = $(div).find('.checkbox');
+            $checkbox.each(function() {
+                if($(this).checkbox('is checked')) {
+                    // console.log(this.getAttribute('name'))
+                    res=this.getAttribute('name');
+                }
+              });
+            return res;
+        }
+        return div;
     }
 
     // 创建折叠菜单
