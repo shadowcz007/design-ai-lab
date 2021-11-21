@@ -1184,11 +1184,11 @@ async initCamera(){
         // })
     }
 
-    createDownlad(url){
+    createDownlad(url,name='design-ai'){
         let a = document.createElement('a');
         a.href = encodeURI(url);
-        a.setAttribute('name', 'design-ai');
-        a.setAttribute('download', 'design-ai');
+        a.setAttribute('name', name);
+        a.setAttribute('download', name);
         a.click();
     }
 
