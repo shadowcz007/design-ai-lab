@@ -1244,7 +1244,7 @@ async initCamera(){
         });
     }
     getFilePath(type = 0, title = "设置……") {
-        let properties = ['openFile', 'openDirectory'];
+        let properties = ['openFile', 'openDirectory','multiSelections'];
         if (type == 1) properties = ['openFile'];
         if (type == 2) properties = ['openDirectory'];
         if(type==3) properties=['openFile', 'multiSelections'];

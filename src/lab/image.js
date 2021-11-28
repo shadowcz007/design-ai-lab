@@ -16,10 +16,10 @@ class ImageTool {
         return canvas
     }
 
-    createCanvasFromImage(im) {
+    createCanvasFromImage(im,width,height) {
         // im.width = im.naturalWidth;
         // im.height = im.naturalHeight;
-        let canvas = this.createCanvas(im.naturalWidth || im.width, im.naturalHeight || im.height);
+        let canvas = this.createCanvas(width||im.naturalWidth || im.width, height||im.naturalHeight || im.height);
         let ctx = canvas.getContext('2d');
         ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
         return canvas
@@ -62,7 +62,8 @@ class ImageTool {
     createImage(url) {
         return new Promise((resolve, reject) => {
             let _img = new Image();
-            _img.src = encodeURI(url);
+            _img.src =url;
+            // _img.src = encodeURI(url);
             // console.log(_img)
             _img.className = 'opacity-background';
             _img.onload = function () {

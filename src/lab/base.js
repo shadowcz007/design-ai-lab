@@ -106,6 +106,9 @@ class Base {
         return URL.createObjectURL(blob);
     }
 
+    mkdir(filepath){
+        fs.mkdirSync(filepath);
+    }
 
     saveData(filepath, data) {
         fs.writeFileSync(filepath, data);
