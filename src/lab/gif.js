@@ -2,7 +2,7 @@ const _GIF = require('gif.js/dist/gif');
 // const fs = require('fs');
 const base = require('./base');
 const image = new (require('./image'));
-
+const Anime=require('./anime');
 const { parseGIF, decompressFrames } = require('gifuct-js');
 
 class GIF {
@@ -129,6 +129,7 @@ class GIF {
     }
 
     createFromCtx(width = 300, height = 300, parameters, from = {}, to = {}, ctxFn, previewCanvas=null) {
+
         let { duration, delay, endDelay, round, easing } = parameters;
         duration = duration || 1000;
         delay = delay || 0;
@@ -137,6 +138,8 @@ class GIF {
         easing = easing || 'linear';
 
         let data = {...from };
+
+        (new Anime()).init();
 
         if(previewCanvas){
             previewCanvas.width=width;

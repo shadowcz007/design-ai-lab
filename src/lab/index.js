@@ -14,6 +14,7 @@ remote.getCurrentWindow().on('focus', e => {
 const base = require('./base');
 const UI = require('./ui');
 const AI = require('./aimodel');
+const Anime=require('./anime');
 const Knn = require('./knn');
 const video = require('./video');
 const DataGenerator = require('./datagenerator');
@@ -41,6 +42,7 @@ module.exports = {
     base: base,
     ui: new UI(),
     ai: new AI(),
+    Anime:Anime,
     knn: new Knn(),
     video: video,
     DataGenerator: DataGenerator,

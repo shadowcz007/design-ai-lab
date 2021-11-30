@@ -5,6 +5,7 @@ const dialog = remote.dialog;
 const base = require('./base');
 const image = new(require('./image'));
 const REGL=require('regl');
+
 // 连接到peerjs服务
 const PeerPC = require('./peerPC');
 
@@ -87,6 +88,11 @@ class UI {
     //         }
     //     }
     // }
+
+    createDatGUI(){
+        const dat = require('dat.gui');
+        return new dat.GUI();
+    }
 
     // 创建createDivider
     createDivider() {
