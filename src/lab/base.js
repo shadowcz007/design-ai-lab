@@ -144,11 +144,15 @@ class Base {
         return Array.from(files, f => path.join(fileDir, f));
     }
 
+    readFileSync(filepath){
+        return fs.readFileSync(filepath, 'utf8');
+    }
+
     // 通过appendChild script加载js
-    loadFromLocal(filePath) {
+    loadFromLocal(filePath,type='js') {
         filePath = path.join(__dirname, '../../node_modules/' + filePath);
         return new Promise(async(resolve, reject) => {
-            let res = await this.loadFromUrl('js', filePath);
+            let res = await this.loadFromUrl(type, filePath);
             resolve(res);
         });
     }
@@ -258,6 +262,10 @@ class Base {
                 })
         });
     }
+    
+    deg2rad(deg) {
+        return deg * Math.PI / 180;
+      }
 }
 
 
