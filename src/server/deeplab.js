@@ -1,13 +1,28 @@
+const internalIp = require('internal-ip');
+const host = internalIp.v4.sync();
+// const utils = require('../utils');
 
-class Deeplab {
+const tf = require('@tensorflow/tfjs');
+const deeplab = require('@tensorflow-models/deeplab');
+require('@tensorflow/tfjs-backend-webgl');
+
+class DL {
+     //单例
+     static getInstance() {
+        if (!DL.instance) {
+            DL.instance = new DL();
+        }
+        return DL.instance;
+    }
+
     constructor(modelName, modelUrl) {
-        this.modelUrl = modelUrl || `https://localhost/model/ade20k_2/model.json`;
+        this.modelUrl = modelUrl || `http://${host}/ade20k_2/model.json`;;
         this.modelName = modelName || 'ade20k';
         this.loadModel(this.modelName, this.modelUrl).then(async () => {
             await this.initModel();
         });
     }
-    async loadModel(modelName = 'ade20k', modelUrl = `https://localhost/model/ade20k_2/model.json`, quantizationBytes = 2) {
+    async loadModel(modelName = 'ade20k', modelUrl, quantizationBytes = 2) {
         this.model = await deeplab.load({ base: modelName, quantizationBytes, modelUrl: modelUrl });
     };
 
@@ -48,10 +63,7 @@ class Deeplab {
     let segmentationMap =this.getRawSegmentationMap(image);
        return  await this.translateSegmentationMap(segmentationMap)
     }
+   
 }
 
-try{
-    module.exports = Deeplab
-}catch{
-
-};
+module.exports = DL.getInstance();

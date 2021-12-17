@@ -5,8 +5,9 @@ const u2net = require('./server/u2net');
 const mobilenet = require('./server/mobilenet');
 const posenet = require('./server/posenet');
 const bodypix = require('./server/bodypix');
-// const face = require('./server/face');
-
+const faceApi = require('./server/faceApi');
+const deeplab = require('./server/deeplab');
+// console.log(faceApi)
 
 async function u2netDrawSegment(base64) {
     let im = await createImage(base64);
@@ -44,6 +45,20 @@ async function segmentPerson(base64) {
     let im = await createImage(base64);
     let canvas = await bodypix.segmentPerson(im);
     return canvas.toDataURL();
+}
+
+
+async function faceExpression(base64) {
+    // console.log(base64)
+    let im = await createImage(base64);
+    let res = await faceApi.faceExpressions(im);
+    return res
+}
+
+async function segmentation(base64){
+    let im = await createImage(base64);
+    let res=await deeplab.predict(im);
+    return res
 }
 
 function createImage(url) {

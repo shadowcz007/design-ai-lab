@@ -85,7 +85,23 @@ class AI {
         };
 
         this.face=new Face();
+        this.face.faceExpression=async (im)=>{
+            let base64 = this.im2base64(im);
+            let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+            faceExpression('${base64}');
+                `, true);
+            return res
+        }
 
+        this.deeplab={
+            segmentation:async(im) => {
+                let base64 = this.im2base64(im);
+                let res = await remote.getGlobal('_WINS').serverWindow.webContents.executeJavaScript(`
+                segmentation('${base64}');
+                    `, true);
+                return res
+            }
+        }
     }
 
     createImage(url) {

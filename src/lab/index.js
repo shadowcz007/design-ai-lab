@@ -31,7 +31,6 @@ const DimensionsDb = require('./dimensionsdb');
 const Store = require('./store');
 const AppStore = require('./appStore');
 const nlp = require('./nlp');
-const Deeplab = require('./deeplab');
 const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
 
@@ -62,7 +61,6 @@ module.exports = {
     cv: cv,
     Store: Store,
     AppStore:AppStore,
-    Deeplab: Deeplab,
     nlp: nlp,
     excel: excel,
     ML:require('ml/lib'),

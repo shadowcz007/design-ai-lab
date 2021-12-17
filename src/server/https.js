@@ -64,7 +64,15 @@ function doReq(req, res) {
         const js = fs.readFileSync(path.join(__dirname, '../../node_modules/@tensorflow-models/face-landmarks-detection/dist/face-landmarks-detection.min.js'), 'utf8');
         res.writeHead(200, { 'Content-type': 'application/javascript' });
         res.end(js);
-    } else if (reqUrlBase === '/mobilenet_v2/model.json') {
+    } else if (reqUrlBase === '/ade20k_2/model.json') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(fs.readFileSync(path.join(__dirname, '../../model/ade20k_2/model.json')));
+    } else if (reqUrlBase === '/ade20k_2/weights.bin') {
+        // 模型
+        res.writeHead(200, { 'Content-Type': 'application/x-binary' });
+        res.end(fs.readFileSync(path.join(__dirname, '../../model/ade20k_2/weights.bin')));
+    }else if (reqUrlBase === '/mobilenet_v2/model.json') {
         // 模型
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(fs.readFileSync(path.join(__dirname, '../../model/mobilenet_v2/model.json')));
