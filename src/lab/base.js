@@ -12,7 +12,10 @@ const _DBPATH = remote.getGlobal('_DBPATH');
 
 
 class Base {
-    constructor() {}
+    constructor() {
+        this.path=path;
+        this.fs=fs;
+    }
     getRootPath() {
         return path.join(__dirname, '../..');
     }

@@ -33,6 +33,7 @@ const AppStore = require('./appStore');
 const nlp = require('./nlp');
 const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
+const TD=require('./3d');
 
 // const aframe=require('aframe');
 // Lab.base.loadFromLocal('kalidokit/dist/kalidokit.umd.js')
@@ -66,5 +67,6 @@ module.exports = {
     ML:require('ml/lib'),
     // aframe:aframe,
     Zdog:require('zdog'),
+    TD:TD,
     tf:require('@tensorflow/tfjs')
 };
