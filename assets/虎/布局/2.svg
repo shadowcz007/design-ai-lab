@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300px" height="300px" viewBox="0 0 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>2</title>
+    <g id="2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.4">
+        <g id="编组" transform="translate(101.531330, 136.389682)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.0232253416" y="0.197388733" width="135.592788" height="78.8446401"></rect>
+        </g>
+        <g id="编组" transform="translate(8.909773, 122.075315)" fill="#0000FF" fill-rule="nonzero" stroke="#0000FF" stroke-width="0.5">
+            <rect id="矩形" x="0" y="0" width="84.0870055" height="72.6205957"></rect>
+        </g>
+        <g id="编组" transform="translate(19.455608, 125.498923)" fill="#FF0000" fill-rule="nonzero" stroke="#FF0000" stroke-width="1.63230542">
+            <rect id="矩形" x="0" y="0" width="269.180963" height="43.3486226"></rect>
+        </g>
+        <g id="编组" transform="translate(13.755031, 13.796981)" fill="#FF0000" fill-rule="nonzero" stroke="#FF0000" stroke-width="1.72758546">
+            <rect id="矩形" x="0" y="0" width="260.790907" height="123.520269"></rect>
+        </g>
+    </g>
+</svg>

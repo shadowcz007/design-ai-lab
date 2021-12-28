@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300px" height="300px" viewBox="0 0 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>6</title>
+    <g id="6" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.4">
+        <g id="编组" transform="translate(260.579677, 170.178499)" fill="#FF0000" fill-rule="nonzero" stroke="#FF0000" stroke-width="0.5">
+            <rect id="矩形" x="0.17184099" y="0" width="14.7783251" height="9.73630832"></rect>
+        </g>
+        <g id="编组" transform="translate(238.315958, 138.967546)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.217549183" y="0.230358193" width="46.3056509" height="65.2593647"></rect>
+        </g>
+        <g id="编组" transform="translate(21.645091, 149.957404)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.155199925" y="0.389995149" width="86.984823" height="103.885324"></rect>
+        </g>
+        <g id="编组" transform="translate(167.300951, 168.943205)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.351392694" y="0.17394091" width="80.5092664" height="55.635891"></rect>
+        </g>
+        <g id="编组" transform="translate(17.940199, 126.060852)" fill="#0000FF" fill-rule="nonzero" stroke="#0000FF" stroke-width="0.5">
+            <rect id="矩形" x="0.17184099" y="0.304259635" width="100.69882" height="172.210953"></rect>
+        </g>
+    </g>
+</svg>
