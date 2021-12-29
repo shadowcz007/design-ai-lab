@@ -1,12 +1,14 @@
 const smartcrop = require('smartcrop')
 const base = require('./base')
 const { createApi } = require('unsplash-js')
+const Jimp=require('jimp');
 
 class ImageTool {
   constructor () {
     //随机获取，累计
     this.randomPicNum = 0
     this.nativeImage = require('electron').nativeImage
+    this.Jimp=Jimp;
   }
 
   createCanvas (width, height) {
@@ -294,6 +296,25 @@ class ImageTool {
       resolve(true)
     })
   }
+
+  changeColor(url,colors=[
+    { apply: 'red', params: [100] },
+    { apply: 'green', params: [100] },
+    { apply: 'blue', params: [100] }]){
+    return new Promise((resolve,reject)=>{
+      Jimp.read(url)
+      .then(async image => {
+        image.color(colors);
+        let base64=await image.getBase64Async('image/png');
+        resolve(base64);
+      })
+      .catch(err => {
+        // Handle an exception.
+        reject(err);
+      });
+    });
+  }
+
 }
 
 module.exports = ImageTool

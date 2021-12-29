@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="300px" height="300px" viewBox="0 0 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>3</title>
-    <g id="3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.4">
-        <g id="编组" transform="translate(88.911968, 126.832503)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
-            <rect id="矩形" x="0.1992034" y="0.0267517116" width="43.1391142" height="96.024794"></rect>
+    <g id="3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bg">
+            <rect id="矩形" x="0" y="0" width="300" height="300"></rect>
         </g>
-        <g id="编组" transform="translate(33.100444, 123.986755)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+        <g id="编组" transform="translate(91.911968, 6.832503)" fill="#00FF00" fill-opacity="0.4" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.0880324698" y="0.167497109" width="70" height="96"></rect>
+        </g>
+        <g id="编组" transform="translate(33.100444, 187.986755)" fill="#00FF00" fill-opacity="0.4" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
             <rect id="矩形" x="0.100074921" y="0.340428096" width="49.8978195" height="85.3320958"></rect>
         </g>
-        <g id="编组" transform="translate(184.488754, 149.493256)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
-            <rect id="矩形" x="0.282249182" y="0.410372093" width="38.2017875" height="74.2118309"></rect>
+        <g id="编组" transform="translate(211.328040, 182.520653)" fill="#00FF00" fill-opacity="0.4" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.671960087" y="0.479347131" width="70" height="74"></rect>
         </g>
-        <g id="编组" transform="translate(14.346508, 101.197898)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+        <g id="编组" transform="translate(14.346508, 104.197898)" fill="#00FF00" fill-opacity="0.4" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
             <rect id="矩形" x="0.0387848051" y="0.323083464" width="36.899503" height="108.24257"></rect>
         </g>
-        <g id="编组" transform="translate(127.412853, 175.704330)" fill="#00FF00" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
-            <rect id="矩形" x="0.143631754" y="0.136872144" width="27.7437432" height="44.5627945"></rect>
+        <g id="编组" transform="translate(84.412853, 173.704330)" fill="#00FF00" fill-opacity="0.4" fill-rule="nonzero" stroke="#00FF00" stroke-width="0.5">
+            <rect id="矩形" x="0.587146611" y="0.295669827" width="86" height="83"></rect>
         </g>
-        <g id="编组" transform="translate(223.460800, 150.696522)" fill="#0000FF" fill-rule="nonzero" stroke="#0000FF" stroke-width="0.5">
-            <rect id="矩形" x="0" y="0.112091347" width="74.5505496" height="72.4110101"></rect>
+        <g id="编组" transform="translate(127.460800, 45.669125)" fill="#0000FF" fill-opacity="0.4" fill-rule="nonzero" stroke="#0000FF" stroke-width="0.5">
+            <rect id="矩形" x="0.539200468" y="0.330875356" width="154" height="156"></rect>
         </g>
     </g>
 </svg>
