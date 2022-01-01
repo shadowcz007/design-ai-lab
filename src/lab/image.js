@@ -30,6 +30,10 @@ class ImageTool {
     return canvas
   }
 
+  base642Buffer(base64){
+    return Buffer.from(base64.replace(/.*base64\,/,''), 'base64');
+  }
+
   base642URL (base64) {
     return new Promise((resolve, reject) => {
       fetch(base64)
@@ -305,6 +309,65 @@ class ImageTool {
       Jimp.read(url)
       .then(async image => {
         image.color(colors);
+        let base64=await image.getBase64Async('image/png');
+        resolve(base64);
+      })
+      .catch(err => {
+        // Handle an exception.
+        reject(err);
+      });
+    });
+  }
+
+  rotate(url,deg=0){
+    return new Promise((resolve,reject)=>{
+      Jimp.read(url)
+      .then(async image => {
+        image.rotate(deg=0);
+        let base64=await image.getBase64Async('image/png');
+        resolve(base64);
+      })
+      .catch(err => {
+        // Handle an exception.
+        reject(err);
+      });
+    });
+  }
+
+  flip(url,horizontal=false,vertical=false){
+    return new Promise((resolve,reject)=>{
+      Jimp.read(url)
+      .then(async image => {
+        image.flip(horizontal, vertical);
+        let base64=await image.getBase64Async('image/png');
+        resolve(base64);
+      })
+      .catch(err => {
+        // Handle an exception.
+        reject(err);
+      });
+    });
+  }
+  scale(url,factor=1){
+    return new Promise((resolve,reject)=>{
+      Jimp.read(url)
+      .then(async image => {
+        image.scale(factor);
+        let base64=await image.getBase64Async('image/png');
+        resolve(base64);
+      })
+      .catch(err => {
+        // Handle an exception.
+        reject(err);
+      });
+    });
+  }
+
+  scaleToFit(url,width,height){
+    return new Promise((resolve,reject)=>{
+      Jimp.read(url)
+      .then(async image => {
+        if(width&&height)image.scaleToFit(width, height);
         let base64=await image.getBase64Async('image/png');
         resolve(base64);
       })

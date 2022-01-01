@@ -110,6 +110,7 @@ class TD {
     this.componentsURL = {
       three: 'three/build/three.min.js',
       OrbitControls: 'three/examples/js/controls/OrbitControls.js',
+      TransformControls:'three/examples/js/controls/TransformControls.js',
       RoomEnvironment: 'three/examples/js/environments/RoomEnvironment.js',
       EffectComposer: 'three/examples/js/postprocessing/EffectComposer.js',
       stats: 'three/examples/js/libs/stats.min.js',
