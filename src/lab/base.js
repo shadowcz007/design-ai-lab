@@ -151,6 +151,9 @@ class Base {
   readFileSync (filepath) {
     return fs.readFileSync(filepath, 'utf8')
   }
+  writeFileSync(filepath,data){
+    return fs.writeFileSync(filepath,data);
+  }
 
   // 通过appendChild script加载js
   loadFromLocal (filePath, type = 'js') {

@@ -1148,19 +1148,21 @@ class UI {
   createTextCanvas2 (txt, style, isAdd = false) {
     let canvas = document.createElement('canvas'),
       ctx = canvas.getContext('2d')
-    let { fontSize, color, fontFamily } = style || {
+    let { fontSize, color, fontFamily,fontWeight } = style || {
       fontSize: 12,
       color: 'black',
-      fontFamily: 'monospace'
+      fontFamily: 'monospace',
+      fontWeight:500
     }
     fontSize = fontSize || 12
     color = color || 'black'
     fontFamily = fontFamily || 'monospace'
+    fontWeight=fontWeight||500;
 
     // 更新文字
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     let x = 2
-    ctx.font = `${fontSize * x}px ${fontFamily}`
+    ctx.font =  `normal normal ${fontWeight} ${fontSize * x}px ${fontFamily}`
     let font = ctx.measureText(txt)
     if (font.width > 0) {
       canvas.height =
@@ -1168,7 +1170,7 @@ class UI {
         font.fontBoundingBoxDescent +
         2 * fontSize * x
       canvas.width = font.width + 2 * fontSize * x
-      ctx.font = `${fontSize * x}px ${fontFamily}`
+      ctx.font = `normal normal ${fontWeight} ${fontSize * x}px ${fontFamily}`
       ctx.fillStyle = color
       ctx.textAlign = 'start'
       ctx.textBaseline = 'top'
