@@ -1,4 +1,4 @@
-const base = require('./base')
+const base = require('./base');
 const fontData = `<font>
     <info face="OpenSans-SemiBold" size="42" bold="0" italic="0" charset="" unicode="1" stretchH="100" smooth="1" aa="1" padding="0,0,0,0" spacing="0,0" />
     <common lineHeight="45" base="34" scaleW="2048" scaleH="2048" pages="1" packed="0" alphaChnl="0" redChnl="0" greenChnl="0" blueChnl="0" />

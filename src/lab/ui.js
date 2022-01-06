@@ -50,6 +50,31 @@ class UI {
   md5 (str = '') {
     return md5(str)
   }
+  // 当前窗口
+  getCurrentWindow () {
+    return remote.getCurrentWindow()
+  }
+  //
+  openDevTools () {
+    if (remote.getCurrentWindow()) remote.getCurrentWindow().openDevTools()
+  }
+  closeDevTools () {
+    if (remote.getCurrentWindow()) remote.getCurrentWindow().closeDevTools()
+  }
+  toggleDevTools(){
+    if (remote.getCurrentWindow()) {
+      remote.getCurrentWindow().isDevToolsOpened()?this.closeDevTools():this.openDevTools()
+    }
+  }
+  createToggleDevToolsIcon(){
+    let btn=this.createIcon('dev',()=>this.toggleDevTools());
+    btn.style=`position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 99;
+    cursor: pointer;`
+    return btn;
+  }
   //手动隐藏,显示p5.js
   // p5Show(isShow = true) {
   //     if (document.querySelector("#p5")) {
@@ -519,7 +544,8 @@ class UI {
       setup: '<i class="icon cog"></i>',
       settings: '<i class="icon settings"></i>',
       thumbtack: '<i class="icon thumbtack"></i>',
-      infinity: '<i class="infinity icon"></i>'
+      infinity: '<i class="infinity icon"></i>',
+      dev: '<i class="bug icon"></i>'
     }
     let html = icons[key]
     if (!html) html = `<i class="${key}"></i>`
@@ -528,6 +554,8 @@ class UI {
     btn.className = 'circular ui icon button'
     return btn
   }
+
+ 
 
   createButton (text, eventListener, isAdd = true) {
     let btn = document.createElement('button')

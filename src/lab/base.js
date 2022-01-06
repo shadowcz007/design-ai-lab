@@ -18,6 +18,9 @@ class Base {
   getRootPath () {
     return path.join(__dirname, '../..')
   }
+  getDirName (filepath) {
+    return path.dirname(filepath)
+  }
   getBaseName (filepath) {
     return path.basename(filepath)
   }
@@ -143,6 +146,9 @@ class Base {
     }
   }
 
+  renameSync(oldPath,newPath){
+    return fs.renameSync(oldPath,newPath)
+  }
   readdirSync (fileDir) {
     let files = fs.readdirSync(fileDir)
     return Array.from(files, f => path.join(fileDir, f))
@@ -280,22 +286,22 @@ class Base {
   deg2rad (deg) {
     return (deg * Math.PI) / 180
   }
-  // 当前窗口
-  getCurrentWindow () {
-    return remote.getCurrentWindow()
-  }
-  //
-  openDevTools () {
-    if (remote.getCurrentWindow()) remote.getCurrentWindow().openDevTools()
-  }
-  closeDevTools () {
-    if (remote.getCurrentWindow()) remote.getCurrentWindow().closeDevTools()
-  }
-  toggleDevTools(){
-    if (remote.getCurrentWindow()) {
-      remote.getCurrentWindow().isDevToolsOpened()?this.closeDevTools():this.openDevTools()
-    }
-  }
+  // // 当前窗口
+  // getCurrentWindow () {
+  //   return remote.getCurrentWindow()
+  // }
+  // //
+  // openDevTools () {
+  //   if (remote.getCurrentWindow()) remote.getCurrentWindow().openDevTools()
+  // }
+  // closeDevTools () {
+  //   if (remote.getCurrentWindow()) remote.getCurrentWindow().closeDevTools()
+  // }
+  // toggleDevTools(){
+  //   if (remote.getCurrentWindow()) {
+  //     remote.getCurrentWindow().isDevToolsOpened()?this.closeDevTools():this.openDevTools()
+  //   }
+  // }
 }
 
 module.exports = new Base()
