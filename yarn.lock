@@ -2158,6 +2158,31 @@ aws4@^1.8.0:
   resolved "http://mirrors.cloud.tencent.com/npm/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
+babylonjs-gltf2interface@4.2.0:
+  version "4.2.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.2.0.tgz#b0ef1e11e3574cf2c6f573d0c5c34857a2a7b322"
+  integrity sha512-Fn/ThxwZWP9kEAqk+9FX9CAeF4ah/I0/8wzAZR8MQuYqlYpEfM+E/IztJ+4LoOOxQYMWNs5lgj8OXSkX0tqc4g==
+
+babylonjs-gui@^4.2.0:
+  version "4.2.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-gui/-/babylonjs-gui-4.2.0.tgz#f9370e922d6de5f99ebbeddd4a15972621ee1941"
+  integrity sha512-eCLlUiShKFN8QCv/Xg8OInWXon9KFfZPVHQtI5A5yUggaNgjZrq1Ul6oveIYbg9UH32oU/jUDb4iChHn5Bsgjw==
+  dependencies:
+    babylonjs "4.2.0"
+
+babylonjs-loaders@^4.2.0:
+  version "4.2.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-loaders/-/babylonjs-loaders-4.2.0.tgz#3d536cb72bf8650fe7f1cee12380bea3227d79c0"
+  integrity sha512-GGLvo4ibbSHMY0Kj/DBu4827NBWeDT0NOBi/UuifXltzqPJtJRi3PCEcELj4Ga8cRxkfYi/7PMKcce2zVnpLZA==
+  dependencies:
+    babylonjs "4.2.0"
+    babylonjs-gltf2interface "4.2.0"
+
+babylonjs@4.2.0, babylonjs@^4.2.0:
+  version "4.2.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs/-/babylonjs-4.2.0.tgz#8f0d957a726de4c065904b14c2f413f455145d38"
+  integrity sha512-4hniJzWRkV0tDTTYGEHPk1lnfWn0HIw7HOvNWPK0rpUIbJooyeD9E5uVyHnslDedt0mtrA7QZu4i2Cz1DEmSsA==
+
 bach@^1.0.0:
   version "1.2.0"
   resolved "http://mirrors.cloud.tencent.com/npm/bach/-/bach-1.2.0.tgz#4b3ce96bf27134f79a1b414a51c14e34c3bd9880"
@@ -7754,6 +7779,11 @@ onetime@^5.1.0, onetime@^5.1.2:
   integrity sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==
   dependencies:
     mimic-fn "^2.1.0"
+
+open-simplex-noise@^2.5.0:
+  version "2.5.0"
+  resolved "http://mirrors.cloud.tencent.com/npm/open-simplex-noise/-/open-simplex-noise-2.5.0.tgz#2f88539c2e3a70eb387a3609bdb2aede547bb0db"
+  integrity sha512-co7x8uWxGcgFtsJNBFqI9ylq+5Isotz2hZR7dsD5Sl+RDPGBeMEG41KAfF+5gF10ksi9Pg6DNpMHEoyTKLbejQ==
 
 open@^8.1.0:
   version "8.4.0"

@@ -109,6 +109,7 @@
         "ngraph.path": "^1.3.1",
         "nouislider": "^14.7.0",
         "object-hash": "^2.1.1",
+        "open-simplex-noise": "^2.5.0",
         "opencvjs-dist": "^4.4.0",
         "osc-js": "^2.1.2",
         "pdfjs-dist": "^2.6.347",

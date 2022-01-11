@@ -40,6 +40,12 @@ class Base {
   hash (obj = {}) {
     return hash(obj)
   }
+  
+  // The charCodeAt() method returns an integer between 0 and 65535 representing the UTF-16 code unit at the given index.
+  hashStringToInt(s){
+    return s.split("").reduce(function (a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+  }
+
   //
   sleep = m => new Promise(r => setTimeout(r, m))
 
