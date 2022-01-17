@@ -1,6 +1,5 @@
 //主要完成html的一些基本的操作
 // 文件存储
-
 const { spawn } = require('child_process')
 const hash = require('object-hash'),
   md5 = require('md5')
@@ -8,7 +7,13 @@ const fs = require('fs'),
   path = require('path')
 const debounce = require('debounce')
 const { nativeImage, remote } = require('electron')
+const QRCode = require('qrcode')
 const _DBPATH = remote.getGlobal('_DBPATH')
+
+let https = require('https')
+const mkcert = require('./mkcert')
+const mime = require('mime-types')
+const serverUrl = require('../server/serverUrl')
 
 class Base {
   constructor () {
@@ -40,10 +45,13 @@ class Base {
   hash (obj = {}) {
     return hash(obj)
   }
-  
+
   // The charCodeAt() method returns an integer between 0 and 65535 representing the UTF-16 code unit at the given index.
-  hashStringToInt(s){
-    return s.split("").reduce(function (a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+  hashStringToInt (s) {
+    return s.split('').reduce(function (a, b) {
+      a = (a << 5) - a + b.charCodeAt(0)
+      return a & a
+    }, 0)
   }
 
   //
@@ -152,8 +160,8 @@ class Base {
     }
   }
 
-  renameSync(oldPath,newPath){
-    return fs.renameSync(oldPath,newPath)
+  renameSync (oldPath, newPath) {
+    return fs.renameSync(oldPath, newPath)
   }
   readdirSync (fileDir) {
     let files = fs.readdirSync(fileDir)
@@ -163,8 +171,8 @@ class Base {
   readFileSync (filepath) {
     return fs.readFileSync(filepath, 'utf8')
   }
-  writeFileSync(filepath,data){
-    return fs.writeFileSync(filepath,data);
+  writeFileSync (filepath, data) {
+    return fs.writeFileSync(filepath, data)
   }
 
   // 通过appendChild script加载js
@@ -292,6 +300,98 @@ class Base {
   deg2rad (deg) {
     return (deg * Math.PI) / 180
   }
+
+  createQRCode (text = '') {
+    return new Promise((resolve, reject) => {
+      QRCode.toDataURL(text, function (err, base64) {
+        resolve(base64)
+      })
+    })
+  }
+
+  // 检测端口是否被占用
+  portIsOccupied (port) {
+    const net = require('net')
+    // 创建服务并监听该端口
+    let server = net.createServer().listen(port)
+
+    return new Promise((resolve, reject) => {
+      server.on('listening', function () {
+        // 执行这块代码说明端口未被占用
+        server.close() // 关闭服务
+        console.log('The port【' + port + '】 is available.') // 控制台输出信息
+        resolve(true)
+      })
+
+      server.on('error', function (err) {
+        if (err.code === 'EADDRINUSE') {
+          // 端口已经被使用
+          console.log(
+            'The port【' + port + '】 is occupied, please change other port.'
+          )
+          resolve(false)
+        }
+      })
+    })
+  }
+
+  createContentType (filepath) {
+    return { 'Content-type': mime.contentType(this.getExtName(filepath)) }
+  }
+
+  async startHttps (dirname) {
+    if (!(await this.portIsOccupied(443))) {
+      if (this.httpsServer) this.httpsServer.close()
+      // return console.log(`https server fail`)
+    }
+
+    const doReq = (req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.setHeader('Access-Control-Request-Method', '*')
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, POST, OPTIONS, PUT, DELETE'
+      )
+      res.setHeader('Access-Control-Allow-Headers', '*')
+      // let reqUrlBase = req.url.replace(/\?.*/gi, '')
+      console.log(req.url, this._filesUrl)
+
+      let file = this._filesUrl[this.getBaseName(req.url)]
+      if (file) {
+        const html = fs.readFileSync(file)
+        res.writeHead(200, this.createContentType(file))
+        // res.write(`<h1>~</h1>`);
+        res.end(html)
+      }
+
+      // if (reqUrlBase === '/') {
+      //   const html = fs.readFileSync(dirname, 'utf8')
+      //   res.writeHead(200, { 'Content-type': 'text/html' })
+      //   // res.write(`<h1>~</h1>`);
+      //   res.end(html)
+      // }
+    }
+    return new Promise((resolve, reject) => {
+      let files = this.readdirSync(dirname)
+      this._filesUrl = {
+        '/': 'index.html'
+      }
+      for (const file of files) {
+        let basename = this.getBaseName(file)
+        this._filesUrl[basename] = file
+      }
+
+      mkcert.create().then(opts => {
+        this.httpsServer = https.createServer(opts, doReq)
+        this.httpsServer.listen(443, async () => {
+          console.log(` 🎉 https server running at `, serverUrl.get())
+          let base64 = await this.createQRCode(serverUrl.get().url)
+          resolve(base64)
+        })
+      })
+    })
+  }
+
   // // 当前窗口
   // getCurrentWindow () {
   //   return remote.getCurrentWindow()

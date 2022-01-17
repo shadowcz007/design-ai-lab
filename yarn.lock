@@ -2160,19 +2160,19 @@ aws4@^1.8.0:
 
 babylonjs-gltf2interface@4.2.0:
   version "4.2.0"
-  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.2.0.tgz#b0ef1e11e3574cf2c6f573d0c5c34857a2a7b322"
+  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-4.2.0.tgz#b0ef1e11e3574cf2c6f573d0c5c34857a2a7b322"
   integrity sha512-Fn/ThxwZWP9kEAqk+9FX9CAeF4ah/I0/8wzAZR8MQuYqlYpEfM+E/IztJ+4LoOOxQYMWNs5lgj8OXSkX0tqc4g==
 
 babylonjs-gui@^4.2.0:
   version "4.2.0"
-  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-gui/-/babylonjs-gui-4.2.0.tgz#f9370e922d6de5f99ebbeddd4a15972621ee1941"
+  resolved "https://registry.yarnpkg.com/babylonjs-gui/-/babylonjs-gui-4.2.0.tgz#f9370e922d6de5f99ebbeddd4a15972621ee1941"
   integrity sha512-eCLlUiShKFN8QCv/Xg8OInWXon9KFfZPVHQtI5A5yUggaNgjZrq1Ul6oveIYbg9UH32oU/jUDb4iChHn5Bsgjw==
   dependencies:
     babylonjs "4.2.0"
 
 babylonjs-loaders@^4.2.0:
   version "4.2.0"
-  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs-loaders/-/babylonjs-loaders-4.2.0.tgz#3d536cb72bf8650fe7f1cee12380bea3227d79c0"
+  resolved "https://registry.yarnpkg.com/babylonjs-loaders/-/babylonjs-loaders-4.2.0.tgz#3d536cb72bf8650fe7f1cee12380bea3227d79c0"
   integrity sha512-GGLvo4ibbSHMY0Kj/DBu4827NBWeDT0NOBi/UuifXltzqPJtJRi3PCEcELj4Ga8cRxkfYi/7PMKcce2zVnpLZA==
   dependencies:
     babylonjs "4.2.0"
@@ -2180,7 +2180,7 @@ babylonjs-loaders@^4.2.0:
 
 babylonjs@4.2.0, babylonjs@^4.2.0:
   version "4.2.0"
-  resolved "http://mirrors.cloud.tencent.com/npm/babylonjs/-/babylonjs-4.2.0.tgz#8f0d957a726de4c065904b14c2f413f455145d38"
+  resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-4.2.0.tgz#8f0d957a726de4c065904b14c2f413f455145d38"
   integrity sha512-4hniJzWRkV0tDTTYGEHPk1lnfWn0HIw7HOvNWPK0rpUIbJooyeD9E5uVyHnslDedt0mtrA7QZu4i2Cz1DEmSsA==
 
 bach@^1.0.0:
@@ -3312,6 +3312,11 @@ diff@~1.0.8:
   resolved "http://mirrors.cloud.tencent.com/npm/diff/-/diff-1.0.8.tgz#343276308ec991b7bc82267ed55bc1411f971666"
   integrity sha1-NDJ2MI7Jkbe8giZ+1VvBQR+XFmY=
 
+dijkstrajs@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/dijkstrajs/-/dijkstrajs-1.0.2.tgz#2e48c0d3b825462afe75ab4ad5e829c8ece36257"
+  integrity sha512-QV6PMaHTCNmKSeP6QoXhVTw9snc9VD8MulTT0Bd99Pacp4SS1cjcrYPgBPmibqKVtMJJfqC6XvOXgPMEEPH/fg==
+
 dom-walk@^0.1.0:
   version "0.1.2"
   resolved "http://mirrors.cloud.tencent.com/npm/dom-walk/-/dom-walk-0.1.2.tgz#0c548bef048f4d1f2a97249002236060daa3fd84"
@@ -3548,6 +3553,11 @@ emoji-regex@^9.2.2:
   version "9.2.2"
   resolved "http://mirrors.cloud.tencent.com/npm/emoji-regex/-/emoji-regex-9.2.2.tgz#840c8803b0d8047f4ff0cf963176b32d4ef3ed72"
   integrity sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==
+
+encode-utf8@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/encode-utf8/-/encode-utf8-1.0.3.tgz#f30fdd31da07fb596f281beb2f6b027851994cda"
+  integrity sha512-ucAnuBEhUK4boH2HjVYG5Q2mQyPorvv0u/ocS+zhdw0S8AlHYY+GOFhP1Gio5z4icpP2ivFSvhtFjQi8+T9ppw==
 
 encodeurl@^1.0.2, encodeurl@~1.0.2:
   version "1.0.2"
@@ -6607,9 +6617,16 @@ mime-db@1.51.0, mime-db@1.x.x:
   resolved "http://mirrors.cloud.tencent.com/npm/mime-db/-/mime-db-1.51.0.tgz#d9ff62451859b18342d960850dc3cfb77e63fb0c"
   integrity sha512-5y8A56jg7XVQx2mbv1lu49NR4dokRnhZYTtL+KGfaa27uq4pSTXkwQkFJl4pkRMyNFz/EtYDSkiiEHx3F7UN6g==
 
-mime-types@^2.1.12, mime-types@^2.1.30, mime-types@~2.1.19, mime-types@~2.1.24:
+mime-types@^2.1.12, mime-types@~2.1.19, mime-types@~2.1.24:
   version "2.1.34"
   resolved "http://mirrors.cloud.tencent.com/npm/mime-types/-/mime-types-2.1.34.tgz#5a712f9ec1503511a945803640fafe09d3793c24"
+  integrity sha512-6cP692WwGIs9XXdOO4++N+7qjqv0rqxxVvJ3VHPh/Sc9mVZcQP+ZGhkKiTvWMQRr2tbHkJP/Yn7Y0npb3ZBs4A==
+  dependencies:
+    mime-db "1.51.0"
+
+mime-types@^2.1.34:
+  version "2.1.34"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.34.tgz#5a712f9ec1503511a945803640fafe09d3793c24"
   integrity sha512-6cP692WwGIs9XXdOO4++N+7qjqv0rqxxVvJ3VHPh/Sc9mVZcQP+ZGhkKiTvWMQRr2tbHkJP/Yn7Y0npb3ZBs4A==
   dependencies:
     mime-db "1.51.0"
@@ -7782,7 +7799,7 @@ onetime@^5.1.0, onetime@^5.1.2:
 
 open-simplex-noise@^2.5.0:
   version "2.5.0"
-  resolved "http://mirrors.cloud.tencent.com/npm/open-simplex-noise/-/open-simplex-noise-2.5.0.tgz#2f88539c2e3a70eb387a3609bdb2aede547bb0db"
+  resolved "https://registry.yarnpkg.com/open-simplex-noise/-/open-simplex-noise-2.5.0.tgz#2f88539c2e3a70eb387a3609bdb2aede547bb0db"
   integrity sha512-co7x8uWxGcgFtsJNBFqI9ylq+5Isotz2hZR7dsD5Sl+RDPGBeMEG41KAfF+5gF10ksi9Pg6DNpMHEoyTKLbejQ==
 
 open@^8.1.0:
@@ -8281,6 +8298,11 @@ pngjs@^3.0.0, pngjs@^3.3.3:
   resolved "http://mirrors.cloud.tencent.com/npm/pngjs/-/pngjs-3.4.0.tgz#99ca7d725965fb655814eaf65f38f12bbdbf555f"
   integrity sha512-NCrCHhWmnQklfH4MtJMRjZ2a8c80qXeMlQMv2uVp9ISJMTt562SbGd6n2oq0PaPgKm7Z6pL9E2UlLIhC+SHL3w==
 
+pngjs@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-5.0.0.tgz#e79dd2b215767fd9c04561c01236df960bce7fbb"
+  integrity sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==
+
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "http://mirrors.cloud.tencent.com/npm/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
@@ -8436,6 +8458,16 @@ punycode@^2.1.0, punycode@^2.1.1:
   version "2.1.1"
   resolved "http://mirrors.cloud.tencent.com/npm/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+
+qrcode@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.5.0.tgz#95abb8a91fdafd86f8190f2836abbfc500c72d1b"
+  integrity sha512-9MgRpgVc+/+47dFvQeD6U2s0Z92EsKzcHogtum4QB+UNd025WOJSHvn/hjk9xmzj7Stj95CyUAs31mrjxliEsQ==
+  dependencies:
+    dijkstrajs "^1.0.1"
+    encode-utf8 "^1.0.3"
+    pngjs "^5.0.0"
+    yargs "^15.3.1"
 
 qs@6.7.0:
   version "6.7.0"

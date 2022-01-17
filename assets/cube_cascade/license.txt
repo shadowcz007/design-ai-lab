@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cube Cascade
+* source:	https://sketchfab.com/3d-models/cube-cascade-11ba2667998d45f8b3ad178b27a34725
+* author:	Tycho Magnetic Anomaly (https://sketchfab.com/Tycho_Magnetic_Anomaly)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cube Cascade" (https://sketchfab.com/3d-models/cube-cascade-11ba2667998d45f8b3ad178b27a34725) by Tycho Magnetic Anomaly (https://sketchfab.com/Tycho_Magnetic_Anomaly) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

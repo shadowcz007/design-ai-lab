@@ -395,6 +395,7 @@ class GUI {
                 utils.loadDirFiles(dirname).then(files => {
                     files = files.filter(f => f.extname.match(_package.fileAssociations[0].ext));
                     Promise.all(Array.from(files, f => fs.readFileSync(f.filepath, 'utf-8'))).then((res) => {
+                        res=res.filter(f=>f);
                         res = Array.from(res, r => JSON.parse(r));
                         resolve(res);
                     });

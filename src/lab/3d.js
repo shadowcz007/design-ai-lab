@@ -113,6 +113,8 @@ class TD {
       TransformControls:'three/examples/js/controls/TransformControls.js',
       RoomEnvironment: 'three/examples/js/environments/RoomEnvironment.js',
       EffectComposer: 'three/examples/js/postprocessing/EffectComposer.js',
+      UnrealBloomPass:"three/examples/js/postprocessing/UnrealBloomPass.js",
+      RenderPass:"three/examples/js/postprocessing/RenderPass.js",
       stats: 'three/examples/js/libs/stats.min.js',
       TextGeometry: 'three/examples/js/geometries/TextGeometry.js',
       FontLoader: 'three/examples/js/loaders/FontLoader.js',
