@@ -61,19 +61,21 @@ class UI {
   closeDevTools () {
     if (remote.getCurrentWindow()) remote.getCurrentWindow().closeDevTools()
   }
-  toggleDevTools(){
+  toggleDevTools () {
     if (remote.getCurrentWindow()) {
-      remote.getCurrentWindow().isDevToolsOpened()?this.closeDevTools():this.openDevTools()
+      remote.getCurrentWindow().isDevToolsOpened()
+        ? this.closeDevTools()
+        : this.openDevTools()
     }
   }
-  createToggleDevToolsIcon(){
-    let btn=this.createIcon('dev',()=>this.toggleDevTools());
-    btn.style=`position: fixed;
+  createToggleDevToolsIcon () {
+    let btn = this.createIcon('dev', () => this.toggleDevTools())
+    btn.style = `position: fixed;
     top: 12px;
     right: 12px;
     z-index: 99;
     cursor: pointer;`
-    return btn;
+    return btn
   }
   //手动隐藏,显示p5.js
   // p5Show(isShow = true) {
@@ -554,8 +556,6 @@ class UI {
     btn.className = 'circular ui icon button'
     return btn
   }
-
- 
 
   createButton (text, eventListener, isAdd = true) {
     let btn = document.createElement('button')
@@ -1176,21 +1176,21 @@ class UI {
   createTextCanvas2 (txt, style, isAdd = false) {
     let canvas = document.createElement('canvas'),
       ctx = canvas.getContext('2d')
-    let { fontSize, color, fontFamily,fontWeight } = style || {
+    let { fontSize, color, fontFamily, fontWeight } = style || {
       fontSize: 12,
       color: 'black',
       fontFamily: 'monospace',
-      fontWeight:500
+      fontWeight: 500
     }
     fontSize = fontSize || 12
     color = color || 'black'
     fontFamily = fontFamily || 'monospace'
-    fontWeight=fontWeight||500;
+    fontWeight = fontWeight || 500
 
     // 更新文字
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     let x = 2
-    ctx.font =  `normal normal ${fontWeight} ${fontSize * x}px ${fontFamily}`
+    ctx.font = `normal normal ${fontWeight} ${fontSize * x}px ${fontFamily}`
     let font = ctx.measureText(txt)
     if (font.width > 0) {
       canvas.height =
@@ -1549,17 +1549,17 @@ class UI {
     // const fs = require('fs');
     let filepath = dialog.showSaveDialogSync({
       title: title,
-      filters: [{ name: 'Movies', extensions: ['mp4'] }]
+      defaultPath: '保存.mp4'
     })
     if (filepath) {
       fs.copyFile(file, filepath, e => (e ? console.log(e) : null))
     }
   }
   // save
-  saveJsonDialog (json, title = '保存') {
+  saveJsonDialog (json, title = '保存.json') {
     let filepath = dialog.showSaveDialogSync({
-      title: title,
-      filters: [{ name: 'json', extensions: ['json'] }]
+      title: '保存',
+      defaultPath: title
     })
     if (filepath) {
       base.saveJson(json, filepath)
