@@ -57,6 +57,16 @@ class Base {
   //
   sleep = m => new Promise(r => setTimeout(r, m))
 
+  makeNoise2D(){
+    return require('open-simplex-noise').makeNoise2D;
+  }
+  makeNoise3D(){
+    return require('open-simplex-noise').makeNoise3D;
+  }
+  makeNoise4D(){
+    return require('open-simplex-noise').makeNoise4D;
+  }
+
   // 打乱
   shuffle (arr) {
     let arrNew = [...arr]
