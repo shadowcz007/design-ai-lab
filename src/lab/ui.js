@@ -126,6 +126,7 @@ class UI {
     return div
   }
 
+  // 头像-名字-文本
   createFeed (items = []) {
     let div = document.createElement('div')
     div.className = 'ui feed'
@@ -159,7 +160,7 @@ class UI {
   createList (list = []) {
     let div = document.createElement('div')
     div.className = 'ui relaxed divided list'
-    div.innerHTML = Array.from(list, t => `<div class="item">${t}</div>`).join(
+    div.innerHTML = Array.from(list, t => `<div class="item" >${t}</div>`).join(
       ''
     )
     return div
@@ -1481,6 +1482,56 @@ class UI {
     }
     return res.length > 0 ? res : null
   }
+
+// 创建选取图片的model窗
+ createImageSelectModel(callback) {
+
+  const aImage = new (require('./image'));
+  let pannel = this.createModel('选择图片');
+  // console.log(type)
+  let imgBase64;
+  let pasteBtn = this.createButton('从剪切板复制图片', () => {
+      let im = clipboard.readImage()
+      if (im) {
+          imgBase64 = im.toDataURL();
+          pannel.hide();
+          if (callback) callback(imgBase64);
+      };
+
+  }, false);
+  pannel.add(pasteBtn);
+
+  let pasteURLBtn =this.createButton('从剪切板复制图片链接', async () => {
+      let url = clipboard.readText();
+      if (url) {
+          let im = await aImage.getNativeImageFromWebview2(url);
+          if (im) {
+              imgBase64 = im;
+              pannel.hide();
+              if (callback) callback(imgBase64);
+          }
+      };
+
+  }, false);
+  pannel.add(pasteURLBtn);
+
+  let readFileBtn = this.createButton('从本地', async () => {
+      let filePaths = this.getFilePath(1, '从本地');
+      if (filePaths && filePaths[0]) {
+          let im = await aImage.getNativeImageFromWebview2(filePaths[0]);
+          if (im) {
+              imgBase64 = im;
+              pannel.hide();
+              if (callback) callback(imgBase64);
+          }
+      };
+
+  }, false);
+  pannel.add(readFileBtn);
+  return pannel
+}
+
+
 
   // // 直接保存base64 为本地文件
   // saveBase64(base64, filepath = null) {
