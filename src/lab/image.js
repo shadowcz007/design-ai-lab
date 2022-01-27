@@ -2,6 +2,7 @@ const smartcrop = require('smartcrop')
 const base = require('./base')
 const { createApi } = require('unsplash-js')
 const Jimp=require('jimp');
+const QRCode = require('qrcode')
 
 class ImageTool {
   constructor () {
@@ -65,6 +66,14 @@ class ImageTool {
         resolve(base64)
       }
       img.src = url
+    })
+  }
+
+  createQRCode (text = '') {
+    return new Promise((resolve, reject) => {
+      QRCode.toDataURL(text, function (err, base64) {
+        resolve(base64)
+      })
     })
   }
 

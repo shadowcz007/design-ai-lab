@@ -16,7 +16,8 @@ const UI = require('./ui');
 const AI = require('./aimodel');
 const Anime=require('./anime');
 const Knn = require('./knn');
-const video = require('./video');
+// const video = ;
+// const audio=;
 const DataGenerator = require('./datagenerator');
 const FlexLayout = require('./flexlayout');
 const Canvas = require('./canvas');
@@ -44,7 +45,8 @@ module.exports = {
     ai: new AI(),
     Anime:Anime,
     knn: new Knn(),
-    video: video,
+    Audio:require('./audio'),
+    video: require('./video'),
     DataGenerator: DataGenerator,
     FlexLayout: FlexLayout,
     Canvas: Canvas,

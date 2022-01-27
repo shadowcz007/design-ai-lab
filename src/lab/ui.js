@@ -531,7 +531,8 @@ class UI {
     let icons = {
       refresh: `<i class="icon sync alternate"></i>`,
       download: `<i class="icon download"></i>`,
-      play: `<i class="icon caret right"></i>`,
+      play: `<i class="icon play"></i>`,
+      pause:`<i class="icon pause"></i>`,
       fan: '<i class="icon fan"></i>',
       clear: '<i class="icon trash alt"></i>',
       paste: '<i class="icon plus"></i>',

@@ -7,7 +7,7 @@ const fs = require('fs'),
   path = require('path')
 const debounce = require('debounce')
 const { nativeImage, remote } = require('electron')
-const QRCode = require('qrcode')
+
 const _DBPATH = remote.getGlobal('_DBPATH')
 
 let https = require('https')
@@ -57,14 +57,14 @@ class Base {
   //
   sleep = m => new Promise(r => setTimeout(r, m))
 
-  makeNoise2D(){
-    return require('open-simplex-noise').makeNoise2D;
+  makeNoise2D () {
+    return require('open-simplex-noise').makeNoise2D
   }
-  makeNoise3D(){
-    return require('open-simplex-noise').makeNoise3D;
+  makeNoise3D () {
+    return require('open-simplex-noise').makeNoise3D
   }
-  makeNoise4D(){
-    return require('open-simplex-noise').makeNoise4D;
+  makeNoise4D () {
+    return require('open-simplex-noise').makeNoise4D
   }
 
   // 打乱
@@ -101,6 +101,15 @@ class Base {
     return nums.reduce((a, b) => a + b)
   }
 
+  // Get the root mean squared of a set of signals
+  rootMeanSquaredArray (data = []) {
+    let rms = 0
+    for (let i = 0; i < data.length; i++) {
+      rms += data[i] * data[i]
+    }
+    return Math.sqrt(rms / data.length)
+  }
+
   // toast
 
   //笛卡尔积
@@ -132,6 +141,11 @@ class Base {
 
   debounce (fn, time) {
     return debounce(fn, time)
+  }
+
+  // The map() function is used to normalize a number having range from min1 to max1 in a range of min2 to max2.
+  map (n, start1, stop1, start2, stop2) {
+    return ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2
   }
 
   // arraybuffer转buffer
@@ -326,14 +340,6 @@ class Base {
 
   deg2rad (deg) {
     return (deg * Math.PI) / 180
-  }
-
-  createQRCode (text = '') {
-    return new Promise((resolve, reject) => {
-      QRCode.toDataURL(text, function (err, base64) {
-        resolve(base64)
-      })
-    })
   }
 
   // 检测端口是否被占用
