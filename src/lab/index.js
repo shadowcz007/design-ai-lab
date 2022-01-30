@@ -35,6 +35,7 @@ const nlp = require('./nlp');
 const cv = require('opencvjs-dist/build/opencv');
 const excel = require('./excel');
 const TD=require('./3d');
+// const Record=require('./record');
 
 // const aframe=require('aframe');
 // Lab.base.loadFromLocal('kalidokit/dist/kalidokit.umd.js')
@@ -47,6 +48,7 @@ module.exports = {
     knn: new Knn(),
     Audio:require('./audio'),
     video: require('./video'),
+    // record:new Record(),
     DataGenerator: DataGenerator,
     FlexLayout: FlexLayout,
     Canvas: Canvas,

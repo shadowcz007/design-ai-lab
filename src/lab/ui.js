@@ -1362,7 +1362,7 @@ class UI {
    * @param {*} url string
    * url instanceof MediaStream
    */
-  createVideo (url, isAdd = true, autoPlay = true) {
+  createVideo (url, isAdd = false, autoPlay = true) {
     let v = document.createElement('video')
     if (url instanceof MediaStream) {
       v.srcObject = url

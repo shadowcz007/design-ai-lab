@@ -24,7 +24,6 @@ class AudioLab {
     // Enable looping so the audio never stops
     this.audio.loop = true
 
-
     return new Promise((resolve, reject) => {
       // Upon loading the audio, let's play it
       this.audio.addEventListener(
@@ -33,8 +32,8 @@ class AudioLab {
           // First, ensure the context is in a resumed state
           this.audioContext.resume()
           // Now, play the audio
-          this.audio.play();
-          resolve(true);
+          this.audio.play()
+          resolve(true)
         },
         { once: true }
       )
@@ -67,7 +66,7 @@ class AudioLab {
       this.gainNode.connect(this.audioContext.destination)
 
       // window.requestAnimationFrame(draw)
-      analyserNode.getFloatTimeDomainData(this.analyserData);
+      analyserNode.getFloatTimeDomainData(this.analyserData)
       // Only update the data every N fps
       this.interval = setInterval(() => {
         analyserNode.getFloatTimeDomainData(this.analyserData)
@@ -83,7 +82,7 @@ class AudioLab {
     }
   }
 
-  // Get a new volume based on mouse position
+  // 调整音量 Get a new volume based on mouse position
   changeVolume () {
     // Schedule a gradual shift in value with a small time constant
     this.gainNode.gain.setTargetAtTime(
@@ -93,7 +92,20 @@ class AudioLab {
     )
   }
 
+  autoChangeVolume () {}
+
   output (minX, maxX, minY, maxY) {
+    if (!this.audioContext || !this.audio)
+      return {
+        points: [],
+        mean: 0,
+        currentTime: 0,
+        duration: 0
+      }
+
+    const currentTime = this.audio.currentTime,
+      duration = this.audio.duration
+
     let points = []
 
     // Loop through each 'bin' and figure out the signal
@@ -133,7 +145,9 @@ class AudioLab {
     mean = base.map(mean, 0, 1, Math.max(minX, minY), Math.min(maxX, maxY))
     return {
       points,
-      mean
+      mean,
+      currentTime,
+      duration
     }
   }
 }
