@@ -5,6 +5,7 @@ const hash = require('object-hash'),
   md5 = require('md5')
 const fs = require('fs'),
   path = require('path')
+  const copydir = require('copy-dir');
 const debounce = require('debounce')
 const { nativeImage, remote } = require('electron')
 
@@ -165,14 +166,6 @@ class Base {
     return URL.createObjectURL(blob)
   }
 
-  mkdir (filepath) {
-    fs.mkdirSync(filepath)
-  }
-
-  saveData (filepath, data) {
-    fs.writeFileSync(filepath, data)
-  }
-
   // 直接保存base64 为本地文件
   saveBase64 (base64, filepath = null) {
     if (filepath) {
@@ -199,6 +192,26 @@ class Base {
         console.log(error)
       }
     }
+  }
+
+  mkdir (filepath) {
+    try {
+      fs.mkdirSync(filepath)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  copyFileSync(oldPath, newPath){
+    fs.copyFileSync(oldPath, newPath)
+  }
+
+  copyDirSync(oldPath,newPath){
+    copydir.sync(oldPath,newPath)
+  }
+
+  saveData (filepath, data) {
+    fs.writeFileSync(filepath, data)
   }
 
   renameSync (oldPath, newPath) {
@@ -373,7 +386,8 @@ class Base {
   }
 
   async startHttps (dirname) {
-    if (!(await this.portIsOccupied(443))) {
+    let port=443
+    if (!(await this.portIsOccupied(port))) {
       if (this.httpsServer) this.httpsServer.close()
       // return console.log(`https server fail`)
     }
@@ -403,6 +417,7 @@ class Base {
       //   // res.write(`<h1>~</h1>`);
       //   res.end(html)
       // }
+
     }
     return new Promise((resolve, reject) => {
       let files = this.readdirSync(dirname)
@@ -416,10 +431,11 @@ class Base {
 
       mkcert.create().then(opts => {
         this.httpsServer = https.createServer(opts, doReq)
-        this.httpsServer.listen(443, async () => {
-          console.log(` 🎉 https server running at `, serverUrl.get())
-          let base64 = await this.createQRCode(serverUrl.get().url)
-          resolve(base64)
+        this.httpsServer.listen(port, async () => {
+          console.log(opts)
+          console.log(` 🎉 https server running at `, serverUrl.get(),port)
+          // let base64 = await this.createQRCode(serverUrl.get().url)
+          resolve(serverUrl.get().url+':'+port)
         })
       })
     })

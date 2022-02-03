@@ -111,6 +111,8 @@ websock在iphone上建立连接失败，在mac和pc和安卓都是好的
 
 - peerjs server部署到mixlab.top官网上
 
+- 局域网访问，防火墙记得关闭
+
 - 系统文件类型注册
 暂时没找到方案
 

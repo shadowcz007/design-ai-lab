@@ -3,17 +3,15 @@ const mkcert = require('mkcert');
 const serverUrl = require('../server/serverUrl');
 
 class Cert {
-   
     create() {
        return new Promise((resolve, reject) => {
             // create a certificate authority
-            
             mkcert.createCA(
                 {
-                    organization: 'MIXLAB',
+                    organization:'mixlab'+(new Date()).getTime(),
                     countryCode: 'CN',
-                    state: 'shanghai',
-                    locality: 'shanghai',
+                    state: 'shanghai'+(new Date()).getTime(),
+                    locality: 'shanghai'+(new Date()).getTime(),
                     validityDays: 365
                 }
             ).then(async ca => {
@@ -21,7 +19,7 @@ class Cert {
                 // then create a tls certificate
                 // '127.0.0.1', 'localhost', 
                 const cert = await mkcert.createCert({
-                    domains: [host],
+                    domains: [host,'127.0.0.1', 'localhost'],
                     validityDays: 365,
                     caKey: ca.key,
                     caCert: ca.cert
