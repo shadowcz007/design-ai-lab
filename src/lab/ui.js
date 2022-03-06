@@ -753,7 +753,7 @@ class UI {
   createTextInput (text, key, eventListener = null) {
     let setPlaceholder = function (value) {
       // console.log(isMultiple, value)
-      if (!value || !(value && value[0])) return
+      if (!value || !(value && (value[0]!=undefined||value[0]!=null))) return
       this.input.value = value[0]
     }
     let div = this.createBaseInput(

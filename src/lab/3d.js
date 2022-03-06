@@ -117,6 +117,8 @@ class TD {
       RenderPass:"three/examples/js/postprocessing/RenderPass.js",
       stats: 'three/examples/js/libs/stats.min.js',
       TextGeometry: 'three/examples/js/geometries/TextGeometry.js',
+      ConvexHull:'three/examples/js/math/ConvexHull.js',
+      ConvexGeometry:'three/examples/js/geometries/ConvexGeometry.js',
       FontLoader: 'three/examples/js/loaders/FontLoader.js',
       OBJLoader: 'three/examples/js/loaders/OBJLoader.js',
       GLTFLoader: 'three/examples/js/loaders/GLTFLoader.js'
