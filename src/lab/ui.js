@@ -112,6 +112,21 @@ class UI {
   //     }
   // }
 
+  initDragAndDrop (dom, callback) {
+    dom.addEventListener('dragover', function (event) {
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'copy'
+    })
+
+    dom.addEventListener('drop', function (event) {
+      event.preventDefault()
+
+      callback(event.dataTransfer.files[0])
+    })
+  }
+
+
+
   createDatGUI () {
     let d = new (require('dat.gui').GUI)()
     d.close()
@@ -532,7 +547,7 @@ class UI {
       refresh: `<i class="icon sync alternate"></i>`,
       download: `<i class="icon download"></i>`,
       play: `<i class="icon play"></i>`,
-      pause:`<i class="icon pause"></i>`,
+      pause: `<i class="icon pause"></i>`,
       fan: '<i class="icon fan"></i>',
       clear: '<i class="icon trash alt"></i>',
       paste: '<i class="icon plus"></i>',
@@ -753,7 +768,8 @@ class UI {
   createTextInput (text, key, eventListener = null) {
     let setPlaceholder = function (value) {
       // console.log(isMultiple, value)
-      if (!value || !(value && (value[0]!=undefined||value[0]!=null))) return
+      if (!value || !(value && (value[0] != undefined || value[0] != null)))
+        return
       this.input.value = value[0]
     }
     let div = this.createBaseInput(
@@ -1484,55 +1500,61 @@ class UI {
     return res.length > 0 ? res : null
   }
 
-// 创建选取图片的model窗
- createImageSelectModel(callback) {
+  // 创建选取图片的model窗
+  createImageSelectModel (callback) {
+    const aImage = new (require('./image'))()
+    let pannel = this.createModel('选择图片')
+    // console.log(type)
+    let imgBase64
+    let pasteBtn = this.createButton(
+      '从剪切板复制图片',
+      () => {
+        let im = clipboard.readImage()
+        if (im) {
+          imgBase64 = im.toDataURL()
+          pannel.hide()
+          if (callback) callback(imgBase64)
+        }
+      },
+      false
+    )
+    pannel.add(pasteBtn)
 
-  const aImage = new (require('./image'));
-  let pannel = this.createModel('选择图片');
-  // console.log(type)
-  let imgBase64;
-  let pasteBtn = this.createButton('从剪切板复制图片', () => {
-      let im = clipboard.readImage()
-      if (im) {
-          imgBase64 = im.toDataURL();
-          pannel.hide();
-          if (callback) callback(imgBase64);
-      };
-
-  }, false);
-  pannel.add(pasteBtn);
-
-  let pasteURLBtn =this.createButton('从剪切板复制图片链接', async () => {
-      let url = clipboard.readText();
-      if (url) {
-          let im = await aImage.getNativeImageFromWebview2(url);
+    let pasteURLBtn = this.createButton(
+      '从剪切板复制图片链接',
+      async () => {
+        let url = clipboard.readText()
+        if (url) {
+          let im = await aImage.getNativeImageFromWebview2(url)
           if (im) {
-              imgBase64 = im;
-              pannel.hide();
-              if (callback) callback(imgBase64);
+            imgBase64 = im
+            pannel.hide()
+            if (callback) callback(imgBase64)
           }
-      };
+        }
+      },
+      false
+    )
+    pannel.add(pasteURLBtn)
 
-  }, false);
-  pannel.add(pasteURLBtn);
-
-  let readFileBtn = this.createButton('从本地', async () => {
-      let filePaths = this.getFilePath(1, '从本地');
-      if (filePaths && filePaths[0]) {
-          let im = await aImage.getNativeImageFromWebview2(filePaths[0]);
+    let readFileBtn = this.createButton(
+      '从本地',
+      async () => {
+        let filePaths = this.getFilePath(1, '从本地')
+        if (filePaths && filePaths[0]) {
+          let im = await aImage.getNativeImageFromWebview2(filePaths[0])
           if (im) {
-              imgBase64 = im;
-              pannel.hide();
-              if (callback) callback(imgBase64);
+            imgBase64 = im
+            pannel.hide()
+            if (callback) callback(imgBase64)
           }
-      };
-
-  }, false);
-  pannel.add(readFileBtn);
-  return pannel
-}
-
-
+        }
+      },
+      false
+    )
+    pannel.add(readFileBtn)
+    return pannel
+  }
 
   // // 直接保存base64 为本地文件
   // saveBase64(base64, filepath = null) {

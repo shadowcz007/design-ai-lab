@@ -121,7 +121,9 @@ class TD {
       ConvexGeometry:'three/examples/js/geometries/ConvexGeometry.js',
       FontLoader: 'three/examples/js/loaders/FontLoader.js',
       OBJLoader: 'three/examples/js/loaders/OBJLoader.js',
-      GLTFLoader: 'three/examples/js/loaders/GLTFLoader.js'
+      GLTFLoader: 'three/examples/js/loaders/GLTFLoader.js',
+      EXRLoader:'three/examples/js/loaders/EXRLoader.js',
+      fflate:'three/examples/js/libs/fflate.min.js'
     }
     this.load = this.initTHREE(components)
   }
